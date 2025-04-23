@@ -1,0 +1,30 @@
+body {
+    font-family: 'Roboto', sans-serif;
+    font-optical-sizing: auto;
+    font-style: normal;
+    font-variation-settings:"wdth" 100;
+}
+
+
+#fr-logo {
+    color: white;
+    display: none !important;
+}
+
+/* HTML: <div class="loader"></div> */
+.loader {
+    width: 140px;
+    height: 140px;
+    --c: no-repeat linear-gradient(orange 0 0);
+    background: var(--c), var(--c), var(--c), var(--c);
+    background-size: 21px 21px;
+    animation: l5 1s infinite cubic-bezier(0.3, 1, 0, 1);
+  }
+  
+  @keyframes l5 {
+    0%   { background-position: 0 0, 100% 0, 100% 100%, 0 100% }
+    33%  { background-position: 0 0, 100% 0, 100% 100%, 0 100%; width: 60px; height: 60px }
+    66%  { background-position: 100% 0, 100% 100%, 0 100%, 0 0; width: 60px; height: 60px }
+    100% { background-position: 100% 0, 100% 100%, 0 100%, 0 0 }
+  }
+  

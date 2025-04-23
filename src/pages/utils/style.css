@@ -1,0 +1,39 @@
+.custom-grid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 1rem;
+}
+
+.custom-rounded {
+  border-top-right-radius: 0rem;
+  border-bottom-right-radius: 0.375rem;
+  border-bottom-left-radius: 0.375rem;
+  border-top-left-radius: 0rem;
+}
+
+@media (min-width: 768px) {
+  .custom-rounded {
+    border-bottom-right-radius: 0.375rem;
+    /* md:rounded-b-xl */
+    border-bottom-left-radius: 0rem;
+    /* md:rounded-br-none */
+    border-top-left-radius: 0rem;
+    /* md:rounded-tr-none */
+    border-top-right-radius: 0.375rem;
+
+  }
+}
+
+@media (max-width: 768px) {
+
+  /* Tailwind's lg breakpoint (1024px and up) */
+  .custom-grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
+@media (max-width: 425px) {
+  .custom-grid {
+    grid-template-columns: repeat(1, 1fr);
+  }
+}

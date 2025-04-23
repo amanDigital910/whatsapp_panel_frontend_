@@ -1,0 +1,46 @@
+/* Hides scrollbar, keeps scroll functionality */
+.hide-scrollbar {
+  overflow: auto;                     /* Ensure scrolling works */
+  -ms-overflow-style: none;           /* IE and Edge */
+  scrollbar-width: none;              /* Firefox */
+}
+
+.hide-scrollbar::-webkit-scrollbar {
+  display: none;                      /* Chrome, Safari, Opera */
+}
+
+/* Optional custom styles for additional effects */
+.button-menu-mobile {
+  background: transparent;
+  border: none;
+  color: #ffffff;
+  font-size: 21px;
+  line-height: 68px;
+  padding: 0px 15px;
+  padding-right: 0px;
+  margin-left: -10px;
+}
+
+/* Smooth hover/tap animation, ripple-like */
+.waves-effect {
+  position: relative;
+  cursor: pointer;
+  display: inline-block;
+  /* overflow: hidden; */
+  /* user-select: none; */
+  /* -webkit-user-select: none;
+  -moz-user-select: none; */
+  -webkit-tap-highlight-color: transparent;
+  vertical-align: middle;
+  z-index: 1;
+  will-change: opacity, transform;
+  transition: all 0.4s ease-out;
+}
+
+.waves-effect:hover {
+  opacity: 0.85;
+}
+
+.waves-effect:active {
+  transform: scale(0.90);
+}

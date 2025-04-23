@@ -1,0 +1,25 @@
+/* Remove autofill background and text color in input fields */
+input:-webkit-autofill {
+    background-color: transparent !important; /* Remove autofill background */
+    color: inherit !important; /* Ensure text color is inherited */
+    -webkit-box-shadow: 0 0 0px 1000px transparent inset !important; /* Remove autofill box shadow */
+  }
+  
+  /* Handle autofilled inputs when in focus */
+  input:-webkit-autofill:focus {
+    background-color: transparent !important; /* Transparent background on focus */
+    color: inherit !important; /* Inherit color on focus */
+    -webkit-box-shadow: 0 0 0px 1000px transparent inset !important; /* Remove box shadow */
+  }
+  
+  /* Firefox autofill styles */
+  input:-moz-autofill {
+    background-color: transparent !important;
+    color: inherit !important;
+  }
+  
+  /* Reset for Chrome/Edge autofill box-shadow */
+  input:-webkit-autofill, input:focus:-webkit-autofill {
+    -webkit-box-shadow: 0 0 0 30px white inset !important;
+  }
+  
