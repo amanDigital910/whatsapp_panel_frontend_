@@ -3,202 +3,156 @@ import React, { useState, useEffect } from "react";
 import CreditHeader from "../../components/CreditHeader";
 import 'react-toastify/dist/ReactToastify.css'; // Import Toastify CSS
 import { ToastContainer, toast } from 'react-toastify'; // Import Toastify
-import axios from 'axios';
 import { FaEye, FaEyeSlash } from "react-icons/fa";
+import { useDispatch } from "react-redux";
+import { createUser } from "../../redux/actions";
 
 function AddNewUser() {
-    const [user, setUser] = useState(null); // Current user data
+    const [user, setUser] = useState(null);
     const [showPassword, setShowPassword] = useState(false);
     const [showConfirmPassword, setShowConfirmPassword] = useState(false);
-
-
-    // Simulating user data fetching from localStorage
-    useEffect(() => {
-        const storedData = localStorage.getItem("userData");
-        if (storedData) {
-            const parsedData = JSON.parse(storedData);
-            setUser(parsedData.user);
-        }
-    }, []);
+    const dispatch = useDispatch();
+    // const { loading, error } = useSelector((state) => state.userCreate);
 
     const [formData, setFormData] = useState({
         userid: "",
         username: "",
         password: "",
         confirmPassword: "",
-        mobileNumber: "",
         userRole: "",
         selectedRoles: [],
-        isActive: true// Initialize as an empty array
+        isActive: true,
     });
-
-    // Simulating user data fetching from localStorage
-
-    // Handle form input change
-    const handleChange = (e) => {
-        const { name, value, checked } = e.target;
-
-        if (name === "selectedRoles") {
-            // Handle checkbox changes
-            let updatedRoles = [...formData.selectedRoles];
-            if (checked) {
-                updatedRoles.push(value);
-            } else {
-                updatedRoles = updatedRoles.filter(role => role !== value);
-            }
-            setFormData(prevData => ({
-                ...prevData,
-                selectedRoles: updatedRoles,
-            }));
-        } else if (name === "userRole") {
-            setFormData(prevData => ({
-                ...prevData,
-                [name]: value,
-            }));
-        } else {
-            setFormData(prevData => ({
-                ...prevData,
-                [name]: value,
-            }));
-        }
-    };
 
     const userRolesOptions = [
         "Virtual",
         "Personal",
         "International Personal",
-        "International Virtual"
+        "International Virtual",
     ];
 
-    const handleCheckboxChange = (role) => {
-        setFormData((prevData) => {
-            const selectedRoles = prevData.selectedRoles || [];
-            const isSelected = selectedRoles.includes(role);
+    // Get logged-in user data from localStorage
+    useEffect(() => {
+        const storedData = localStorage.getItem("userData");
+        if (storedData) {
+            const parsed = JSON.parse(storedData);
+            setUser(parsed?.user || parsed); // Fallback if `user` key isn't nested
+        }
+    }, []);
 
-            const updatedRoles = isSelected
-                ? selectedRoles.filter((r) => r !== role)
-                : [...selectedRoles, role];
+    const handleChange = (e) => {
+        const { name, value, checked } = e.target;
 
-            return { ...prevData, selectedRoles: updatedRoles };
-        });
+        if (name === "selectedRoles") {
+            const updatedRoles = checked
+                ? [...formData.selectedRoles, value]
+                : formData.selectedRoles.filter((role) => role !== value);
+            setFormData((prev) => ({ ...prev, selectedRoles: updatedRoles }));
+        } else {
+            setFormData((prev) => ({ ...prev, [name]: value }));
+        }
     };
 
-    // Submit form data   
+    const handleCheckboxChange = (role) => {
+        const updated = formData.selectedRoles.includes(role)
+            ? formData.selectedRoles.filter((r) => r !== role)
+            : [...formData.selectedRoles, role];
+        setFormData((prev) => ({ ...prev, selectedRoles: updated }));
+    };
+
     const handleSubmit = async (e) => {
         e.preventDefault();
 
-        // Check if passwords match
         if (formData.password !== formData.confirmPassword) {
-            toast.error("Passwords do not match!", {
-                position: "top-right",
-                autoClose: 3000,
-                hideProgressBar: false,
-                closeOnClick: true,
-                pauseOnHover: true,
-                draggable: true,
-                theme: "dark",
-            });
-            return; // Prevent form submission if passwords do not match
+            return toast.error("Passwords do not match!");
         }
 
-        // Check if password and role are present
-        if (!formData.password || !formData.selectedRoles || formData.selectedRoles.length === 0) {
-            toast.error("Password and Role are required!", {
-                position: "top-right",
-                autoClose: 3000,
-                hideProgressBar: false,
-                closeOnClick: true,
-                pauseOnHover: true,
-                draggable: true,
-                theme: "dark",
-            });
-            return; // Prevent form submission if password or role is missing
+        if (!formData.password.length || formData.password.length <= 6 || formData.selectedRoles.length === 0) {
+            return toast.error("Password and User Permissions are required!");
         }
 
-        // Prepare the data payload
         const payload = {
-            userName: formData.username,
-            password: formData.confirmPassword, // Use confirmPassword as the updated password
-            role: formData.userRole, // Use selected role, default to "3" (Reseller)
-            permission: formData.selectedRoles, // Use selected roles as permissions
-            parentuser_id: user.userid, // Assuming `user` contains the parent user ID
+            username: formData.username,
+            password: formData.password,
+            role: formData.userRole,
+            isActive: true,
+            permission: formData.selectedRoles,
+            // parentuser_id: user?.userid,
+            email: "example11@gmail.com",
+            firstName: "Amansingh",
+            lastName: "Chauhan",
+            mobileNumber: "9234234234",
         };
-
-        console.log("Payload being sent to API:", payload);
-
         try {
-            let response;
-            if (formData.userid) {
-                // If user ID exists, send a PUT request to update the user
-                response = await axios.put(`${process.env.REACT_APP_API_URL}/auth/updateUser/${formData.userid}`, payload);
-            } else {
-                // If no user ID, it's a new user creation, send a POST request
-                response = await axios.post(`${process.env.REACT_APP_API_URL}/auth/CreateUser`, payload);
-            }
+            // Dispatch Redux action to create the user
+            await dispatch(createUser(payload)); // Wait until it's done
 
-            if (response.status === 200 || response.status === 201) {
-                toast.success(formData.userid ? "User updated successfully!" : "User created successfully!", {
-                    position: "top-right",
-                    autoClose: 3000,
-                    hideProgressBar: false,
-                    closeOnClick: true,
-                    pauseOnHover: true,
-                    draggable: true,
-                    theme: "dark",
-                });
-
-                // Reset the form data
-                setFormData({
-                    userid: "",
-                    username: "",
-                    password: "",
-                    confirmPassword: "",
-                    userRole: "3",
-                    selectedRoles: [],
-                });
-            }
-        } catch (error) {
-            console.error("Error submitting user data:", error);
-            toast.error("Failed to process request. Please try again.", {
-                position: "top-right",
-                autoClose: 3000,
-                hideProgressBar: false,
-                closeOnClick: true,
-                pauseOnHover: true,
-                draggable: true,
-                theme: "dark",
+            setFormData({
+                userid: "",
+                username: "",
+                password: "",
+                confirmPassword: "",
+                userRole: "",
+                selectedRoles: [],
             });
+        } catch (error) {
+            // No need for toast here since it's handled in the action
+            console.error("Error dispatching createUser:", error);
         }
+
+        // try {
+        //     const headerConfig = {
+        //         headers: {
+        //             'Content-Type': 'application/json',
+        //             'Authorization': `Bearer ${localStorage.getItem("userToken")}`,
+        //         }
+        //     };
+
+        //     //   const response = formData.userid
+        //     // ? await axios.put(`${process.env.REACT_APP_API_URL}/auth/updateUser/${formData.userid}`, payload, config)
+        //     // : await axios.post(`http://147.93.106.185:3000/api/auth/CreateUser`, payload, config);
+        //     const response = await axios.post(`http://147.93.106.185:3000/api/auth/CreateUser`, payload, headerConfig);
+
+        //     if ([200, 201].includes(response.status)) {
+        //         // toast.success(formData.userid ? "User updated!" : "User created!");
+        //         toast.success("Successfully User Created")
+
+        //         setFormData({
+        //             userid: "",
+        //             username: "",
+        //             password: "",
+        //             confirmPassword: "",
+        //             userRole: "",
+        //             selectedRoles: [],
+        //         });
+        //     }
+        // } catch (err) {
+        //     console.error(err);
+        //     toast.error("Something went wrong. Try again.");
+        // }
     };
 
     const renderRoleOptions = () => {
-        if (!user) return null; // Wait until user data is available
+        if (!user) return null;
 
-        switch (user.role) {
-            case "super_admin":
-                return (
-                    <>
-                        <option value="admin">Admin</option>
-                        <option value="reseller">Reseller</option>
-                        <option value="user">User</option>
-                    </>
-                );
-            case "admin":
-                return (
-                    <>
-                        <option value="reseller">Reseller</option>
-                        <option value="user">User</option>
-                    </>
-                );
-            case "user":
-                return (
-                    <option value="user" selected>User</option>
-                );
-            default:
-                return <option value="user">User</option>;
-        }
+        const options = {
+            selectRole: "Select a Role",
+            super_admin: ["admin", "reseller", "user"],
+            admin: ["reseller", "user"],
+            user: ["user"],
+        };
+
+        const availableRoles = options[user.role || "user"] || [];
+
+        return [
+            <option key="default" value="" disabled>Select a Role</option>,
+            ...availableRoles.map((role) => (
+                <option key={role} value={role}>
+                    {role.charAt(0).toUpperCase() + role.slice(1)}
+                </option>
+            )),
+        ];
     };
-
 
     return (
         <>
@@ -301,21 +255,21 @@ function AddNewUser() {
                                 )}
                             </div>
                             <div className="mb-4">
-                                <label className="block text-lg font-medium text-black">User  Permissions</label>
+                                <label className="block text-lg font-medium text-black">User Permissions</label>
                                 <div className="border-2 border-gray-400 rounded-md p-2 overflow-auto max-h-40">
                                     {userRolesOptions.map((role, index) => (
                                         <div key={index} className="flex items-center mb-1">
                                             <input
                                                 type="checkbox"
                                                 className="form-check-input mr-2 mt-0 border-black border-2"
-                                                id={`permission`}
+                                                id={`permission-${index}`}
                                                 value={role}
                                                 checked={formData.selectedRoles.includes(role)}
                                                 onChange={() => handleCheckboxChange(role)}
                                             />
                                             <label
                                                 className="form-check-label pt-0.5"
-                                                htmlFor={`permission`}
+                                                htmlFor={`permission-${index}`}
                                             >
                                                 {role}
                                             </label>

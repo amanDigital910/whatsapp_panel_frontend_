@@ -15,9 +15,6 @@ const UserLogin = () => {
   const dispatch = useDispatch();
   const navigate = useNavigate();
 
-  const loginUrl = `http://147.93.106.185:3000/api/auth/login`
-  console.log("Login Url",loginUrl);  
-
   // Accessing state from Redux store
   const { loading, error, isAuthenticated, user } = useSelector((state) => state.user);
 

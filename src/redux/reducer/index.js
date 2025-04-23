@@ -1,14 +1,19 @@
 import { LOGOUT, LOGIN_REQUEST, LOGIN_SUCCESS, LOGIN_FAILURE } from '../actions';
-
-const initialState = {
+import { CREATE_USER_REQUEST, CREATE_USER_SUCCESS, CREATE_USER_FAILURE, } from "../actions";
+const loginInitialState = {
     user: null,
     isAuthenticated: false,
     loading: false,
     error: '',
     token: null, // You may want to store the token here
 };
+const createUserInitialState = {
+    loading: false,
+    user: null,
+    error: null,
+};
 
-const userReducer = (state = initialState, action) => {
+export const loginReducer = (state = loginInitialState, action) => {
     switch (action.type) {
         case LOGIN_REQUEST:
             return {
@@ -45,4 +50,15 @@ const userReducer = (state = initialState, action) => {
     }
 };
 
-export default userReducer;
+export const createUserReducer = (state = createUserInitialState, action) => {
+    switch (action.type) {
+        case CREATE_USER_REQUEST:
+            return { ...state, loading: true, error: null };
+        case CREATE_USER_SUCCESS:
+            return { ...state, loading: false, user: action.payload };
+        case CREATE_USER_FAILURE:
+            return { ...state, loading: false, error: action.payload };
+        default:
+            return state;
+    }
+};
