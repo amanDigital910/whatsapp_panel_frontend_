@@ -320,11 +320,13 @@ const VirtualButtonCampaign = () => {
 
             <div className="bg-white rounded p-4 border border-black flex flex-col ">
               {/* Button Details */}
-              <div className="flex justify-between">
-                <p className="m-0 pb-3 font-semibold uppercase text-lg">Call to Action Option</p>
-                <button className=" bg-green-600 text-white text-xl px-3 font-medium mb-2 rounded-xl" onClick={handleAddMore}>
-                  Add More
-                </button>
+              <div className="flex justify-between sm:flex-col mb-3 gap-3">
+                <p className="m-0 font-semibold uppercase text-lg whitespace-nowrap text-center flex items-center">Call to Action Option</p>
+                <div className="w-full flex justify-end">
+                  <button className=" bg-green-600 text-white text-xl px-3 py-1 mb-0 font-medium rounded-xl w-fit" onClick={handleAddMore}>
+                    Add More
+                  </button>
+                </div>
               </div>
               <div className="w-full flex flex-col gap-6">
                 {/* <DisplayButton

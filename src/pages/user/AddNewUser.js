@@ -4,7 +4,7 @@ import CreditHeader from "../../components/CreditHeader";
 import 'react-toastify/dist/ReactToastify.css'; // Import Toastify CSS
 import { ToastContainer, toast } from 'react-toastify'; // Import Toastify
 import { FaEye, FaEyeSlash } from "react-icons/fa";
-import { useDispatch } from "react-redux";
+import { useDispatch, } from "react-redux";
 import { createUser } from "../../redux/actions";
 
 function AddNewUser() {
@@ -12,7 +12,6 @@ function AddNewUser() {
     const [showPassword, setShowPassword] = useState(false);
     const [showConfirmPassword, setShowConfirmPassword] = useState(false);
     const dispatch = useDispatch();
-    // const { loading, error } = useSelector((state) => state.userCreate);
 
     const [formData, setFormData] = useState({
         userid: "",
@@ -236,7 +235,7 @@ function AddNewUser() {
                             <div className="mb-4">
                                 {user ? (
                                     <>
-                                        <label htmlFor="userRole" className="block text-sm font-medium text-black">
+                                        <label htmlFor="userRole" className="block text-lg font-medium text-black">
                                             User Role
                                         </label>
                                         <select

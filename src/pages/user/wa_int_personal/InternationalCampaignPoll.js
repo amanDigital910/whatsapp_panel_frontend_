@@ -2,8 +2,9 @@ import React, { useRef, useState, useEffect } from "react";
 import axios from "axios";
 import CreditHeader from "../../../components/CreditHeader";
 import "froala-editor/css/froala_editor.pkgd.min.css";
-import { CampaignHeading, CampaignStatus, CampaignTitle, CountryDropDown, CSVButton, DelayButtonDetails, GroupDropDown, PdfUploader, PollCampaign, RichTextEditor, SendNowButton, TemplateDropdown, VideoUploader, WhatsappTextNumber } from "../../utils/Index";
+import { CampaignHeading, CampaignStatus, CampaignTitle, CountryDropDown, CSVButton, DelayButtonDetails, GroupDropDown, PdfUploader, PollCampaign, SendNowButton, TemplateDropdown, VideoUploader, WhatsappTextNumber } from "../../utils/Index";
 import ImageUploaderGroup from "../../utils/ImageUploaderGroup";
+import CustomEditor from "../../../components/RichTextEditor";
 
 const PersonalCampaignPoll = () => {
   // Campaign and group details
@@ -266,7 +267,7 @@ const PersonalCampaignPoll = () => {
     <>
       <section className="w-[100%] bg-gray-200 flex justify-center flex-col">
         <CreditHeader />
-        <div className="w-full border-2 mt-8">
+        <div className="w-full mt-8">
           <CampaignHeading campaignHeading={"International Personal Poll Campaign"} />
 
           {/* <div className=""> */}
@@ -320,11 +321,12 @@ const PersonalCampaignPoll = () => {
                 setSelectedTemplate={setSelectedTemplate} />
 
               {/* Froala Editor for Custom Message */}
-              <div className="w-full border border-black rounded-b-none rounded-[11px] ">
-                <RichTextEditor
-                  editorData={editorData}
-                  setEditorData={setEditorData} />
+              <div className="w-full border border-black rounded-sm">
+                <CustomEditor />
               </div>
+              {/* <RichTextEditor
+                  editorData={editorData}
+                  setEditorData={setEditorData} /> */}
 
               {/* Upload Media Section */}
               <div className="bg-white rounded p-4 border border-black flex flex-col gap-6 ">

@@ -169,7 +169,7 @@ const GroupCampaign = () => {
               </div>
               {feedback && <p className="text-red-500 mt-2">{feedback}</p>}
             </div>
-            <div className="w-[60%] flex flex-col gap-4">
+            <div className="lg:w-full w-[60%] flex flex-col gap-4">
               <div className="w-full max-h-[400px] rounded text-white overflow-auto">
                 <table className="w-full text-center table-auto">
                   <thead className="bg-gray-800 border-b-2 border-gray-600">

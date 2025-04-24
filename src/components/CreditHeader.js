@@ -7,7 +7,7 @@ const CreditHeader = () => {
         {/* Title */}
 
         {/* Credit Items */}
-        <div className="flex flex-wrap md:flex-wrap items-center md:gap-x-4 gap-x-6 text-lg pl-6">
+        <div className="flex flex-wrap md:flex-wrap items-center md:gap-x-4 gap-x-6 text-lg pl-2">
           <p className="text-lg font-semibold whitespace-nowrap p-0 m-0">Balance :-</p>
           <p className="whitespace-nowrap p-0 m-0">WAV:&nbsp;<span>0</span></p>
           <p className="whitespace-nowrap p-0 m-0">WAVBT:&nbsp;<span>0</span></p>

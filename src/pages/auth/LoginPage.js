@@ -42,7 +42,7 @@ const LoginPage = () => {
                 // Navigate based on user role
                 const userRole = data?.data?.user?.role;
                 if (userRole === 'superAdmin' || userRole === 'admin') {
-                    navigate("/AdminDashboard");
+                    navigate("/admindashboard");
                 } else {
                     navigate("/dashboard");
                 }

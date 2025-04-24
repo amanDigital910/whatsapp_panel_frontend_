@@ -1,4 +1,4 @@
-import React, { lazy, Suspense, useEffect, useState } from 'react';
+import React, { lazy, Suspense, useState } from 'react';
 import { BrowserRouter as Router, Routes, Route, Navigate, useLocation } from 'react-router-dom';
 import 'bootstrap/dist/css/bootstrap.min.css';
 import 'bootstrap/dist/js/bootstrap.bundle.min.js';
@@ -8,6 +8,7 @@ import './App.css'
 import { Provider } from 'react-redux';
 import store from './redux/store';
 import { PrivateRoute, PublicRoute } from './components/ProtectedRoutes';
+import NotFoundPage from './components/NotFoundPage';
 // import SideBar from './components/SideBar';
 
 // Pages
@@ -58,13 +59,13 @@ const App = () => {
   const [activeDropdown, setActiveDropdown] = useState(null);
 
   // Loader effect
-  const [show, setShow] = useState(false);
+  // const [show, setShow] = useState(false);
 
-  useEffect(() => {
-    const timer = setTimeout(() => setShow(true), [30000]); // delay 1s
-    // return () => clearTimeout(timer);
-    return timer;
-  }, []);
+  // useEffect(() => {
+  //   const timer = setTimeout(() => setShow(true), [30000]); // delay 1s
+  //   // return () => clearTimeout(timer);
+  //   return timer;
+  // }, []);
 
   const toggleDropdown = (index) =>
     setActiveDropdown(activeDropdown === index ? null : index);
@@ -120,10 +121,11 @@ const App = () => {
           <div className={`flex-1 flex flex-col h-full  ${!isLoginPage ? ' mt-[70px]' : ''} `}>
             {/* Scrollable content area */}
             <div className="h-[100%] overflow-y-auto">
-              <Suspense fallback={show && (
-                <div className='w-full max-h-screen h-full flex justify-center items-center'>
-                  <div className='loader' />
-                </div>)}>
+              <Suspense  >
+              {/*  fallback={show && (
+                 <div className='w-full max-h-screen h-full flex justify-center items-center'>
+                   <div className='loader' />
+                 </div>)}> */}
                 <Routes>
                   {/* Default redirect to /login */}
                   <Route path="/" element={<Navigate to="/login" />} />
@@ -137,7 +139,7 @@ const App = () => {
                   <Route element={<PrivateRoute />}>
                     <Route path="/login" element={<LoginScreen />} />
                     {/* Dashboard admin and user */}
-                    <Route path="/AdminDashboard" element={<AdminDashboard />} />
+                    <Route path="/admindashboard" element={<AdminDashboard />} />
                     <Route path='/Transitiontable' element={<TransitionCReditUser />} />
                     <Route path="/dashboard" element={<Dashboard />} />
                     {/* Wa virtual campaige */}
@@ -176,6 +178,7 @@ const App = () => {
                     <Route path='/manageuser' element={<ManageUser />} />
                     <Route path='/managecredit' element={<ManageCredit />} />
                     <Route path='/add-new-user' element={<AddNewUser />} />
+                    <Route path='*' element={<NotFoundPage />} />
                   </Route>
                 </Routes>
               </Suspense>

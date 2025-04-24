@@ -13,8 +13,9 @@ export const CREATE_USER_REQUEST = "CREATE_USER_REQUEST";
 export const CREATE_USER_SUCCESS = "CREATE_USER_SUCCESS";
 export const CREATE_USER_FAILURE = "CREATE_USER_FAILURE";
 
-const REACT_APP_API_URL = "http://147.93.106.185:3000"
+const REACT_APP_API_URL = "http://147.93.106.185:3000";
 
+// Action Creators
 export const loginRequest = () => ({
   type: LOGIN_REQUEST,
 });
@@ -29,43 +30,82 @@ export const loginFailure = (error) => ({
   payload: error,
 });
 
-// Async login function
+// // Async login function
+// export const login = (username, password) => async (dispatch) => {
+//   dispatch(loginRequest());
+
+//   try {
+//     const response = await axios.post(`${REACT_APP_API_URL}/api/auth/login`, {
+//       username,
+//       password,
+//     }).catch(err => {
+//       toast.error('Login failed. Please try again.');
+//     });
+
+//     if (response.status === 200) {
+//       const data = response.data;
+//       localStorage.setItem('userData', JSON.stringify(data.data));
+//       localStorage.setItem('userToken', data.data.token);
+//       dispatch(loginSuccess(data.data?.user));
+//       toast.success("Successfully Login")
+//     } else if(response.status === 400 || response.status === 401) {
+//       dispatch(loginFailure('Login failed. Please try again.'));
+//       toast.error('Login failed. Please try again.');
+//     }
+//   } catch (error) {
+//     // dispatch(loginFailure(error.response?.data?.message || 'Server error. Please try again later.'));
+//     toast.error('Server error. Please try again later.');
+//   }
+// };
+
 export const login = (username, password) => async (dispatch) => {
   dispatch(loginRequest());
 
   try {
-    const response = await fetch(`${REACT_APP_API_URL}/api/auth/login`, {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify({ username, password }),
+    const response = await axios.post(`${REACT_APP_API_URL}/api/auth/login`, {
+      username,
+      password,
     });
 
-    const data = await response.json();
-    if (!response.ok) {
-      dispatch(loginFailure(data?.message || 'Failed to login.'));
-      return;
-    }
-
-    if (data?.message === 'Invalid credentials') {
-      dispatch(loginFailure('Invalid credentials'));
-    } else if (data?.message === 'Login successful') {
-      // Store token and user info
-      localStorage.setItem('userData', JSON.stringify(data?.data));
-      localStorage.setItem('userToken', data?.data?.token);
-
-      dispatch(loginSuccess(data?.data));
-    } else {
-      dispatch(loginFailure('Something went wrong, please try again.'));
+    if (response.status === 200) {
+      const data = response.data;
+      localStorage.setItem('userData', JSON.stringify(data.data));
+      localStorage.setItem('userToken', data.data.token);
+      dispatch(loginSuccess(data.data?.user));
+      toast.success("Successfully Logged In");
     }
   } catch (error) {
-    dispatch(loginFailure('Server error. Please try again later.'));
+    let errorMessage = 'An unknown error occurred. Please try again.';
+
+    // Axios returns response on error if it's a response issue (4xx, 5xx)
+    if (error.response) {
+      const { status, data } = error.response;
+
+      if (status === 400 || status === 401) {
+        errorMessage = data.message || 'Invalid Username or Password.';
+      } else if (status >= 500) {
+        errorMessage = 'Server error. Please try again later.';
+      } else {
+        errorMessage = data.message || 'Login failed. Please try again.';
+      }
+
+    } else if (error.request) {
+      // Request was made but no response received
+      errorMessage = 'No response from server. Check your internet connection or try again later.';
+    } else {
+      // Something happened in setting up the request
+      errorMessage = 'Failed to send request. Please try again.';
+    }
+
+    dispatch(loginFailure(errorMessage));
+    toast.error(errorMessage);
   }
 };
 
+
 // Logout action
-export const logout = (dispatch) => {
+export const logout = () => (dispatch) => {
+  toast.error('Logout Successfully.');
   localStorage.removeItem('userToken');
   localStorage.removeItem('userData');
 

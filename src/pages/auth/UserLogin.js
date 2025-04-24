@@ -6,20 +6,23 @@ import socialmedia from '../../assets/whatsApp_Panel_Login_Background_5.jpg';
 import { FaEye, FaEyeSlash } from 'react-icons/fa';
 import usernameSvgLogo from '../../assets/icons/username-svg-logo.svg';
 import passwordSvgLogo from '../../assets/icons/password-svg-logo.svg';
-import './style.css'; // Assuming you have imported your custom CSS
+import './style.css';
 
 const UserLogin = () => {
+  const { loading = false, error = null, isAuthenticated = false, user = null } = useSelector((state) => state.userLogin) || {};
+  const [localLoading, setLocalLoading] = useState(loading);
   const [username, setUsername] = useState('');
   const [password, setPassword] = useState('');
   const [showPassword, setShowPassword] = useState(false);
   const dispatch = useDispatch();
   const navigate = useNavigate();
 
-  // Accessing state from Redux store
-  const { loading, error, isAuthenticated, user } = useSelector((state) => state.user);
-
   const handleLogin = async (e) => {
     e.preventDefault();
+    if (!username || !password) {
+      alert("Please enter both username and password.");
+      return;
+    }
     dispatch(login(username, password)); // Dispatch login action
   };
 
@@ -27,13 +30,24 @@ const UserLogin = () => {
     if (isAuthenticated) {
       // Navigate based on user role
       const userRole = user?.role;
-      if (userRole === 'super_admin' || userRole === 'admin') {
-        navigate('/AdminDashboard');
-      } else {
+      if (userRole === "super_admin" || userRole === 'admin') {
+        navigate('/admindashboard');
+      } else if(userRole === "user" || userRole === "reseller") {
         navigate('/dashboard');
       }
     }
-  }, [isAuthenticated, user, navigate]);
+  }, [isAuthenticated, navigate, user]);  
+
+  useEffect(() => {
+    if (error) {
+      setLocalLoading(true); // Set local loading to true on error
+      const timer = setTimeout(() => {
+        setLocalLoading(false); // Stop loading after 3 seconds
+      }, 3000);
+
+      return () => clearTimeout(timer); // Cleanup timeout on unmount
+    }
+  }, [error]);
 
   return (
     <div className="relative flex items-center justify-center min-h-screen w-full bg-cover bg-center px-4">
@@ -45,10 +59,12 @@ const UserLogin = () => {
       />
 
       {/* Login Box */}
-      <div className="relative z-20 w-full max-w-lg bg-[#e0dada] bg-opacity-40 backdrop-blur-sm rounded-lg shadow-[10px_20px_60px_rgba(0,0,0,0.9)] m-4 p-8">
+      <div className="relative z-20 w-full max-w-lg bg-[#e0dada] bg-opacity-40 backdrop-blur-sm rounded-lg shadow-[10px_20px 60px_rgba(0,0,0,0.9)] m-4 p-8">
         <form onSubmit={handleLogin}>
           {error && (
-            <p className="text-[#ff2a2a] text-2xl mb-4 font-bold">{error}</p>
+            <p className="text-[#ff2a2a] text-2xl mb-4 font-bold" aria-live="assertive">
+              {error}
+            </p>
           )}
 
           {/* Username */}
@@ -64,6 +80,7 @@ const UserLogin = () => {
               <input
                 className="w-full pr-3 border-none bg-transparent focus:outline-none text-gray-700 md:text-xl text-2xl"
                 id="username"
+                autoComplete='username'
                 type="text"
                 placeholder="Enter your user name"
                 value={username}
@@ -72,7 +89,7 @@ const UserLogin = () => {
                   WebkitAppearance: 'none',
                   MozAppearance: 'none',
                   appearance: 'none',
-                  backgroundColor: 'transparent', // Prevent background change when autofilled
+                  backgroundColor: 'transparent',
                 }}
               />
             </div>
@@ -97,7 +114,7 @@ const UserLogin = () => {
                   WebkitAppearance: 'none',
                   MozAppearance: 'none',
                   appearance: 'none',
-                  backgroundColor: 'transparent', // Prevent background change when autofilled
+                  backgroundColor: 'transparent',
                 }}
               />
               <div
@@ -112,11 +129,11 @@ const UserLogin = () => {
           {/* Submit */}
           <div className="w-full">
             <button
-              className="bg-green-600 hover:bg-green-700 text-black font-bold py-3 px-4 rounded focus:outline-none focus:ring-2 focus:ring-[#120d50] w-full md:text-lg text-xl"
+              className={`bg-green-600 hover:bg-green-700 text-black font-bold py-3 px-4 rounded focus:outline-none focus:ring-2 focus:ring-[#120d50] w-full md:text-lg text-xl ${localLoading ? 'opacity-90 cursor-not-allowed' : ''}`}
               type="submit"
-              disabled={loading}
+              disabled={localLoading}
             >
-              {loading ? 'Logging in...' : 'Login'}
+              {localLoading ? 'Logging in...' : 'Login'}
             </button>
           </div>
         </form>

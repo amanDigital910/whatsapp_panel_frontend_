@@ -3,28 +3,33 @@ import { DisplayButton } from "../pages/utils/Index";
 
 const DisplayButtonComponent = () => {
   const [buttons, setButtons] = useState([
-    { id: 1, type: "phone", number: "", text: "" },
-    { id: 2, type: "url", number: "", text: "" },
+    { id: 1, type: "phone", number: "", text: "", phBtnDetails: "Max 10 digit number allowed" },
+    { id: 2, type: "url", number: "", text: "", phBtnDetails: "https://write-your-url.com" },
   ]);
 
+  // Adds a new button if under limit
   const handleAddButton = () => {
     if (buttons.length < 5) {
       setButtons([
         ...buttons,
         {
           id: Date.now(),
-          type: "custom", // could be phone or url depending on user choice
+          type: "text",
           number: "",
           text: "",
+          phBtnText: `Button ${buttons.length + 1} Display Text`,
+          phBtnDetails: "Enter your text here",
         },
       ]);
     }
   };
 
+  // Removes a button by ID
   const handleRemoveButton = (id) => {
     setButtons(buttons.filter((btn) => btn.id !== id));
   };
 
+  // Updates a field (text or number) for a specific button
   const updateButton = (id, key, value) => {
     setButtons(
       buttons.map((btn) =>
@@ -34,35 +39,35 @@ const DisplayButtonComponent = () => {
   };
 
   return (
-    <div className="flex flex-col gap-3 mt-4 items-start w-full">
+    <div className="flex flex-col gap-3 items-start w-full">
       {buttons.length < 5 && (
         <button onClick={handleAddButton}>+ Add Button</button>
       )}
       {buttons.map((btn) => (
-        <div key={btn.id} className="relative flex w-full" style={{ marginBottom: "10px" }}>
+        <div
+          key={btn.id}
+          className="relative flex w-full"
+          style={{ marginBottom: "10px" }}
+        >
           <DisplayButton
             buttonNumber={btn.number}
             buttonText={btn.text}
             setButtonNumber={(val) => updateButton(btn.id, "number", val)}
             setButtonText={(val) => updateButton(btn.id, "text", val)}
-            phBtnText={
-              btn.type === "url"
-                ? "Button Display Text (Web URL)"
-                : "Button Display Text (Call Now)"
-            }
-            phBtnDetails={
-              btn.type === "url"
-                ? "https://writeyoururl.com"
-                : "Max 10 digit number allowed"
-            }
+            phBtnText={btn.phBtnText}
+            phBtnDetails={btn.phBtnDetails}
           />
+          {/* Only show remove button for buttons other than the first two */}
           {btn.id !== 1 && btn.id !== 2 && (
-            <button className="absolute top-0 right-0 h-full justify-center mr-2" onClick={() => handleRemoveButton(btn.id)}>❌</button>
+            <button
+              className="absolute top-0 right-0 h-full justify-center mr-2 md:mt-5"
+              onClick={() => handleRemoveButton(btn.id)}
+            >
+              ❌
+            </button>
           )}
         </div>
       ))}
-
-
     </div>
   );
 };

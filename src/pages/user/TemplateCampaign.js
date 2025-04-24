@@ -226,7 +226,7 @@ const TemplateCampaign = () => {
     <>
       <section className="w-[100%] bg-gray-200   flex justify-center flex-col">
         <CreditHeader />
-        <div className="w-full border-2 mt-8">
+        <div className="w-full mt-8">
           <CampaignHeading campaignHeading={"All Templates"} />
 
           {/* <div className=""> */}
@@ -267,7 +267,7 @@ const TemplateCampaign = () => {
               {feedback && <p className="text-red-500 mt-2">{feedback}</p>}
             </div>
             {/* Table Section */}
-            <div className="w-[60%] flex flex-col gap-4">
+            <div className="lg:w-full w-[60%] flex flex-col gap-4">
               {/* Upload Media Section */}
               <div className="bg-white rounded p-4 border border-black flex flex-col gap-6 ">
                 <ImageUploaderGroup

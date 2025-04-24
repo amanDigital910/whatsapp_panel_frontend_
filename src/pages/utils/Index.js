@@ -29,7 +29,7 @@ export const CampaignTitle = ({ mainTitle, inputTitle, setCampaignTitle, placeho
             </p>
             <input
                 type="text"
-                className="w-full max-h-full custom-rounded form-control border-0 rounded-none py-2 px-4 text-[1rem] text-black placeholder-gray-500 focus:outline-none focus:ring-0 focus:border-0"
+                className="w-full max-h-full custom-rounded form-control border-0 rounded-none py-2 px-2 text-[1rem] text-black placeholder-gray-500 focus:outline-none focus:ring-0 focus:border-0"
                 placeholder={placeholder || "Enter Campaign Title"}
                 value={inputTitle}
                 onChange={(e) => setCampaignTitle(e.target.value)}
@@ -142,25 +142,31 @@ export const DragDropButton = ({ handleDrop, inputRef, selectedFile, fileType, r
     )
 }
 
-export const DisplayButton = ({ buttonText, setButtonText, buttonNumber, setButtonNumber,phBtnText, phBtnDetails }) => {
+export const DisplayButton = ({ buttonText, setButtonText, buttonNumber, setButtonNumber, phBtnText, phBtnDetails }) => {
     return (
         <div className="w-full flex md:flex-col !gap-0">
-            {/* <div> */}
-                <input
-                    placeholder={phBtnText}
-                    type="text"
+            <div className="w-[40%] md:w-full px-2 border-2 border-gray-700 placeholder:text-gray-600 md:rounded-t-md md:rounded-br-none md:rounded-bl-none rounded-l-md focus:outline-black focus:outline-2">
+                <select
                     value={buttonText}
                     onChange={(e) => setButtonText(e.target.value)}
-                    className="w-[40%] md:w-full p-2 bg-white text-black border-2 border-gray-700 placeholder:text-gray-600 md:rounded-t-md md:rounded-br-none md:rounded-bl-none rounded-l-md"
-                />
-                <input
-                    type="text"
-                    placeholder={phBtnDetails}
-                    value={buttonNumber}
-                    onChange={(e) => setButtonNumber(e.target.value)}
-                    className="w-[60%] md:w-full p-2 bg-white text-black border-2 border-gray-700 placeholder:text-gray-600  md:rounded-b-md md:rounded-tr-none md:rounded-tl-none rounded-r-md"
-                />
-            {/* </div> */}
+                    className="w-full h-full md:text-lg bg-white text-black rounded-md focus-within:outline-none focus:outline-none"
+                    required
+                >
+                    <option value="" disabled>Pick Display Button</option>
+                    <option value="Call Now">Call Now</option>
+                    <option value="Visit Website">Visit Website</option>
+                    <option value="Quick Reply">Quick Reply</option>
+                    <option value="Not Interested">Not Interested</option>
+                    <option value="Interested">Interested</option>
+                </select>
+            </div>
+            <input
+                type="text"
+                placeholder={phBtnDetails}
+                value={buttonNumber}
+                onChange={(e) => setButtonNumber(e.target.value)}
+                className="w-[60%] md:w-full p-2 bg-white text-black md:text-lg border-l-0 md:border-t-0 md:border-l-2 border-r-2 border-y-2 border-gray-700 placeholder:text-gray-600 md:rounded-b-md md:rounded-tr-none md:rounded-tl-none rounded-r-md focus:outline-black focus:outline-[0.5px]"
+            />
         </div>
     );
 };
@@ -343,7 +349,7 @@ export const TemplateDropdown = ({ selectedTemplate, setSelectedTemplate, msgTem
     );
 }
 
-// export const QuillRichTextEditor = ({ placeholder }) => {
+// export const QuillRichTextEditor = ({placeholder}) => {
 //     const [editorHtml, setEditorHtml] = useState('');
 //     const quillRef = useRef(null); // This will hold the Quill instance
 //     const reactQuillRef = useRef(null); // This will hold the ReactQuill reference
@@ -386,29 +392,8 @@ export const TemplateDropdown = ({ selectedTemplate, setSelectedTemplate, msgTem
 // };
 
 // Quill Editor Format
-const Formats = [
-    'header', 'font', 'background', 'color', 'code', 'size',
-    'bold', 'italic', 'underline', 'strike', 'blockquote',
-    'list', 'bullet', 'indent', 'script', 'align', 'direction',
-    'link', 'image', 'code-block', 'formula', 'video'
-];
 
 // Quill modules to attach to the editor
-const ToolbarData = [
-    ['bold', 'italic', 'underline', 'strike'], // toggled buttons
-    ['blockquote', 'code-block'], // blocks
-    [{ 'header': 1 }, { 'header': 2 }], // custom button values
-    [{ 'list': 'ordered' }, { 'list': 'bullet' }], // lists
-    [{ 'script': 'sub' }, { 'script': 'super' }], // superscript/subscript
-    [{ 'indent': '-1' }, { 'indent': '+1' }], // outdent/indent
-    [{ 'direction': 'rtl' }], // text direction
-    [{ 'size': ['small', false, 'large', 'huge'] }], // custom dropdown
-    [{ 'header': [1, 2, 3, 4, 5, 6, false] }], // header dropdown
-    [{ 'color': [] }, { 'background': [] }], // dropdown with defaults
-    [{ 'font': [] }], // font family
-    [{ 'align': [] }], // text align
-    ['clean'] // remove formatting
-];
 
 // write your message in this rich text editor
 export const RichTextEditor = ({ editorData, setEditorData }) => {

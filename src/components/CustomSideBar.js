@@ -28,7 +28,7 @@ const SideBar = ({ isOpen, toggleDropdown, activeDropdown }) => {
     const sidebarMenu = [
         {
             label: "Admin Dashboard",
-            to: "/AdminDashboard",
+            to: "/admindashboard",
             icon: dashboardIcon
         },
         {

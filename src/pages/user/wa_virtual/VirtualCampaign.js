@@ -255,7 +255,7 @@ const VirtualCampaign = () => {
 
           <div className="w-full px-3 md:px-6 py-6 flex lg:flex-col gap-6">
             {/* Left Column */}
-            <div className="w-2/5 flex flex-col gap-6">
+            <div className="lg:w-full w-2/5 flex flex-col gap-6">
               {/* Campaign Title */}
               <CampaignTitle
                 inputTitle={campaignTitle}
@@ -283,7 +283,7 @@ const VirtualCampaign = () => {
             </div>
 
             {/* Right Column */}
-            <div className="w-3/5 flex flex-col gap-6">
+            <div className="lg:w-full w-3/5 flex flex-col gap-6">
               {/* Status Section */}
               <CampaignStatus
                 duplicateStatus={0}

@@ -9,7 +9,7 @@ const loginInitialState = {
 };
 const createUserInitialState = {
     loading: false,
-    user: null,
+    addNewUser: null,
     error: null,
 };
 
@@ -24,10 +24,10 @@ export const loginReducer = (state = loginInitialState, action) => {
         case LOGIN_SUCCESS:
             return {
                 ...state,
-                user: action.payload.user,   // Assuming payload contains user data
+                user: action.payload,
                 isAuthenticated: true,
                 loading: false,
-                token: action.payload.token, // Store token if returned
+                token: action.payload.token,
                 error: '',
             };
         case LOGIN_FAILURE:
@@ -55,7 +55,7 @@ export const createUserReducer = (state = createUserInitialState, action) => {
         case CREATE_USER_REQUEST:
             return { ...state, loading: true, error: null };
         case CREATE_USER_SUCCESS:
-            return { ...state, loading: false, user: action.payload };
+            return { ...state, loading: false, addNewUser: action.payload };
         case CREATE_USER_FAILURE:
             return { ...state, loading: false, error: action.payload };
         default:

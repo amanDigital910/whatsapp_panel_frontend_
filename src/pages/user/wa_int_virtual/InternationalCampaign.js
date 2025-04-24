@@ -250,7 +250,7 @@ const InternationalQuickCampaign = () => {
     <>
       <section className="w-full h-full bg-gray-200 overflow-hidden flex justify-center flex-col">
         <CreditHeader />
-        <div className="w-full border-2 mt-8">
+        <div className="w-full mt-8">
           <CampaignHeading campaignHeading={"International Virtual Quick Campaign"} />
 
           {/* <div className=""> */}

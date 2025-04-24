@@ -274,7 +274,7 @@ const PersonalCampaignPoll = () => {
     <>
       <section className="w-[100%] bg-gray-200 flex justify-center flex-col">
         <CreditHeader />
-        <div className="w-full border-2 mt-8">
+        <div className="w-full mt-8">
           <CampaignHeading campaignHeading={"Personal Poll Campaign"} />
 
           {/* <div className=""> */}

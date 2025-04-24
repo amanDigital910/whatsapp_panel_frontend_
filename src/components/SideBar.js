@@ -42,7 +42,7 @@ const SideBar = () => {
   const sidebarMenu = [
     {
       label: "Admin Dashboard",
-      to: "/AdminDashboard",
+      to: "/admindashboard",
       icon: dashboardIcon
     },
     {
@@ -140,7 +140,7 @@ const SideBar = () => {
           <div className="offcanvas-body text-white">
             <ul className="navbar-nav justify-content-end flex-grow-1 pe-3" >
               <li className="nav-item">
-                <Link className="nav-link text-white d-flex" aria-current="page" to="/AdminDashboard">
+                <Link className="nav-link text-white d-flex" aria-current="page" to="/admindashboard">
                   <img src={dashboardIcon} width={20} height={20} />
                   <span className="ms-2">Admin Dashboard</span>
                 </Link>
