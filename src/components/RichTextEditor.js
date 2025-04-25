@@ -1,5 +1,6 @@
 import { useEffect, useRef, useState } from 'react';
 import Editor, { BtnBold, BtnItalic, BtnUnderline, BtnBulletList, BtnNumberedList, BtnStrikeThrough, BtnUndo, BtnRedo, BtnClearFormatting, Toolbar } from 'react-simple-wysiwyg';
+import './style.css'
 
 export default function CustomEditor() {
     const [value, setValue] = useState('');
@@ -26,13 +27,9 @@ export default function CustomEditor() {
     }, [value]);
 
     return (
-        <div ref={editorRef}>
-            <div
-                className="prose"
-                dangerouslySetInnerHTML={{ __html: value }}
-            />
-            <Editor value={value} onChange={onChange} className='min-h-40 w-full overflow-auto max-h-96 h-full'>
-                <Toolbar className="w-full flex justify-end rounded-xl text-black">
+        <div ref={editorRef} className='bg-white h-full rounded-md'>
+            <Editor value={value} placeholder='Enter your Message' onChange={onChange} className='h-[368px] w-full pl-3 overflow-auto border rounded-b-md border-black'>
+                <Toolbar className="w-full flex justify-end rounded-t-md border-b-0 border-t-[1px] border-x-[1px] pl-3 text-black border-black">
                     <BtnRedo />
                     <BtnUndo />
                     <BtnClearFormatting />

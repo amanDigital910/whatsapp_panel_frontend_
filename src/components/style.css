@@ -44,3 +44,14 @@
 .waves-effect:active {
   transform: scale(0.90);
 }
+
+/* For Rich Text Editor react-simple-wysiwyg */
+.rsw-ce ul {
+  list-style: disc;
+  padding-left: 2em;
+}
+
+.rsw-ce ol {
+  list-style: decimal;
+  padding-left: 2em;
+}

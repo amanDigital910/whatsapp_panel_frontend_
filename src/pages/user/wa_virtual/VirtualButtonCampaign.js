@@ -8,6 +8,7 @@ import { MdDelete } from "react-icons/md";
 import FroalaEditor from "react-froala-wysiwyg";
 import "froala-editor/css/froala_editor.pkgd.min.css";
 import { CampaignHeading, CampaignStatus, CampaignTitle, CountryDropDown, CSVButton, DisplayButton, DragDropButton, GroupDropDown, RichTextEditor, SendNowButton, TemplateDropdown, WhatsappTextNumber } from "../../utils/Index";
+import CustomEditor from "../../../components/RichTextEditor";
 
 const VirtualButtonCampaign = () => {
   // File and editor states
@@ -33,22 +34,7 @@ const VirtualButtonCampaign = () => {
   const [whatsAppNumbers, setWhatsAppNumbers] = useState("");
 
   // Display Button Numbers 
-  const [button1Number, setButton1Number] = useState("");
-  const [button1Text, setButton1Text] = useState("");
-  const [button2Url, setButton2Url] = useState("");
-  const [button2Text, setButton2Text] = useState("");
-  const [button3QReplyNum, setButton3QReplyNum] = useState("");
-  const [button3QReplyText, setButton3QReplyText] = useState("");
-  const [button4NotIntNum, setButton4NotIntNum] = useState("");
-  const [button4NotIntText, setButton4NotIntText] = useState("");
-  const [button4IntNum, setButton4IntNum] = useState("");
-  const [button4IntText, setButton4IntText] = useState("");
-  const [buttonCount, setButtonCount] = useState(0);
-
-  const handleAddMore = () => {
-    setButtonCount(buttonCount + 1); // Increase the button count each time "Add More" is clicked
-  };
-
+  const [buttons, setButtons] = useState("");
 
   // Fetch message groups using axios
   useEffect(() => {
@@ -190,13 +176,13 @@ const VirtualButtonCampaign = () => {
     formData.append("selectedGroup", selectedGroup);
     formData.append("countryCode", selectedCountry);
     formData.append("whatsAppNumbers", whatsAppNumbers);
-    // formData.append("displayButtonDetail", setButtonsDetails);
+    formData.append("displayButtonDetails", buttons);
     formData.append("userMessage", editorData);
     formData.append("selectedTemplate", selectedTemplate);
-    formData.append("button1Text", button1Text);
-    formData.append("button1Number", button1Number);
-    formData.append("button2Text", button2Text);
-    formData.append("button2Url", button2Url);
+    // formData.append("button1Text", button1Text);
+    // formData.append("button1Number", button1Number);
+    // formData.append("button2Text", button2Text);
+    // formData.append("button2Url", button2Url);
 
     // Append the file and caption based on fileType
     if (selectedFileObj) {
@@ -252,6 +238,9 @@ const VirtualButtonCampaign = () => {
           {/* Left Column */}
           <div className="lg:w-full w-2/5 flex flex-col gap-6">
 
+            {/* CSV Button Dropdown */}
+            <CSVButton />
+
             {/* Campaign Title */}
             <CampaignTitle
               inputTitle={campaignTitle}
@@ -265,8 +254,6 @@ const VirtualButtonCampaign = () => {
               setSelectedGroup={setSelectedGroup}
               groups={groups} />
 
-            {/* CSV Button Dropdown */}
-            <CSVButton />
 
             {/* Country Dropdown */}
             <CountryDropDown
@@ -298,10 +285,8 @@ const VirtualButtonCampaign = () => {
               setSelectedTemplate={setSelectedTemplate} />
 
             {/* Froala Editor for Custom Message */}
-            <div className="w-full border border-black rounded-b-none rounded-[11px] ">
-              <RichTextEditor
-                editorData={editorData}
-                setEditorData={setEditorData} />
+            <div className="w-full rounded-md h-[400px] ">
+              <CustomEditor />
             </div>
 
             {/* File Upload and Button Settings */}
@@ -320,68 +305,8 @@ const VirtualButtonCampaign = () => {
 
             <div className="bg-white rounded p-4 border border-black flex flex-col ">
               {/* Button Details */}
-              <div className="flex justify-between sm:flex-col mb-3 gap-3">
-                <p className="m-0 font-semibold uppercase text-lg whitespace-nowrap text-center flex items-center">Call to Action Option</p>
-                <div className="w-full flex justify-end">
-                  <button className=" bg-green-600 text-white text-xl px-3 py-1 mb-0 font-medium rounded-xl w-fit" onClick={handleAddMore}>
-                    Add More
-                  </button>
-                </div>
-              </div>
-              <div className="w-full flex flex-col gap-6">
-                {/* <DisplayButton
-                  buttonNumber={button1Number}
-                  buttonText={button1Text}
-                  setButtonNumber={setButton1Number}
-                  setButtonText={setButton1Text}
-                  phBtnText="Button 1 Display Text (Call Now)"
-                  phBtnDetails="Max 10 digit number allowed"
-                />
-                <DisplayButton
-                  buttonNumber={button2Url}
-                  buttonText={button2Text}
-                  phBtnText="Button 2 Display Text (Web URL)"
-                  phBtnDetails="https://writeyoururl.com"
-                  setButtonText={setButton2Text}
-                  setButtonNumber={setButton2Url}
-                /> */}
-                <DisplayButtonComponent />
-              </div>
-              {/*
-                // Conditional rendering of the 3 buttons 
-                <div className="w-full flex flex-col gap-6">
-                  {buttonCount >= 2 && (
-                    <DisplayButton
-                      buttonNumber={button3QReplyNum}
-                      buttonText={button3QReplyText}
-                      setButtonNumber={setButton3QReplyNum}
-                      setButtonText={setButton3QReplyText}
-                      phBtnText="Button 3 Display Quick Reply"
-                      phBtnDetails="Write your Message"
-                    />
-                  )}
-                  {buttonCount >= 3 && (
-                    <DisplayButton
-                      buttonNumber={button4NotIntNum}
-                      buttonText={button4NotIntText}
-                      setButtonText={setButton4NotIntText}
-                      setButtonNumber={setButton4NotIntNum}
-                      phBtnText="Button 4 Display Not Interested Button"
-                      phBtnDetails="Write your Text for Not Interested"
-                    />
-                  )}
-                  {buttonCount >= 5 && (
-                    <DisplayButton
-                      buttonNumber={button4IntNum}
-                      buttonText={button4IntText}
-                      setButtonText={setButton4IntText}
-                      setButtonNumber={setButton4IntNum}
-                      phBtnText="Button 5 Display Interested Button"
-                      phBtnDetails="Write your Text for Interested"
-                    />
-                  )}
-                </div>
-              </div> */}
+              <DisplayButtonComponent buttons={buttons} setButtons={setButtons} />
+              {/* </div> */}
             </div>
           </div>
         </div>

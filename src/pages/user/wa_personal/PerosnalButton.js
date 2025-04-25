@@ -233,6 +233,9 @@ const PerosnalButtonCampaign = () => {
           {/* Left Column */}
           <div className="lg:w-full w-2/5 flex flex-col gap-6">
 
+            {/* CSV Button Dropdown */}
+            <CSVButton />
+            
             {/* Campaign Title */}
             <CampaignTitle
               inputTitle={campaignTitle}
@@ -246,8 +249,6 @@ const PerosnalButtonCampaign = () => {
               setSelectedGroup={setSelectedGroup}
               groups={groups} />
 
-            {/* CSV Button Dropdown */}
-            <CSVButton />
 
             {/* Country Dropdown */}
             <CountryDropDown

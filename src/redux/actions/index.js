@@ -72,7 +72,7 @@ export const login = (username, password) => async (dispatch) => {
       localStorage.setItem('userData', JSON.stringify(data.data));
       localStorage.setItem('userToken', data.data.token);
       dispatch(loginSuccess(data.data?.user));
-      toast.success("Successfully Logged In");
+      // toast.success("Successfully Logged In");
     }
   } catch (error) {
     let errorMessage = 'An unknown error occurred. Please try again.';
@@ -105,9 +105,9 @@ export const login = (username, password) => async (dispatch) => {
 
 // Logout action
 export const logout = () => (dispatch) => {
-  toast.error('Logout Successfully.');
   localStorage.removeItem('userToken');
   localStorage.removeItem('userData');
+  toast.error('Logout Successfully.');
 
   dispatch({ type: LOGOUT });
 };

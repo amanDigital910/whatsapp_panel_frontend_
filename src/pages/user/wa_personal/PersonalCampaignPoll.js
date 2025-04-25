@@ -76,46 +76,46 @@ const PersonalCampaignPoll = () => {
   }, []);
 
   // Fetch countries from REST Countries API.
- // Fetch countries from REST Countries API.
- useEffect(() => {
-  axios
-    .get("https://restcountries.com/v3.1/all")
-    .then((response) => {
-      const countryData = response.data.map((country) => {
-        let dialCode = "";
-        if (
-          country.idd &&
-          country.idd.root &&
-          country.idd.suffixes &&
-          country.idd.suffixes.length > 0
-        ) {
-          // Combine root and suffix
-          dialCode = country.idd.root + country.idd.suffixes[0];
+  // Fetch countries from REST Countries API.
+  useEffect(() => {
+    axios
+      .get("https://restcountries.com/v3.1/all")
+      .then((response) => {
+        const countryData = response.data.map((country) => {
+          let dialCode = "";
+          if (
+            country.idd &&
+            country.idd.root &&
+            country.idd.suffixes &&
+            country.idd.suffixes.length > 0
+          ) {
+            // Combine root and suffix
+            dialCode = country.idd.root + country.idd.suffixes[0];
+          }
+
+          // Remove '+' for consistency
+          dialCode = dialCode.replace("+", "");
+
+          return {
+            name: country.name.common,
+            dialCode,
+          };
+        });
+
+        // Sort alphabetically
+        countryData.sort((a, b) => a.name.localeCompare(b.name));
+
+        // Set countries
+        setCountries(countryData);
+
+        // Set default country to India if found
+        const india = countryData.find((c) => c.name === "India");
+        if (india) {
+          setSelectedCountry(india.dialCode);
         }
-
-        // Remove '+' for consistency
-        dialCode = dialCode.replace("+", "");
-
-        return {
-          name: country.name.common,
-          dialCode,
-        };
-      });
-
-      // Sort alphabetically
-      countryData.sort((a, b) => a.name.localeCompare(b.name));
-
-      // Set countries
-      setCountries(countryData);
-
-      // Set default country to India if found
-      const india = countryData.find((c) => c.name === "India");
-      if (india) {
-        setSelectedCountry(india.dialCode);
-      }
-    })
-    .catch((error) => console.error("Error fetching countries:", error));
-}, []);
+      })
+      .catch((error) => console.error("Error fetching countries:", error));
+  }, []);
 
   // Fetch message templates from your API
   useEffect(() => {
@@ -283,6 +283,9 @@ const PersonalCampaignPoll = () => {
             {/* Left Column */}
             <div className="lg:w-full w-2/5 flex flex-col gap-6">
 
+              {/* CSV Button Dropdown */}
+              <CSVButton />
+
               {/* Campaign Title */}
               <CampaignTitle
                 inputTitle={campaignTitle}
@@ -297,8 +300,6 @@ const PersonalCampaignPoll = () => {
                 setSelectedGroup={setSelectedGroup}
                 groups={groups} />
 
-              {/* CSV Button Dropdown */}
-              <CSVButton />
 
               {/* Country Dropdown */}
               <CountryDropDown

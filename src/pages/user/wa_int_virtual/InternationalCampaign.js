@@ -259,6 +259,9 @@ const InternationalQuickCampaign = () => {
             {/* Left Column */}
             <div className="lg:w-full w-2/5 flex flex-col gap-6">
 
+              {/* CSV Button Dropdown */}
+              <CSVButton />
+
               {/* Campaign Title */}
               <CampaignTitle
                 inputTitle={campaignTitle}
@@ -271,8 +274,6 @@ const InternationalQuickCampaign = () => {
                 selectedGroup={selectedGroup}
                 setSelectedGroup={setSelectedGroup}
                 groups={groups} />
-
-              <CSVButton />
 
               {/* Country Dropdown */}
               <CountryDropDown
@@ -347,7 +348,7 @@ const InternationalQuickCampaign = () => {
         </div>
 
         {/* Send Now Button */}
-          <SendNowButton handleSendCampaign={handleSendCampaign} />
+        <SendNowButton handleSendCampaign={handleSendCampaign} />
       </section>
     </>
   );

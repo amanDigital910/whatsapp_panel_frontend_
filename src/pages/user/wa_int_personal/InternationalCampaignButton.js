@@ -230,6 +230,9 @@ const PerosnalButtonCampaign = () => {
           {/* Left Column */}
           <div className="lg:w-full w-2/5 flex flex-col gap-6">
 
+            {/* CSV Button Dropdown */}
+            <CSVButton />
+
             {/* Campaign Title */}
             <CampaignTitle
               inputTitle={campaignTitle}
@@ -242,9 +245,6 @@ const PerosnalButtonCampaign = () => {
               selectedGroup={selectedGroup}
               setSelectedGroup={setSelectedGroup}
               groups={groups} />
-
-            {/* CSV Button Dropdown */}
-            <CSVButton />
 
             {/* Country Dropdown */}
             <CountryDropDown
@@ -276,7 +276,7 @@ const PerosnalButtonCampaign = () => {
               setSelectedTemplate={setSelectedTemplate} />
 
             {/* Froala Editor for Custom Message */}
-            <div className="w-full border border-black relative rounded-[11px] h-[400px] ">
+            <div className="w-full rounded-md h-[400px] ">
               <CustomEditor />
               {/* <RichTextEditor
                 editorData={editorData}

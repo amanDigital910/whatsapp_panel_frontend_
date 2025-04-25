@@ -7,6 +7,11 @@ import { MdDelete } from "react-icons/md"
 import { FaFileCsv } from "react-icons/fa6"
 import { useEffect, useRef, useState } from "react"
 
+const RequireMark = () => {
+    return (
+        <span className="text-red-500">*</span>
+    )
+}
 // Main Heading
 export const CampaignHeading = ({ campaignHeading }) => {
     return (
@@ -24,7 +29,8 @@ export const CampaignHeading = ({ campaignHeading }) => {
 export const CampaignTitle = ({ mainTitle, inputTitle, setCampaignTitle, placeholder }) => {
     return (
         <div className="flex md:flex-col items-start h-fit border-black border rounded-[0.42rem]">
-            <p className="md:w-full w-[40%] py-2 md:px-4 px-3 bg-brand_colors whitespace-nowrap text-white text-start font-semibold text-[1rem] m-0 md:rounded-t-md md:rounded-br-none md:rounded-bl-none rounded-l-md ">
+            <p className="md:w-full w-[40%] py-2 md:px-4 px-3 bg-brand_colors whitespace-nowrap text-white text-start font-semibold 
+            text-[1rem] m-0 md:rounded-t-md md:rounded-br-none md:rounded-bl-none rounded-l-md ">
                 {mainTitle}
             </p>
             <input
@@ -63,10 +69,11 @@ export const CampaignStatus = ({ totalStatus, validStatus, invalidStatus, duplic
 // Drag and Drop Feature
 export const DragDropButton = ({ handleDrop, inputRef, selectedFile, fileType, removeFile, handleFileInputChange, caption, setCaption }) => {
     return (
-        <div>
+        <div className="flex p-4 bg-white h-fit border-black border rounded-[0.42rem]">
             {/* Drag & Drop Upload Box */}
             <div
-                className="w-full h-[200px] border-2 border-dashed border-gray-400 rounded flex justify-center items-center text-gray-500 hover:border-blue-400 hover:text-blue-400 cursor-pointer transition-colors duration-200"
+                className="w-full h-[200px] border-2 border-dashed border-gray-400 rounded flex justify-center items-center
+                 text-gray-500 hover:border-[#383387] hover:text-[#383387] cursor-pointer transition-colors duration-200"
                 onDragOver={(e) => e.preventDefault()}
                 onDrop={handleDrop}
                 onClick={() => inputRef.current.click()}
@@ -111,7 +118,7 @@ export const DragDropButton = ({ handleDrop, inputRef, selectedFile, fileType, r
                         />
                     </div>
                 ) : (
-                    <p className="text-center text-lg px-4">
+                    <p className="text-center text-2xl md:text-lg px-4">
                         Drag and drop your file here or click to upload <br />
                         <span className="font-medium">Image / PDF / Video</span>
                     </p>
@@ -134,7 +141,7 @@ export const DragDropButton = ({ handleDrop, inputRef, selectedFile, fileType, r
                         value={caption}
                         onChange={(e) => setCaption(e.target.value)}
                         placeholder="Enter file caption"
-                        className="w-full p-2 border border-gray-400 rounded"
+                        className="w-full p-2 border border-gray-400 placeholder-gray-500 rounded"
                     />
                 </div>
             )}
@@ -142,31 +149,70 @@ export const DragDropButton = ({ handleDrop, inputRef, selectedFile, fileType, r
     )
 }
 
-export const DisplayButton = ({ buttonText, setButtonText, buttonNumber, setButtonNumber, phBtnText, phBtnDetails }) => {
+export const DisplayButton = ({
+    btnType,
+    buttonText,
+    setButtonText,
+    setValueButtonNumber,
+    valueButtonNumber,
+    phBtnDetails,
+    valueTextNumber,
+    setValueTextNumber,
+    phBtnShowText
+}) => {
+    const isFixedButton = buttonText === "Call Now" || buttonText === "URL Button";
+    const isRequired = isFixedButton;
+
     return (
-        <div className="w-full flex md:flex-col !gap-0">
-            <div className="w-[40%] md:w-full px-2 border-2 border-gray-700 placeholder:text-gray-600 md:rounded-t-md md:rounded-br-none md:rounded-bl-none rounded-l-md focus:outline-black focus:outline-2">
-                <select
-                    value={buttonText}
-                    onChange={(e) => setButtonText(e.target.value)}
-                    className="w-full h-full md:text-lg bg-white text-black rounded-md focus-within:outline-none focus:outline-none"
-                    required
+        <div className="w-full flex">
+            <div className="w-full h-full flex md:flex-col !gap-0">
+                {/* Left side: Select or Static Label */}
+                <div
+                    className={`w-[40%] md:w-full ${isFixedButton ? "h-fit py-2 " : "h-full"} flex flex-row px-2 bg-white border-r-0 md:border-r-2 border-l-2 border-y-2 border-b-2 md:border-b-0 border-gray-700 placeholder:text-gray-600 md:rounded-t-md md:rounded-br-none md:rounded-bl-none rounded-l-md focus:outline-black focus:outline-2`}
                 >
-                    <option value="" disabled>Pick Display Button</option>
-                    <option value="Call Now">Call Now</option>
-                    <option value="Visit Website">Visit Website</option>
-                    <option value="Quick Reply">Quick Reply</option>
-                    <option value="Not Interested">Not Interested</option>
-                    <option value="Interested">Interested</option>
-                </select>
+                    {isFixedButton ? (
+                        <div className="w-full h-full md:text-lg text-black flex items-center px-1">
+                            {buttonText}
+                            {isRequired && <RequireMark />}
+                        </div>
+                    ) : (
+                        <select
+                            value={buttonText}
+                            onChange={(e) => setButtonText(e.target.value)}
+                            className="w-full h-full md:text-lg text-black rounded-md focus-within:outline-none focus:outline-none py-[9.5px]"
+                            required
+                        >
+                            <option value="" disabled>Pick Display Button</option>
+                            <option value="Quick Reply">Quick Reply</option>
+                            {/* <option value="Not Interested">Not Interested</option>
+                            <option value="Interested">Interested</option> */}
+                        </select>
+                    )}
+                </div>
+
+                {/* Right side: Text Input Fields */}
+                <div className="w-full">
+                    {isFixedButton && (
+                        <input
+                            type="text"
+                            placeholder={phBtnShowText}
+                            value={valueTextNumber}
+                            onChange={(e) => setValueTextNumber(e.target.value)}
+                            className="w-full p-2 placeholder-gray-500 bg-white text-black md:text-lg border-b-0 border-t-2 border-x-2 border-gray-700 placeholder:text-gray-600 md:rounded-tr-none rounded-br-none md:rounded-tl-none rounded-r-md md:rounded-b-none focus:outline-black focus:outline-[0.5px]"
+                        />
+                    )}
+                    {/* {isFixedButton && ( */}
+                    <input
+                        type="text"
+                        placeholder={phBtnDetails}
+                        value={valueButtonNumber}
+                        onChange={(e) => setValueButtonNumber(e.target.value)}
+                        className={`w-full p-2 placeholder-gray-500 bg-white text-black md:text-lg border-y-2 border-x-2 border-gray-700 placeholder:text-gray-600
+                             md:rounded-b-md rounded-tr-none md:rounded-tr-none md:rounded-tl-none rounded-r-md focus:outline-black focus:outline-[0.5px] ${isFixedButton ? "rounded-tr-none" : 'rounded-tr-md'} `}
+                    />
+                    {/* )} */}
+                </div>
             </div>
-            <input
-                type="text"
-                placeholder={phBtnDetails}
-                value={buttonNumber}
-                onChange={(e) => setButtonNumber(e.target.value)}
-                className="w-[60%] md:w-full p-2 bg-white text-black md:text-lg border-l-0 md:border-t-0 md:border-l-2 border-r-2 border-y-2 border-gray-700 placeholder:text-gray-600 md:rounded-b-md md:rounded-tr-none md:rounded-tl-none rounded-r-md focus:outline-black focus:outline-[0.5px]"
-            />
         </div>
     );
 };
@@ -215,13 +261,13 @@ export const CSVButton = () => {
                 onChange={(e) => onFileUpload(e, "csv")}
             />
 
-            <button className="flex items-center md:flex-col" onClick={() => csvInputRef.current.click()}>
-                <button className="bg-brand_colors font-medium text-white text-base py-2 px-3 w-fit md:w-full whitespace-nowrap md:rounded-t-md md:rounded-br-none md:rounded-bl-none rounded-l-md">
+            <button className="flex items-center md:flex-col border border-black rounded-[7px]" onClick={() => csvInputRef.current.click()}>
+                <button className="bg-brand_colors font-medium text-[1rem] text-white text-base  py-2 px-3 w-fit md:w-full  whitespace-nowrap md:rounded-t-md md:rounded-br-none md:rounded-bl-none rounded-l-md">
                     Upload CSV
                 </button>
-                <span className="w-full relative flex flex-row justify-center py-2 px-2 bg-gray-300 text-gray-700 font-medium text-base overflow-hidden custom-rounded whitespace-nowrap">
-                    <p className="px-2 flex m-0 p-0">Ex: Name, Number (Vikram, 91xxxxxx57)</p>
-                    <p className="py-0 m-0 pr-2 absolute top-0 right-0 h-full bg-gray-300">&nbsp;</p>
+                <span className="w-full relative flex flex-row justify-start md:justify-center text-[1rem] py-2 bg-gray-400 text-gray-700 font-medium text-base overflow-hidden custom-rounded whitespace-nowrap md:rounded-r-md md:rounded-br-none md:rounded-bl-none rounded-tl-none rounded-tr-none">
+                    <p className=" pl-3  flex m-0 py-0">Ex: Name, Number (Vikram, 91xxxxxx57)</p>
+                    {/* <p className="py-0 m-0 absolute top-0 right-0 h-full bg-gray-400">&nbsp;</p> */}
                 </span>
             </button>
 
@@ -309,18 +355,56 @@ export const CountryDropDown = ({ selectedCountry, setSelectedCountry, countries
 }
 
 // Write all whatsapp Text Numbers
-export const WhatsappTextNumber = ({ whatsAppNumbers, setWhatsAppNumbers }) => {
+export const WhatsappTextNumber = ({ setWhatsAppNumbers, whatsAppNumbers }) => {
+    const [errorMessages, setErrorMessages] = useState([]);
+
+    const handleInputChange = (event) => {
+        const value = event.target.value;
+        setWhatsAppNumbers(value);
+
+        // Split the input into an array of numbers
+        const numberArray = value.split('\n');
+        const newErrorMessages = [];
+
+        // Validation logic for each number
+        numberArray.forEach((number, index) => {
+            const cleanedNumber = number.trim();
+            if (cleanedNumber === '') {
+                newErrorMessages[1] = ''; // Valid number
+            } else if (/\s/.test(cleanedNumber)) {
+                newErrorMessages[2] = 'Spaces are not allowed.';
+            } else if (!/^\d{10}$/.test(cleanedNumber)) {
+                newErrorMessages[3] = 'Mobile number must be exactly 10 digits.';
+            }
+        });
+        setErrorMessages(newErrorMessages);
+    };
+
     return (
-        // <div>
-        <textarea
-            className="w-full px-3 py-2 rounded-md bg-white text-black border-black form-control placeholder-gray-500"
-            placeholder="Enter WhatsApp Number"
-            rows={10}
-            style={{ height: "100%", minHeight: "400px" }}
-            value={whatsAppNumbers}
-            onChange={(e) => setWhatsAppNumbers(e.target.value)} />
-    )
-}
+        <div className="h-full relative ">
+            {errorMessages.length > 0 &&
+                <div className="pb-1">
+                    {errorMessages.map((error, index) => (
+                        // error && <p key={index} className="m-0 pb-[5px] text-red-500">{error}</p>
+                        error && <p key={index} className="m-0 pb-[1px] text-red-500">{error}</p>
+                    ))}
+                </div>}
+            <textarea
+                className="w-full px-3 py-2 rounded-md bg-white text-black border-black form-control placeholder-gray-500"
+                placeholder="Enter WhatsApp Numbers (one per line)"
+                required
+                rows={10}
+                style={{
+                    minHeight: '400px',
+                    height: errorMessages.some(msg => msg) ? '94%' : '100%',
+                    overflowY: 'auto',
+                }}
+                value={whatsAppNumbers}
+                onChange={handleInputChange}
+            />
+        </div>
+    );
+};
 
 // Templates Dropdowns 
 export const TemplateDropdown = ({ selectedTemplate, setSelectedTemplate, msgTemplates, setEditorData, }) => {
@@ -429,7 +513,7 @@ export const PollCampaign = ({ question, setQuestion, inputs, handleInputChange,
                 value={question}
                 onChange={(e) => setQuestion(e.target.value)}
                 placeholder="Ask Your Question"
-                className="py-2 px-3 rounded bg-white text-black border border-black"
+                className="py-2 px-3 rounded bg-white text-black border border-black placeholder-gray-500"
             />
             <div className="flex mt-3">
                 <div className="w-[70%] flex flex-col gap-2">
@@ -440,7 +524,7 @@ export const PollCampaign = ({ question, setQuestion, inputs, handleInputChange,
                             onChange={(e) =>
                                 handleInputChange(e.target.value, index)
                             }
-                            className="py-2 px-3 rounded bg-white text-black border border-black"
+                            className="py-2 px-3 rounded bg-white text-black border border-black placeholder-gray-500"
                             placeholder={`Option ${index + 1}`}
                         />
                     ))}
@@ -482,7 +566,7 @@ export const ImagesUploader = ({ type, index, inputRef, uploadedFile, onFileUplo
                 />
                 <div className="flex md:flex-col w-full">
                     <button
-                        className="bg-[#23a31af5] text-white py-2 px-4 md:rounded-t-md md:rounded-br-none md:rounded-bl-none rounded-l-md "
+                        className="bg-[#23a31af5] text-white py-2 px-4 md:rounded-t-md md:rounded-br-none md:rounded-bl-none rounded-l-md flex  "
                         onClick={() => inputRef.current.click()}
                     >
                         Image {index + 1}
@@ -490,7 +574,7 @@ export const ImagesUploader = ({ type, index, inputRef, uploadedFile, onFileUplo
                     <input
                         type="text"
                         maxLength={1500}
-                        className="flex-1 border border-gray-300 py-2 px-3 custom-rounded"
+                        className="flex-1 border border-gray-300 py-2 px-3 custom-rounded placeholder-gray-500"
                         placeholder={`Enter caption for Image ${index + 1}`}
                         value={caption}
                         onChange={(e) => onCaptionChange(e.target.value)}
@@ -541,7 +625,7 @@ export const PdfUploader = ({ inputRef, uploadedFile, onFileUpload, onRemove, ca
                 </button>
                 <input
                     type="text"
-                    className="w-full border border-gray-300 py-2 px-3 custom-rounded"
+                    className="w-full border border-gray-300 py-2 px-3 custom-rounded placeholder-gray-500"
                     placeholder="Enter caption for PDF"
                     value={caption}
                     onChange={(e) => onCaptionChange(e.target.value)}
@@ -666,7 +750,7 @@ export const VideoUploader = ({ inputRef, uploadedFile, onFileUpload, onRemove, 
                 ref={inputRef} className="hidden" onChange={(e) => onFileUpload(e, "video")} />
             <input
                 type="text"
-                className="w-full border border-gray-300 py-2 px-3 rounded-lg custom-rounded"
+                className="w-full border border-gray-300 py-2 px-3 rounded-lg custom-rounded placeholder-gray-500"
                 placeholder="Enter caption for Video"
                 value={caption}
                 onChange={(e) => onCaptionChange(e.target.value)}

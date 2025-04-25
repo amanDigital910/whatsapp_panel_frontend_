@@ -3,6 +3,7 @@ import axios from "axios";
 import CreditHeader from "../../../components/CreditHeader";
 import "froala-editor/css/froala_editor.pkgd.min.css";
 import { CampaignHeading, CampaignStatus, CampaignTitle, CountryDropDown, CSVButton, DisplayButton, DragDropButton, GroupDropDown, RichTextEditor, SendNowButton, TemplateDropdown, WhatsappTextNumber } from "../../utils/Index";
+import CustomEditor from "../../../components/RichTextEditor";
 
 const InternaitionaButtonCampaign = () => {
   // File and editor states
@@ -234,6 +235,9 @@ const InternaitionaButtonCampaign = () => {
           {/* Left Column */}
           <div className="lg:w-full w-2/5 flex flex-col gap-6">
 
+            {/* CSV Button Dropdown */}
+            <CSVButton />
+            
             {/* Campaign Title */}
             <CampaignTitle
               inputTitle={campaignTitle}
@@ -246,9 +250,6 @@ const InternaitionaButtonCampaign = () => {
               selectedGroup={selectedGroup}
               setSelectedGroup={setSelectedGroup}
               groups={groups} />
-
-            {/* CSV Button Dropdown */}
-            <CSVButton />
 
             {/* Country Dropdown */}
             <CountryDropDown
@@ -281,10 +282,8 @@ const InternaitionaButtonCampaign = () => {
               setSelectedTemplate={setSelectedTemplate} />
 
             {/* Rich Text Editor */}
-            <div className="w-full border border-black rounded-b-none rounded-[11px] ">
-              <RichTextEditor
-                editorData={editorData}
-                setEditorData={setEditorData} />
+            <div className="w-full rounded-md h-[400px] ">
+              <CustomEditor />
             </div>
 
             {/* File Upload and Button Settings */}

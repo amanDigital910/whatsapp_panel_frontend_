@@ -256,6 +256,10 @@ const VirtualCampaign = () => {
           <div className="w-full px-3 md:px-6 py-6 flex lg:flex-col gap-6">
             {/* Left Column */}
             <div className="lg:w-full w-2/5 flex flex-col gap-6">
+
+              {/* CSV Button Dropdown */}
+              <CSVButton />
+
               {/* Campaign Title */}
               <CampaignTitle
                 inputTitle={campaignTitle}
@@ -267,8 +271,6 @@ const VirtualCampaign = () => {
                 selectedGroup={selectedGroup}
                 setSelectedGroup={setSelectedGroup}
                 groups={groups} />
-
-              <CSVButton />
 
               {/* Country Dropdown */}
               <CountryDropDown
