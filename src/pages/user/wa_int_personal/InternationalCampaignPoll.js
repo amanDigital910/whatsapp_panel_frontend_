@@ -1,7 +1,6 @@
 import React, { useRef, useState, useEffect } from "react";
 import axios from "axios";
 import CreditHeader from "../../../components/CreditHeader";
-import "froala-editor/css/froala_editor.pkgd.min.css";
 import { CampaignHeading, CampaignStatus, CampaignTitle, CountryDropDown, CSVButton, DelayButtonDetails, GroupDropDown, PdfUploader, PollCampaign, SendNowButton, TemplateDropdown, VideoUploader, WhatsappTextNumber } from "../../utils/Index";
 import ImageUploaderGroup from "../../utils/ImageUploaderGroup";
 import CustomEditor from "../../../components/RichTextEditor";
@@ -78,9 +77,9 @@ const PersonalCampaignPoll = () => {
         console.error("Error fetching message templates:", error)
       );
   }, []);
- 
-   // Fetch countries from REST Countries API.
-   useEffect(() => {
+
+  // Fetch countries from REST Countries API.
+  useEffect(() => {
     axios
       .get("https://restcountries.com/v3.1/all")
       .then((response) => {
@@ -275,7 +274,7 @@ const PersonalCampaignPoll = () => {
 
             {/* Left Column */}
             <div className="lg:w-full w-2/5 flex flex-col gap-6">
-            
+
               {/* CSV Button Dropdown */}
               <CSVButton />
 
@@ -321,8 +320,8 @@ const PersonalCampaignPoll = () => {
                 setEditorData={setEditorData}
                 setSelectedTemplate={setSelectedTemplate} />
 
-              {/* Froala Editor for Custom Message */}
-              <div className="w-full border border-black rounded-sm">
+              {/* RichTextEditor Editor for Custom Message */}
+              <div className="w-full rounded-md h-[400px] ">
                 <CustomEditor />
               </div>
               {/* <RichTextEditor

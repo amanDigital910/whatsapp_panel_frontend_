@@ -2,9 +2,9 @@ import React, { useEffect, useRef, useState } from "react";
 import axios from "axios";
 import CreditHeader from "../../../components/CreditHeader";
 import userImage from "../../../assets/profile.png";
-import "froala-editor/css/froala_editor.pkgd.min.css";
-import { CampaignHeading, CampaignStatus, CampaignTitle, CountryDropDown, CSVButton, GroupDropDown, PdfUploader, ProfileImageUploader, RichTextEditor, SendNowButton, TemplateDropdown, VideoUploader, WhatsappTextNumber } from "../../utils/Index";
+import { CampaignHeading, CampaignStatus, CampaignTitle, CountryDropDown, CSVButton, GroupDropDown, PdfUploader, ProfileImageUploader, SendNowButton, TemplateDropdown, VideoUploader, WhatsappTextNumber } from "../../utils/Index";
 import ImageUploaderGroup from "../../utils/ImageUploaderGroup";
+import CustomEditor from "../../../components/RichTextEditor";
 
 const VirtualDpCampaign = () => {
   // Form and editor states
@@ -354,10 +354,8 @@ const VirtualDpCampaign = () => {
               />
 
               {/* Froala Editor for Custom Message */}
-              <div className="w-full border border-black rounded-b-none rounded-[11px] ">
-                <RichTextEditor
-                  editorData={editorData}
-                  setEditorData={setEditorData} />
+              <div className="w-full rounded-md h-[400px] ">
+                <CustomEditor />
               </div>
             </div>
 

@@ -1,9 +1,9 @@
 import React, { useRef, useState, useEffect } from "react";
 import axios from "axios";
 import CreditHeader from "../../../components/CreditHeader";
-import "froala-editor/css/froala_editor.pkgd.min.css";
-import { CampaignHeading, CampaignStatus, CampaignTitle, CountryDropDown, CSVButton, DelayButtonDetails, GroupDropDown, PdfUploader, RichTextEditor, SendNowButton, TemplateDropdown, VideoUploader, WhatsappTextNumber } from "../../utils/Index";
+import { CampaignHeading, CampaignStatus, CampaignTitle, CountryDropDown, CSVButton, DelayButtonDetails, GroupDropDown, PdfUploader, SendNowButton, TemplateDropdown, VideoUploader, WhatsappTextNumber } from "../../utils/Index";
 import ImageUploaderGroup from "../../utils/ImageUploaderGroup";
+import CustomEditor from "../../../components/RichTextEditor";
 
 const PerosnalCampaign2 = () => {
   // State for campaign title.
@@ -57,7 +57,6 @@ const PerosnalCampaign2 = () => {
 
   // Base API URL from environment variable.
   // New state for Button Detail and Delay Between Messages.
-  const [buttonDetail, setButtonDetail] = useState("");
   const [delayBetweenMessages, setDelayBetweenMessages] = useState("");
 
   // Fetch groups from the API when the component mounts.
@@ -68,7 +67,7 @@ const PerosnalCampaign2 = () => {
         setGroups(response.data);
       })
       .catch((error) => console.error("Error fetching groups:", error));
-  }, [process.env.REACT_APP_API_URL]);
+  }, []);
 
   // Fetch message templates from the API.
   useEffect(() => {
@@ -78,7 +77,7 @@ const PerosnalCampaign2 = () => {
       .catch((error) =>
         console.error("Error fetching message templates:", error)
       );
-  }, [process.env.REACT_APP_API_URL]);
+  }, []);
 
   // When a group is selected, update the WhatsApp numbers field.
   useEffect(() => {
@@ -323,10 +322,8 @@ const PerosnalCampaign2 = () => {
               setSelectedTemplate={setSelectedTemplate} />
 
             {/* Froala Editor for Custom Message */}
-            <div className="w-full border border-black rounded-b-none rounded-[11px] ">
-              <RichTextEditor
-                editorData={editorData}
-                setEditorData={setEditorData} />
+            <div className="w-full rounded-md h-[400px] ">
+              <CustomEditor />
             </div>
 
             {/* Upload Media Section */}

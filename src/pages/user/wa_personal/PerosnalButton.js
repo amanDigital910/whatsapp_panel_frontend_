@@ -1,8 +1,8 @@
 import React, { useEffect, useRef, useState } from "react";
 import axios from "axios";
 import CreditHeader from "../../../components/CreditHeader";
-import "froala-editor/css/froala_editor.pkgd.min.css";
-import { CampaignHeading, CampaignStatus, CampaignTitle, CountryDropDown, CSVButton, DisplayButton, DragDropButton, GroupDropDown, RichTextEditor, SendNowButton, TemplateDropdown, WhatsappTextNumber } from "../../utils/Index";
+import { CampaignHeading, CampaignStatus, CampaignTitle, CountryDropDown, CSVButton, DisplayButton, DragDropButton, GroupDropDown, SendNowButton, TemplateDropdown, WhatsappTextNumber } from "../../utils/Index";
+import CustomEditor from "../../../components/RichTextEditor";
 
 const PerosnalButtonCampaign = () => {
   // File and editor states
@@ -235,7 +235,7 @@ const PerosnalButtonCampaign = () => {
 
             {/* CSV Button Dropdown */}
             <CSVButton />
-            
+
             {/* Campaign Title */}
             <CampaignTitle
               inputTitle={campaignTitle}
@@ -280,10 +280,8 @@ const PerosnalButtonCampaign = () => {
               setSelectedTemplate={setSelectedTemplate} />
 
             {/* Froala Editor for Custom Message */}
-            <div className="w-full border border-black rounded-b-none rounded-[11px] ">
-              <RichTextEditor
-                editorData={editorData}
-                setEditorData={setEditorData} />
+            <div className="w-full rounded-md h-[400px] ">
+              <CustomEditor />
             </div>
 
             {/* File Upload and Button Settings */}

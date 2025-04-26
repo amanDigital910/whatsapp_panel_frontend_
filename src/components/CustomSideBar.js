@@ -1,5 +1,5 @@
 import React from 'react';
-import { Link, useLocation, useNavigate } from 'react-router-dom';
+import { Link, useLocation } from 'react-router-dom';
 import creditCardIcon from '../assets/icons/credit-card.png';
 import dashboardIcon from '../assets/icons/dashboard.png';
 import home from '../assets/icons/home.png';
@@ -16,11 +16,6 @@ import './style.css'
 
 const SideBar = ({ isOpen, toggleDropdown, activeDropdown }) => {
 
-    const navigate = useNavigate();
-    const handleLogout = () => {
-        localStorage.clear();
-        navigate("/login")
-    }
     const location = useLocation();
 
     const isMobile = useIsMobile();
@@ -33,12 +28,12 @@ const SideBar = ({ isOpen, toggleDropdown, activeDropdown }) => {
         },
         {
             label: "Transaction Logs",
-            to: "/Transitiontable",
+            to: "/transitiontable",
             icon: dashboardIcon
         },
         {
             label: "Dashboard",
-            to: "/Dashboard",
+            to: "/dashboard",
             icon: home
         },
         {

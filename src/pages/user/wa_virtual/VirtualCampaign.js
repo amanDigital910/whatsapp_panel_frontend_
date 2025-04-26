@@ -1,12 +1,9 @@
 import React, { useEffect, useRef, useState } from "react";
 import axios from "axios";
-import { FaFilePdf } from "react-icons/fa6";
-import { MdDelete } from "react-icons/md";
 import CreditHeader from "../../../components/CreditHeader";
-import FroalaEditor from "react-froala-wysiwyg";
-import "froala-editor/css/froala_editor.pkgd.min.css";
-import { CampaignHeading, CampaignStatus, CampaignTitle, CountryDropDown, CSVButton, GroupDropDown, PdfUploader, RichTextEditor, TemplateDropdown, VideoUploader, WhatsappTextNumber } from "../../utils/Index";
+import { CampaignHeading, CampaignStatus, CampaignTitle, CountryDropDown, CSVButton, GroupDropDown, PdfUploader, TemplateDropdown, VideoUploader, WhatsappTextNumber } from "../../utils/Index";
 import ImageUploaderGroup from "../../utils/ImageUploaderGroup";
+import CustomEditor from "../../../components/RichTextEditor";
 
 const VirtualCampaign = () => {
   // State for campaign title.
@@ -68,7 +65,7 @@ const VirtualCampaign = () => {
         setGroups(response.data);
       })
       .catch((error) => console.error("Error fetching groups:", error));
-  }, [process.env.REACT_APP_API_URL]);
+  }, []);
 
   // Fetch countries from REST Countries API.
   useEffect(() => {
@@ -119,7 +116,7 @@ const VirtualCampaign = () => {
       .catch((error) =>
         console.error("Error fetching message templates:", error)
       );
-  }, [process.env.REACT_APP_API_URL]);
+  }, []);
 
   // When a group is selected, update the WhatsApp numbers field.
   useEffect(() => {
@@ -303,10 +300,8 @@ const VirtualCampaign = () => {
                 setSelectedTemplate={setSelectedTemplate} />
 
               {/* Rich Text Editor */}
-              <div className="w-full border border-black rounded-b-none rounded-[11px] ">
-                <RichTextEditor
-                  editorData={editorData}
-                  setEditorData={setEditorData} />
+              <div className="w-full rounded-md h-[400px] ">
+                <CustomEditor />
               </div>
 
               {/* File Upload Section */}

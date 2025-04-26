@@ -34,7 +34,7 @@ function ManageUser() {
             setUser(parsedData.user);
 
             // Fetch users list using parentuser_id
-            fetchUsers(parsedData.user.userid);
+            // fetchUsers(parsedData.user.userid);
         }
     }, []);
 

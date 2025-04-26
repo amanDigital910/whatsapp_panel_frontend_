@@ -26,9 +26,9 @@ function ManageCredit() {
             const parsedData = JSON.parse(storedData);
             setUser(parsedData.user);
             // Fetch all necessary data
-            fetchUsers(parsedData.user.userid);
-            fetchTransactionLogs(parsedData.user.userid);
-            fetchCategories();
+            // fetchUsers(parsedData.user.userid);
+            // fetchTransactionLogs(parsedData.user.userid);
+            // fetchCategories();
         }
     }, []);
 
@@ -149,7 +149,7 @@ function ManageCredit() {
                 });
 
                 // Fetch updated transaction logs
-                fetchTransactionLogs(user.userid);
+                // fetchTransactionLogs(user.userid);
 
                 // Clear the form
                 setFormData({
@@ -197,7 +197,7 @@ function ManageCredit() {
                 <div className="w-full px-3 ">
                     <div className="container-fluid p-3 mt-5">
                         {/* Filters Section */}
-                        <form onSubmit={handleSubmit}>
+                        <form >
                             <div className="row mb-4 me-0">
                                 {/* Left Section */}
                                 <div className="col-md-6 d-flex gap-3 align-items-center ">

@@ -1,14 +1,9 @@
 import React, { useRef, useState, useEffect } from "react";
 import axios from "axios";
-import { FaFileUpload } from "react-icons/fa";
 import CreditHeader from "../../../components/CreditHeader";
-import Notes from "../../../components/Notes";
-import { FaFilePdf } from "react-icons/fa6";
-import { MdDelete } from "react-icons/md";
-import FroalaEditor from "react-froala-wysiwyg";
-import "froala-editor/css/froala_editor.pkgd.min.css";
-import { CampaignHeading, CampaignStatus, CampaignTitle, CountryDropDown, CSVButton, DelayButtonDetails, GroupDropDown, PdfUploader, PollCampaign, RichTextEditor, SendNowButton, TemplateDropdown, VideoUploader, WhatsappTextNumber } from "../../utils/Index";
+import { CampaignHeading, CampaignStatus, CampaignTitle, CountryDropDown, CSVButton, DelayButtonDetails, GroupDropDown, PdfUploader, PollCampaign, SendNowButton, TemplateDropdown, VideoUploader, WhatsappTextNumber } from "../../utils/Index";
 import ImageUploaderGroup from "../../utils/ImageUploaderGroup";
+import CustomEditor from "../../../components/RichTextEditor";
 
 const PersonalCampaignPoll = () => {
   // Campaign and group details
@@ -331,10 +326,8 @@ const PersonalCampaignPoll = () => {
                 setSelectedTemplate={setSelectedTemplate} />
 
               {/* Froala Editor for Custom Message */}
-              <div className="w-full border border-black rounded-b-none rounded-[11px] ">
-                <RichTextEditor
-                  editorData={editorData}
-                  setEditorData={setEditorData} />
+              <div className="w-full rounded-md h-[400px] ">
+                <CustomEditor />
               </div>
 
               {/* Upload Media Section */}

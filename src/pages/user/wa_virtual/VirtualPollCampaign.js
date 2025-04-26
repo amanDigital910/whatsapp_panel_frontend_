@@ -1,9 +1,9 @@
 import React, { useRef, useState, useEffect } from "react";
 import axios from "axios";
 import CreditHeader from "../../../components/CreditHeader";
-import "froala-editor/css/froala_editor.pkgd.min.css";
-import { CampaignHeading, CampaignStatus, CampaignTitle, CountryDropDown, CSVButton, DelayButtonDetails, GroupDropDown, PdfUploader, PollCampaign, RichTextEditor, SendNowButton, TemplateDropdown, VideoUploader, WhatsappTextNumber } from "../../utils/Index";
+import { CampaignHeading, CampaignStatus, CampaignTitle, CountryDropDown, CSVButton, DelayButtonDetails, GroupDropDown, PdfUploader, PollCampaign, SendNowButton, TemplateDropdown, VideoUploader, WhatsappTextNumber } from "../../utils/Index";
 import ImageUploaderGroup from "../../utils/ImageUploaderGroup";
+import CustomEditor from "../../../components/RichTextEditor";
 
 const PersonalCampaignPoll = () => {
   // Campaign and group details
@@ -77,9 +77,9 @@ const PersonalCampaignPoll = () => {
         console.error("Error fetching message templates:", error)
       );
   }, []);
-  
-   // Fetch countries from REST Countries API.
-   useEffect(() => {
+
+  // Fetch countries from REST Countries API.
+  useEffect(() => {
     axios
       .get("https://restcountries.com/v3.1/all")
       .then((response) => {
@@ -188,9 +188,9 @@ const PersonalCampaignPoll = () => {
   };
 
   // Update media captions
-  const handleMediaCaptionChange = (e, type) => {
-    setMediaCaptions((prev) => ({ ...prev, [type]: e.target.value }));
-  };
+  // const handleMediaCaptionChange = (e, type) => {
+  //   setMediaCaptions((prev) => ({ ...prev, [type]: e.target.value }));
+  // };
 
   // Update poll options
   const handleInputChange = (value, index) => {
@@ -277,7 +277,7 @@ const PersonalCampaignPoll = () => {
 
               {/* CSV Button Dropdown */}
               <CSVButton />
-              
+
               {/* Campaign Title */}
               <CampaignTitle
                 inputTitle={campaignTitle}
@@ -321,10 +321,8 @@ const PersonalCampaignPoll = () => {
                 setSelectedTemplate={setSelectedTemplate} />
 
               {/* Froala Editor for Custom Message */}
-              <div className="w-full border border-black rounded-b-none rounded-[11px] ">
-                <RichTextEditor
-                  editorData={editorData}
-                  setEditorData={setEditorData} />
+              <div className="w-full rounded-md h-[400px] ">
+                <CustomEditor />
               </div>
 
               {/* Upload Media Section */}

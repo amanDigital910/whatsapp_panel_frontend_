@@ -68,10 +68,10 @@ export const login = (username, password) => async (dispatch) => {
     });
 
     if (response.status === 200) {
-      const data = response.data;
-      localStorage.setItem('userData', JSON.stringify(data.data));
-      localStorage.setItem('userToken', data.data.token);
-      dispatch(loginSuccess(data.data?.user));
+      const UserData = response?.data?.data
+      localStorage.setItem('userData', JSON.stringify(UserData?.user));
+      localStorage.setItem('userToken', UserData.token);
+      dispatch(loginSuccess(UserData?.user));
       // toast.success("Successfully Logged In");
     }
   } catch (error) {
@@ -107,7 +107,7 @@ export const login = (username, password) => async (dispatch) => {
 export const logout = () => (dispatch) => {
   localStorage.removeItem('userToken');
   localStorage.removeItem('userData');
-  toast.error('Logout Successfully.');
+  // toast.error('Logout Successfully.');
 
   dispatch({ type: LOGOUT });
 };

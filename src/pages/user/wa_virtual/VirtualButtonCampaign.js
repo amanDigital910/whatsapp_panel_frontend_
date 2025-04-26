@@ -1,13 +1,8 @@
 import React, { useEffect, useRef, useState } from "react";
 import axios from "axios";
-import { FaFileUpload } from "react-icons/fa";
 import CreditHeader from "../../../components/CreditHeader";
 import DisplayButtonComponent from "../../../components/DisplayButtonComponent";
-import { FaFilePdf } from "react-icons/fa6";
-import { MdDelete } from "react-icons/md";
-import FroalaEditor from "react-froala-wysiwyg";
-import "froala-editor/css/froala_editor.pkgd.min.css";
-import { CampaignHeading, CampaignStatus, CampaignTitle, CountryDropDown, CSVButton, DisplayButton, DragDropButton, GroupDropDown, RichTextEditor, SendNowButton, TemplateDropdown, WhatsappTextNumber } from "../../utils/Index";
+import { CampaignHeading, CampaignStatus, CampaignTitle, CountryDropDown, CSVButton, DragDropButton, GroupDropDown, SendNowButton, TemplateDropdown, WhatsappTextNumber } from "../../utils/Index";
 import CustomEditor from "../../../components/RichTextEditor";
 
 const VirtualButtonCampaign = () => {

@@ -1,7 +1,3 @@
-import FroalaEditor from "react-froala-wysiwyg"
-// import ReactQuill from 'react-quill';
-// import 'react-quill/dist/quill.snow.css'; // Quill CSS
-
 import './style.css'
 import { MdDelete } from "react-icons/md"
 import { FaFileCsv } from "react-icons/fa6"
@@ -431,77 +427,6 @@ export const TemplateDropdown = ({ selectedTemplate, setSelectedTemplate, msgTem
             ))}
         </select>
     );
-}
-
-// export const QuillRichTextEditor = ({placeholder}) => {
-//     const [editorHtml, setEditorHtml] = useState('');
-//     const quillRef = useRef(null); // This will hold the Quill instance
-//     const reactQuillRef = useRef(null); // This will hold the ReactQuill reference
-
-//     // Attach Quill reference when the component is mounted
-//     useEffect(() => {
-//         if (reactQuillRef.current) {
-//             const quill = reactQuillRef.current.getEditor();
-//             if (quill) {
-//                 quillRef.current = quill; // Store Quill instance for later use
-//             }
-//         }
-//     }, []); // Run effect only once when component mounts
-
-//     const handleChange = (html) => {
-//         setEditorHtml(html);
-//     };
-
-//     const handleClick = () => {
-//         // Insert "Hello, World!" at the current cursor position
-//         const range = quillRef.current.getSelection();
-//         const position = range ? range.index : 0;
-//         quillRef.current.insertText(position, 'Hello, World! ');
-//     };
-
-//     return (
-//         <div>
-//             <ReactQuill
-//                 ref={reactQuillRef}
-//                 theme="snow"
-//                 onChange={handleChange}
-//                 modules={ToolbarData}
-//                 formats={Formats}
-//                 defaultValue={editorHtml}
-//                 placeholder={placeholder}
-//             />
-//             <button onClick={handleClick}>Insert Text</button>
-//         </div>
-//     );
-// };
-
-// Quill Editor Format
-
-// Quill modules to attach to the editor
-
-// write your message in this rich text editor
-export const RichTextEditor = ({ editorData, setEditorData }) => {
-    return (
-        <FroalaEditor
-            tag="textarea"
-            config={{
-                placeholderText: "Enter your text here...",
-                charCounterCount: true,
-                toolbarButtons: ["bold", "underline", "italic"],
-                quickInsertButtons: [],
-                pluginsEnabled: [],
-                height: 300,
-                events: {
-                    initialized: function () {
-                        const secondToolbar = document.querySelector(".fr-second-toolbar");
-                        if (secondToolbar) secondToolbar.style.color = "white";
-                    },
-                },
-            }}
-            model={editorData}
-            onModelChange={(data) => setEditorData(data)}
-        />
-    )
 }
 
 // Poll Campaign
