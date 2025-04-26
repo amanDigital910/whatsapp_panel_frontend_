@@ -11,7 +11,15 @@ const InternationalQuickCampaign = () => {
   // State for groups, selected group, and WhatsApp numbers.
   const [groups, setGroups] = useState([]);
   const [selectedGroup, setSelectedGroup] = useState("");
+
+  // Bulk Whatsapp Number Field
   const [whatsAppNumbers, setWhatsAppNumbers] = useState("");
+  const [statsNumber, setStatsNumber] = useState({
+    total: 0,
+    valid: 0,
+    invalid: 0,
+    duplicates: 0,
+  });
 
   // Editor data state (will be sent as userMessage).
   const [editorData, setEditorData] = useState("");
@@ -281,17 +289,19 @@ const InternationalQuickCampaign = () => {
               {/* WhatsApp Numbers Textarea */}
               <WhatsappTextNumber
                 whatsAppNumbers={whatsAppNumbers}
-                setWhatsAppNumbers={setWhatsAppNumbers} />
+                setWhatsAppNumbers={setWhatsAppNumbers}
+                statsNumber={statsNumber}
+                setStatsNumber={setStatsNumber} />
             </div>
 
             {/* Right Column */}
             <div className="lg:w-full w-3/5 flex flex-col gap-6">
               {/* Status */}
               <CampaignStatus
-                duplicateStatus={0}
-                invalidStatus={0}
-                totalStatus={0}
-                validStatus={0}
+                duplicateStatus={statsNumber.duplicates}
+                invalidStatus={statsNumber.invalid}
+                totalStatus={statsNumber.total}
+                validStatus={statsNumber.valid}
               />
 
               {/* Template Dropdown */}

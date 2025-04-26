@@ -350,57 +350,132 @@ export const CountryDropDown = ({ selectedCountry, setSelectedCountry, countries
     )
 }
 
-// Write all whatsapp Text Numbers
-export const WhatsappTextNumber = ({ setWhatsAppNumbers, whatsAppNumbers }) => {
-    const [errorMessages, setErrorMessages] = useState([]);
-
+// New whatsapp Text Numbers
+export const WhatsappTextNumber = ({ setWhatsAppNumbers, whatsAppNumbers, statsNumber, setStatsNumber }) => {
+    
     const handleInputChange = (event) => {
-        const value = event.target.value;
-        setWhatsAppNumbers(value);
+        setWhatsAppNumbers(event.target.value);
+    };
 
-        // Split the input into an array of numbers
-        const numberArray = value.split('\n');
-        const newErrorMessages = [];
+    const handleBlur = () => {
+        const rawLines = whatsAppNumbers.split('\n');
+        const seen = new Set();
+        const validNumbers = [];
 
-        // Validation logic for each number
-        numberArray.forEach((number, index) => {
-            const cleanedNumber = number.trim();
-            if (cleanedNumber === '') {
-                newErrorMessages[1] = ''; // Valid number
-            } else if (/\s/.test(cleanedNumber)) {
-                newErrorMessages[2] = 'Spaces are not allowed.';
-            } else if (!/^\d{10}$/.test(cleanedNumber)) {
-                newErrorMessages[3] = 'Mobile number must be exactly 10 digits.';
+        let total = 0;
+        let invalid = 0;
+        let duplicates = 0;
+
+        rawLines.forEach((line, index) => {
+            const number = line.trim();
+            if (number === '') return;
+
+            total++;
+
+            if (!/^\d{10}$/.test(number)) {
+                invalid++;
+                // errors.push(Line ${index + 1}: Invalid number "${number}");
+            } else if (seen.has(number)) {
+                duplicates++;
+                // errors.push(Line ${index + 1}: Duplicate number "${number}");
+            } else {
+                seen.add(number);
+                validNumbers.push(number);
             }
         });
-        setErrorMessages(newErrorMessages);
+
+        const cleanedText = validNumbers.join('\n');
+        setWhatsAppNumbers(cleanedText);
+        // setErrorMessages(errors);
+        setStatsNumber({
+            total,
+            valid: validNumbers.length,
+            invalid,
+            duplicates,
+        });
     };
 
     return (
-        <div className="h-full relative ">
-            {errorMessages.length > 0 &&
-                <div className="pb-1">
-                    {errorMessages.map((error, index) => (
-                        // error && <p key={index} className="m-0 pb-[5px] text-red-500">{error}</p>
-                        error && <p key={index} className="m-0 pb-[1px] text-red-500">{error}</p>
-                    ))}
-                </div>}
-            <textarea
-                className="w-full px-3 py-2 rounded-md bg-white text-black border-black form-control placeholder-gray-500"
-                placeholder="Enter WhatsApp Numbers (one per line)"
-                required
-                rows={10}
-                style={{
-                    minHeight: '400px',
-                    height: errorMessages.some(msg => msg) ? '94%' : '100%',
-                    overflowY: 'auto',
-                }}
-                value={whatsAppNumbers}
-                onChange={handleInputChange}
-            />
+        <div className="flex flex-col h-full relative">
+            {/* <div className="mt-2 text-sm text-gray-700">
+                <p className="m-0">Total: {statsNumber.total}</p>
+                <p className="m-0">Valid: {statsNumber.valid}</p>
+                <p className="m-0">Invalid: {statsNumber.invalid}</p>
+                <p className="m-0">Duplicates: {statsNumber.duplicates}</p>
+            </div> */}
+
+            <div className="h-full flex flex-grow">
+                <textarea
+                    className="w-full h-full px-3 py-2 rounded-md bg-white text-black border border-black form-control placeholder-gray-500"
+                    placeholder="Enter WhatsApp Numbers (one per line)"
+                    required
+                    style={{
+                        minHeight: '400px',
+                        height: '100%',
+                        maxHeight: '100%',
+                        overflowY: 'auto',
+                    }}
+                    value={whatsAppNumbers}
+                    onChange={handleInputChange}
+                    onBlur={handleBlur}
+                />
+            </div>
         </div>
     );
 };
+
+
+// // Write all whatsapp Text Numbers
+// export const WhatsappTextNumber = ({ setWhatsAppNumbers, whatsAppNumbers }) => {
+//     const [errorMessages, setErrorMessages] = useState([]);
+
+//     const handleInputChange = (event) => {
+//         const value = event.target.value;
+//         setWhatsAppNumbers(value);
+
+//         // Split the input into an array of numbers
+//         const numberArray = value.split('\n');
+//         const newErrorMessages = [];
+
+//         // Validation logic for each number
+//         numberArray.forEach((number, index) => {
+//             const cleanedNumber = number.trim();
+//             if (cleanedNumber === '') {
+//                 newErrorMessages[1] = ''; // Valid number
+//             } else if (/\s/.test(cleanedNumber)) {
+//                 newErrorMessages[2] = 'Spaces are not allowed.';
+//             } else if (!/^\d{10}$/.test(cleanedNumber)) {
+//                 newErrorMessages[3] = 'Mobile number must be exactly 10 digits.';
+//             }
+//         });
+//         setErrorMessages(newErrorMessages);
+//     };
+
+//     return (
+//         <div className="h-full relative ">
+//             {errorMessages.length > 0 &&
+//                 <div className="pb-1">
+//                     {errorMessages.map((error, index) => (
+//                         // error && <p key={index} className="m-0 pb-[5px] text-red-500">{error}</p>
+//                         error && <p key={index} className="m-0 pb-[1px] text-red-500">{error}</p>
+//                     ))}
+//                 </div>}
+//             <textarea
+//                 className="w-full px-3 py-2 rounded-md bg-white text-black border-black form-control placeholder-gray-500"
+//                 placeholder="Enter WhatsApp Numbers (one per line)"
+//                 required
+//                 rows={10}
+//                 style={{
+//                     minHeight: '400px',
+//                     height: errorMessages.some(msg => msg) ? '94%' : '100%',
+//                     overflowY: 'auto',
+//                 }}
+//                 value={whatsAppNumbers}
+//                 onChange={handleInputChange}
+//             />
+//         </div>
+//     );
+// };
 
 // Templates Dropdowns 
 export const TemplateDropdown = ({ selectedTemplate, setSelectedTemplate, msgTemplates, setEditorData, }) => {

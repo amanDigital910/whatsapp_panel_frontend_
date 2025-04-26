@@ -21,7 +21,16 @@ const InternaitionaButtonCampaign = () => {
 
   // Additional form fields
   const [campaignTitle, setCampaignTitle] = useState("");
+
+  // Bulk Whatsapp Number Field
   const [whatsAppNumbers, setWhatsAppNumbers] = useState("");
+  const [statsNumber, setStatsNumber] = useState({
+    total: 0,
+    valid: 0,
+    invalid: 0,
+    duplicates: 0,
+  });
+
   const [button1Text, setButton1Text] = useState("");
   const [button1Number, setButton1Number] = useState("");
   const [button2Text, setButton2Text] = useState("");
@@ -259,17 +268,19 @@ const InternaitionaButtonCampaign = () => {
             {/* WhatsApp Numbers Textarea */}
             <WhatsappTextNumber
               whatsAppNumbers={whatsAppNumbers}
-              setWhatsAppNumbers={setWhatsAppNumbers} />
+              setWhatsAppNumbers={setWhatsAppNumbers} 
+              statsNumber={statsNumber}
+              setStatsNumber={setStatsNumber}/>
           </div>
 
           {/* Right Column */}
           <div className="lg:w-full w-3/5 flex flex-col gap-6">
             {/* Status */}
             <CampaignStatus
-              duplicateStatus={0}
-              invalidStatus={0}
-              totalStatus={0}
-              validStatus={0}
+              duplicateStatus={statsNumber.duplicates}
+              invalidStatus={statsNumber.invalid}
+              totalStatus={statsNumber.total}
+              validStatus={statsNumber.valid}
             />
 
 
