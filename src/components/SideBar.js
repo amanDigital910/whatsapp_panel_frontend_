@@ -1,3 +1,5 @@
+/* eslint-disable jsx-a11y/anchor-is-valid */
+/* eslint-disable jsx-a11y/alt-text */
 import React, { useState, useEffect } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import creditCardIcon from '../assets/icons/credit-card.png';
@@ -42,62 +44,62 @@ const SideBar = () => {
   const sidebarMenu = [
     {
       label: "Admin Dashboard",
-      to: "/admindashboard",
+      to: "/admin-dashboard",
       icon: dashboardIcon
     },
     {
       label: "Transaction Logs",
-      to: "/Transitiontable",
+      to: "/transitiontable",
       icon: dashboardIcon
     },
     {
       label: "Dashboard",
-      to: "/Dashboard",
+      to: "/dashboard",
       icon: home
     },
     {
       label: "Wa Virtual",
       icon: whatsappIcon,
       dropdown: [
-        { label: "Quick Campaign", to: "/user/virtualcampaign" },
-        { label: "DP Campaign", to: "/user/dpcampaign" },
-        { label: "Button Campaign", to: "/user/buttoncampaign" },
-        { label: "CSV Campaign", to: "/user/csvvirtual" },
-        { label: "WhatsApp Report", to: "/user/whatsappreport" }
+        { label: "Quick Campaign", to: "/virtual-quick-csv" },
+        { label: "DP Campaign", to: "/virtual-dp" },
+        { label: "Button Campaign", to: "/virtual-button" },
+        // { label: "CSV Campaign", to: "/user/csvvirtual" },
+        { label: "WhatsApp Report", to: "/virtual-whatsapp-report" }
       ]
     },
     {
       label: "Wa Personal",
       icon: whatsappIcon,
       dropdown: [
-        { label: "Quick Campaign", to: "/personal/campaign" },
-        { label: "Button Campaign", to: "/personal/button" },
-        { label: "Personal Csv Campaign", to: "/personal/PersonalCsv" },
-        { label: "Poll Campaign", to: "/personal/poll/campaign" },
-        { label: "WhatsApp Report", to: "/personal/report" },
-        { label: "WhatsApp Scan", to: "/personal/scan" }
+        { label: "Quick Campaign", to: "/personal-quick-csv" },
+        { label: "Button Campaign", to: "/personal-button" },
+        // { label: "Personal Csv Campaign", to: "/personal-PersonalCsv" },
+        { label: "Poll Campaign", to: "/personal-poll" },
+        { label: "WhatsApp Report", to: "/personal-whatsapp-report" },
+        { label: "WhatsApp Scan", to: "/personal-whatsapp-scan" }
       ]
     },
     {
       label: "Wa Int. Virtual",
       icon: world,
       dropdown: [
-        { label: "Quick Campaign", to: "/international/campaign" },
-        { label: "CSV Campaign", to: "/international/csvcampaign" },
-        { label: "Button Campaign", to: "/international/buttoncampaign" },
-        { label: "Whatsapp Reports", to: "/international/whatsappreport" }
+        { label: "Quick Campaign", to: "/international-virtual-quick-csv" },
+        // { label: "CSV Campaign", to: "/international-csvcampaign" },
+        { label: "Button Campaign", to: "/international-virtual-button" },
+        { label: "Whatsapp Reports", to: "/international-virtual-whatsapp-report" }
       ]
     },
     {
       label: "Wa Int. Personal",
       icon: exchange,
       dropdown: [
-        { label: "Quick Campaign", to: "/international/personal/campaign" },
-        { label: "Csv Campaign", to: "/international/personal/csvcampaign" },
-        { label: "Button Campaign", to: "/international/personal/buttoncampaign" },
-        { label: "Poll Campaign", to: "/international/personal/pollcampaign" },
-        { label: "Whatsapp Reports", to: "/international/personal/report" },
-        { label: "Whatsapp Scan", to: "/international/personal/scan" }
+        { label: "Quick Campaign", to: "/international-personal-quick-csv" },
+        // { label: "Csv Campaign", to: "/international-personal-csvcampaign" },
+        { label: "Button Campaign", to: "/international-personal-button" },
+        { label: "Poll Campaign", to: "/international-personal-poll" },
+        { label: "Whatsapp Reports", to: "/international-personal-whatsapp-report" },
+        { label: "Whatsapp Scan", to: "/international-personal-whatsapp-scan" }
       ]
     },
     {
@@ -112,12 +114,12 @@ const SideBar = () => {
     },
     {
       label: "Manage User",
-      to: "/manageuser",
+      to: "/manage-user",
       icon: UserIcon
     },
     {
       label: "Manage Credit",
-      to: "/managecredit",
+      to: "/manage-credit",
       icon: creditCardIcon
     }
   ];
@@ -140,19 +142,19 @@ const SideBar = () => {
           <div className="offcanvas-body text-white">
             <ul className="navbar-nav justify-content-end flex-grow-1 pe-3" >
               <li className="nav-item">
-                <Link className="nav-link text-white d-flex" aria-current="page" to="/admindashboard">
+                <Link className="nav-link text-white d-flex" aria-current="page" to="/admin-dashboard">
                   <img src={dashboardIcon} width={20} height={20} />
                   <span className="ms-2">Admin Dashboard</span>
                 </Link>
               </li>
               <li className="nav-item">
-                <Link className="nav-link text-white d-flex" aria-current="page" to="/Transitiontable">
+                <Link className="nav-link text-white d-flex" aria-current="page" to="/transitiontable">
                   <img src={dashboardIcon} width={20} height={20} />
                   <span className="ms-2">Transaction Logs</span>
                 </Link>
               </li>
               <li className="nav-item">
-                <Link className="nav-link text-white d-flex" aria-current="page" to="/Dashboard">
+                <Link className="nav-link text-white d-flex" aria-current="page" to="/dashboard">
                   <img src={home} width={20} height={20} />
                   <span className="ms-2">Dashboard</span>
                 </Link>
@@ -165,12 +167,12 @@ const SideBar = () => {
                 </a>
                 <ul className="dropdown-menu " aria-labelledby="virtualDropdown" style={{ backgroundColor: "#133E87" }} onClick={handleDropdownClick} >
                   <li>
-                    <Link to="/user/virtualcampaign" className="dropdown-item text-white " style={{ backgroundColor: "#133E87" }}>Quick Campaign</Link>
+                    <Link to="/virtual-quick-csv" className="dropdown-item text-white " style={{ backgroundColor: "#133E87" }}>Quick Campaign</Link>
                   </li>
-                  <li><Link to="/user/dpcampaign" className="dropdown-item text-white " style={{ backgroundColor: "#133E87" }}>DP Campaign</Link></li>
-                  <li><Link to="/user/buttoncampaign" className="dropdown-item text-white " style={{ backgroundColor: "#133E87" }}>Button Campaign</Link></li>
-                  <li><Link to="/user/csvvirtual" className="dropdown-item text-white " style={{ backgroundColor: "#133E87" }}>CSV Campaign</Link></li>
-                  <li><Link to="/user/whatsappreport" className="dropdown-item text-white " style={{ backgroundColor: "#133E87" }}>WhatsApp Report</Link></li>
+                  <li><Link to="/virtual-dp" className="dropdown-item text-white " style={{ backgroundColor: "#133E87" }}>DP Campaign</Link></li>
+                  <li><Link to="/virtual-button" className="dropdown-item text-white " style={{ backgroundColor: "#133E87" }}>Button Campaign</Link></li>
+                  {/* <li><Link to="/user/csvvirtual" className="dropdown-item text-white " style={{ backgroundColor: "#133E87" }}>CSV Campaign</Link></li> */}
+                  <li><Link to="/virtual-whatsapp-report" className="dropdown-item text-white " style={{ backgroundColor: "#133E87" }}>WhatsApp Report</Link></li>
                 </ul>
               </li>
               {/* whatsapp personal  */}
@@ -180,15 +182,15 @@ const SideBar = () => {
                   <span className="ms-2">Wa Personal</span>
                 </a>
                 <ul className="dropdown-menu " aria-labelledby="personalDropdown" style={{ backgroundColor: "#133E87" }} onClick={handleDropdownClick} >
-                  <li><Link to="/personal/campaign" className="dropdown-item text-white " style={{ backgroundColor: "#133E87" }}>Quick Campaign</Link></li>
-                  <li><Link to="/personal/button" className="dropdown-item text-white " style={{ backgroundColor: "#133E87" }}>Button Campaign</Link></li>
-                  <li><Link to="/personal/PersonalCsv" className="dropdown-item text-white " style={{ backgroundColor: "#133E87" }}>Personal Csv Campaign</Link></li>
-                  {/* <li><Link to="/personal/Personalbutton" className="dropdown-item text-white " style={{ backgroundColor: "#133E87" }}>Personal Button Campaign</Link></li> */}
-                  <li><Link to="/personal/poll/campaign" className="dropdown-item text-white " style={{ backgroundColor: "#133E87" }}>Poll Campaign</Link></li>
-                  <li><Link to="/personal/report" className="dropdown-item text-white " style={{ backgroundColor: "#133E87" }}>WhatsApp Report</Link></li>
-                  <li><Link to="/personal/scan" className="dropdown-item text-white " style={{ backgroundColor: "#133E87" }}>WhatsApp Scan</Link></li>
-                  {/* <li><Link to="/personal/channel" className="dropdown-item text-white " style={{backgroundColor:"#133E87"}}>WhatsApp Channel</Link></li> */}
-                  {/* <li><Link to="/personal/community" className="dropdown-item text-white " style={{backgroundColor:"#133E87"}}>WhatsApp Community</Link></li> */}
+                  <li><Link to="/personal-quick-csv" className="dropdown-item text-white " style={{ backgroundColor: "#133E87" }}>Quick Campaign</Link></li>
+                  <li><Link to="/personal-button" className="dropdown-item text-white " style={{ backgroundColor: "#133E87" }}>Button Campaign</Link></li>
+                  {/* <li><Link to="/personal-PersonalCsv" className="dropdown-item text-white " style={{ backgroundColor: "#133E87" }}>Personal Csv Campaign</Link></li> */}
+                  {/* <li><Link to="/personal-Personalbutton" className="dropdown-item text-white " style={{ backgroundColor: "#133E87" }}>Personal Button Campaign</Link></li> */}
+                  <li><Link to="/personal-poll/campaign" className="dropdown-item text-white " style={{ backgroundColor: "#133E87" }}>Poll Campaign</Link></li>
+                  <li><Link to="/personal-report" className="dropdown-item text-white " style={{ backgroundColor: "#133E87" }}>WhatsApp Report</Link></li>
+                  <li><Link to="/personal-scan" className="dropdown-item text-white " style={{ backgroundColor: "#133E87" }}>WhatsApp Scan</Link></li>
+                  {/* <li><Link to="/personal-channel" className="dropdown-item text-white " style={{backgroundColor:"#133E87"}}>WhatsApp Channel</Link></li> */}
+                  {/* <li><Link to="/personal-community" className="dropdown-item text-white " style={{backgroundColor:"#133E87"}}>WhatsApp Community</Link></li> */}
                 </ul>
               </li>
               {/* whatsapp Int virtual */}
@@ -198,10 +200,10 @@ const SideBar = () => {
                   <span className="ms-2 text-white">Wa Int. Virtual</span>
                 </a>
                 <ul className="dropdown-menu " aria-labelledby="internationalDropdown" style={{ backgroundColor: "#133E87" }} onClick={handleDropdownClick} >
-                  <li><Link to="/international/campaign" className="dropdown-item text-white " style={{ backgroundColor: "#133E87" }}>Quick Campaign</Link></li>
-                  <li><Link to="/international/csvcampaign" className="dropdown-item text-white " style={{ backgroundColor: "#133E87" }}>CSV Campaign</Link></li>
-                  <li><Link to="/international/buttoncampaign" className="dropdown-item text-white " style={{ backgroundColor: "#133E87" }}>Button Campaign</Link></li>
-                  <li><Link to="/international/whatsappreport" className="dropdown-item text-white " style={{ backgroundColor: "#133E87" }}>Whatsapp Reports</Link></li>
+                  <li><Link to="/international-campaign" className="dropdown-item text-white " style={{ backgroundColor: "#133E87" }}>Quick Campaign</Link></li>
+                  <li><Link to="/international-csvcampaign" className="dropdown-item text-white " style={{ backgroundColor: "#133E87" }}>CSV Campaign</Link></li>
+                  <li><Link to="/international-buttoncampaign" className="dropdown-item text-white " style={{ backgroundColor: "#133E87" }}>Button Campaign</Link></li>
+                  <li><Link to="/international-whatsappreport" className="dropdown-item text-white " style={{ backgroundColor: "#133E87" }}>Whatsapp Reports</Link></li>
                 </ul>
               </li>
 
@@ -211,12 +213,12 @@ const SideBar = () => {
                   <span className="ms-2 text-white">Wa Int. Personal</span>
                 </a>
                 <ul className="dropdown-menu " aria-labelledby="internationalDropdown2" style={{ backgroundColor: "#133E87" }} onClick={handleDropdownClick} >
-                  <li><Link to="/international/personal/campaign" className="dropdown-item text-white " style={{ backgroundColor: "#133E87" }}>Quick Campaign</Link></li>
-                  <li><Link to="/international/personal/csvcampaign" className="dropdown-item text-white " style={{ backgroundColor: "#133E87" }}>Csv Campaign</Link></li>
-                  <li><Link to="/international/personal/buttoncampaign" className="dropdown-item text-white " style={{ backgroundColor: "#133E87" }}>Button Campaign</Link></li>
-                  <li><Link to="/international/personal/pollcampaign" className="dropdown-item text-white " style={{ backgroundColor: "#133E87" }}>Poll Campaign</Link></li>
-                  <li><Link to="/international/personal/report" className="dropdown-item text-white " style={{ backgroundColor: "#133E87" }}>Whatsapp Reports</Link></li>
-                  <li><Link to="/international/personal/scan" className="dropdown-item text-white " style={{ backgroundColor: "#133E87" }}>Whatsapp Scan</Link></li>
+                  <li><Link to="/international-personal-campaign" className="dropdown-item text-white " style={{ backgroundColor: "#133E87" }}>Quick Campaign</Link></li>
+                  <li><Link to="/international-personal-csvcampaign" className="dropdown-item text-white " style={{ backgroundColor: "#133E87" }}>Csv Campaign</Link></li>
+                  <li><Link to="/international-personal-buttoncampaign" className="dropdown-item text-white " style={{ backgroundColor: "#133E87" }}>Button Campaign</Link></li>
+                  <li><Link to="/international-personal-pollcampaign" className="dropdown-item text-white " style={{ backgroundColor: "#133E87" }}>Poll Campaign</Link></li>
+                  <li><Link to="/international-personal-report" className="dropdown-item text-white " style={{ backgroundColor: "#133E87" }}>Whatsapp Reports</Link></li>
+                  <li><Link to="/international-personal-scan" className="dropdown-item text-white " style={{ backgroundColor: "#133E87" }}>Whatsapp Scan</Link></li>
                 </ul>
               </li>
 
@@ -233,13 +235,13 @@ const SideBar = () => {
                 </Link>
               </li>
               <li className="nav-item">
-                <Link to="/manageuser" className="nav-link text-white d-flex">
+                <Link to="/manage-user" className="nav-link text-white d-flex">
                   <img src={UserIcon} width={24} height={24} />
                   <span className="ms-2">Manage User</span>
                 </Link>
               </li>
               <li className="nav-item">
-                <Link to="/managecredit" className="nav-link text-white d-flex">
+                <Link to="/manage-credit" className="nav-link text-white d-flex">
                   <img src={creditCardIcon} width={24} height={24} />
                   <span className="ms-2">Manage Credit</span>
                 </Link>

@@ -10,7 +10,14 @@ const PersonalCampaignPoll = () => {
   const [campaignTitle, setCampaignTitle] = useState("");
   const [groups, setGroups] = useState([]);
   const [selectedGroup, setSelectedGroup] = useState("");
+
   const [whatsAppNumbers, setWhatsAppNumbers] = useState("");
+  const [statsNumber, setStatsNumber] = useState({
+    total: 0,
+    valid: 0,
+    invalid: 0,
+    duplicates: 0,
+  });
 
   // Editor content (sent as userMessage)
   const [editorData, setEditorData] = useState("");
@@ -301,16 +308,18 @@ const PersonalCampaignPoll = () => {
               {/* WhatsApp Numbers Textarea */}
               <WhatsappTextNumber
                 whatsAppNumbers={whatsAppNumbers}
-                setWhatsAppNumbers={setWhatsAppNumbers} />
+                setWhatsAppNumbers={setWhatsAppNumbers} 
+                statsNumber={statsNumber}
+                setStatsNumber={setStatsNumber}/>
             </div>
             {/* Right Column – Templates, Message, Media, Poll & Delay */}
             <div className="lg:w-full w-3/5 flex flex-col gap-6">
               {/* Status */}
               <CampaignStatus
-                duplicateStatus={0}
-                invalidStatus={0}
-                totalStatus={0}
-                validStatus={0}
+                 duplicateStatus={statsNumber.duplicates}
+                 invalidStatus={statsNumber.invalid}
+                 totalStatus={statsNumber.total}
+                 validStatus={statsNumber.valid}
               />
 
               {/* Template Dropdown */}

@@ -1,12 +1,12 @@
 import React, { useEffect, useRef, useState } from 'react';
 import menuIcon from '../assets/icons/paragraph.png';
-import bulkicon from '../assets/icons/wp bulk.png';
+import bulkicon from '../assets/icons/wp_bulk.png';
 import userImage from '../assets/profile.png';
 import useIsMobile from '../hooks/useMobileSize';
 import './style.css';
 import { FaPowerOff } from 'react-icons/fa';
 import { BsPersonCircle } from 'react-icons/bs';
-import { useNavigate } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import { useDispatch } from 'react-redux';
 import { logout } from '../redux/actions';
 
@@ -17,6 +17,9 @@ const NavBar = ({ setIsOpen, isOpen }) => {
     const toggleRef = useRef(null);
     const dispatch = useDispatch();
     const navigate = useNavigate();
+    const usersData = JSON.parse(localStorage.getItem("userData"));
+    console.log(usersData?.firstName);
+    
 
     const handleOutsideClick = (event) => {
         if (
@@ -72,10 +75,12 @@ const NavBar = ({ setIsOpen, isOpen }) => {
                 <img src={userImage} alt="User  Profile" width={40} height={15} className='flex flex-1 justify-end' />
             </div>
             {isOpenMenu && (
-                <div ref={dropdownRef} className={`absolute right-0 mt-48 w-48 bg-white border rounded-lg shadow-lg z-50 ${!isMobile ? isOpen ? "mr-[240px]" : "mr-[100px]" : "mr-6"}`}>
-                    <div className="bg-[#383387] text-white text-lg px-4 py-3 rounded-t-lg font-medium flex items-center gap-2 cursor-pointer">
-                        <BsPersonCircle /> User ID
-                    </div>
+                <div ref={dropdownRef} className={`absolute right-0 mt-48 w-48 bg-white border rounded-lg shadow-lg z-50 ${!isMobile ? isOpen ? "mr-[260px]" : "mr-[100px]" : "mr-6"}`}>
+                    <Link to={"/profile"} className='no-underline'>
+                        <button className="bg-[#383387] w-full text-white text-lg px-4 py-3 rounded-t-lg font-medium flex items-center gap-2 cursor-pointer">
+                            <BsPersonCircle /> {usersData ? usersData.username : "VikramRajput"}
+                        </button>
+                    </Link>
                     <button onClick={handleLogout} className="w-full px-4 py-3 flex items-center gap-2 text-red-500 text-lg hover:bg-gray-100 border-2 rounded-b-lg border-[#383387] cursor-pointer">
                         <FaPowerOff /> Logout
                     </button>

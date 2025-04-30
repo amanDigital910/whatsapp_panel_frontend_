@@ -7,6 +7,7 @@ import { FaEye, FaEyeSlash } from 'react-icons/fa';
 import usernameSvgLogo from '../../assets/icons/username-svg-logo.svg';
 import passwordSvgLogo from '../../assets/icons/password-svg-logo.svg';
 import './style.css';
+import { toast } from 'react-toastify';
 
 const UserLogin = () => {
   const { loading = false, error = null, isAuthenticated = false, user = null } = useSelector((state) => state.userLogin) || {};
@@ -16,12 +17,15 @@ const UserLogin = () => {
   const [showPassword, setShowPassword] = useState(false);
   const dispatch = useDispatch();
   const navigate = useNavigate();
+  const [errorValid, setErrorValid] = useState("");
 
   const handleLogin = async (e) => {
     e.preventDefault();
     if (!username || !password) {
-      alert("Please enter both username and password.");
+      setErrorValid("Please enter both username and password.");
       return;
+    } else if (username || password) {
+      setErrorValid("")
     }
     dispatch(login(username, password)); // Dispatch login action
   };
@@ -31,12 +35,14 @@ const UserLogin = () => {
       // Navigate based on user role
       const userRole = user?.role;
       if (userRole === "super_admin" || userRole === 'admin') {
-        navigate('/admindashboard');
-      } else if(userRole === "user" || userRole === "reseller") {
+        toast.success('Welcome Admin!');
+        navigate('/admin-dashboard');
+      } else if (userRole === "user" || userRole === "reseller") {
+        toast.success('Welcome User!');
         navigate('/dashboard');
       }
     }
-  }, [isAuthenticated, navigate, user]);  
+  }, [isAuthenticated, navigate, user]);
 
   useEffect(() => {
     if (error) {
@@ -61,9 +67,10 @@ const UserLogin = () => {
       {/* Login Box */}
       <div className="relative z-20 w-full max-w-lg bg-[#e0dada] bg-opacity-40 backdrop-blur-sm rounded-lg shadow-[10px_20px 60px_rgba(0,0,0,0.9)] m-4 p-8">
         <form onSubmit={handleLogin}>
-          {error && (
-            <p className="text-[#ff2a2a] text-2xl mb-4 font-bold" aria-live="assertive">
-              {error}
+          {(error || errorValid) && (
+            <p className="text-[#e72b2b] text-xl mb-2 font-bold" aria-live="assertive">
+              {errorValid && <span>{errorValid}</span>}
+              {error && <span>{error} </span>}
             </p>
           )}
 

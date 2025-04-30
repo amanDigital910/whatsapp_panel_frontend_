@@ -5,8 +5,9 @@ const loginInitialState = {
     isAuthenticated: false,
     loading: false,
     error: '',
-    token: null, // You may want to store the token here
+    token: null,
 };
+
 const createUserInitialState = {
     loading: false,
     addNewUser: null,
@@ -55,7 +56,7 @@ export const createUserReducer = (state = createUserInitialState, action) => {
         case CREATE_USER_REQUEST:
             return { ...state, loading: true, error: null };
         case CREATE_USER_SUCCESS:
-            return { ...state, loading: false, addNewUser: action.payload };
+            return { ...state, loading: false, addNewUser: action.payload,  error: null };
         case CREATE_USER_FAILURE:
             return { ...state, loading: false, error: action.payload };
         default:

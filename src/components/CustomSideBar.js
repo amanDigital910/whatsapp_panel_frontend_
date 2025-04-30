@@ -23,7 +23,7 @@ const SideBar = ({ isOpen, toggleDropdown, activeDropdown }) => {
     const sidebarMenu = [
         {
             label: "Admin Dashboard",
-            to: "/admindashboard",
+            to: "/admin-dashboard",
             icon: dashboardIcon
         },
         {
@@ -40,48 +40,46 @@ const SideBar = ({ isOpen, toggleDropdown, activeDropdown }) => {
             label: "Wa Virtual",
             icon: whatsappIcon,
             dropdown: [
-                { label: "Quick / CSV Campaign", to: "/user/virtualcampaign" },
+                { label: "Quick Campaign", to: "/virtual-quick-csv" },
+                { label: "DP Campaign", to: "/virtual-dp" },
+                { label: "Button Campaign", to: "/virtual-button" },
                 // { label: "CSV Campaign", to: "/user/csvvirtual" },
-                { label: "Button Campaign", to: "/user/buttoncampaign" },
-                { label: "DP Campaign", to: "/user/dpcampaign" },
-                { label: "Poll Campaign", to: "/user/virtualpollcampaign" }, //new One
-                { label: "WhatsApp Report", to: "/user/whatsappreport" }
+                { label: "WhatsApp Report", to: "/virtual-whatsapp-report" }
             ]
         },
         {
             label: "Wa Personal",
             icon: whatsappIcon,
             dropdown: [
-                { label: "Quick / CSV Campaign", to: "/personal/campaign" },
-                // { label: "Personal Csv Campaign", to: "/personal/personal-csv" },
-                { label: "Button Campaign", to: "/personal/button" },
-                { label: "Group/Comm. Campaign", to: "/personal/group" }, //new One
-                { label: "Channel Create & \nSend Bulk Mess. Campaign", to: "/personal/group-community" }, //new One
-                { label: "Poll Campaign", to: "/personal/poll/campaign" },
-                { label: "WhatsApp Report", to: "/personal/report" },
-                { label: "Scan WhatsApp No.", to: "/personal/scan" }
+                { label: "Quick Campaign", to: "/personal-quick-csv" },
+                { label: "Button Campaign", to: "/personal-button" },
+                { label: "Group/Comm. Campaign", to: "/personal-group-community" }, //new One
+                { label: "Channel Create & \nSend Bulk Mess. Campaign", to: "/personal-channel-create-bulk-sms"}, //new One
+                { label: "Poll Campaign", to: "/personal-poll" },
+                { label: "WhatsApp Report", to: "/personal-whatsapp-report" },
+                { label: "WhatsApp Scan", to: "/personal-whatsapp-scan" }
             ]
         },
         {
             label: "Wa Int. Virtual",
             icon: world,
             dropdown: [
-                { label: "Quick / CSV Campaign", to: "/international/campaign" },
-                // { label: "CSV Campaign", to: "/international/csvcampaign" },
-                { label: "Button Campaign", to: "/international/buttoncampaign" },
-                { label: "Whatsapp Reports", to: "/international/whatsappreport" }
+                { label: "Quick Campaign", to: "/international-virtual-quick-csv" },
+                // { label: "CSV Campaign", to: "/international-csvcampaign" },
+                { label: "Button Campaign", to: "/international-virtual-button" },
+                { label: "Whatsapp Reports", to: "/international-virtual-whatsapp-report" }
             ]
         },
         {
             label: "Wa Int. Personal",
             icon: exchange,
             dropdown: [
-                { label: "Quick / CSV Campaign", to: "/international/personal/campaign" },
-                // { label: "Csv Campaign", to: "/international/personal/csvcampaign" },
-                { label: "Button Campaign", to: "/international/personal/buttoncampaign" },
-                { label: "Poll Campaign", to: "/international/personal/pollcampaign" },
-                { label: "Whatsapp Reports", to: "/international/personal/report" },
-                { label: "Scan Whatsapp No.", to: "/international/personal/scan" }
+                { label: "Quick Campaign", to: "/international-personal-quick-csv" },
+                // { label: "Csv Campaign", to: "/international-personal-csvcampaign" },
+                { label: "Button Campaign", to: "/international-personal-button" },
+                { label: "Poll Campaign", to: "/international-personal-poll" },
+                { label: "Whatsapp Reports", to: "/international-personal-whatsapp-report" },
+                { label: "Whatsapp Scan", to: "/international-personal-whatsapp-scan" }
             ]
         },
         {
@@ -96,12 +94,12 @@ const SideBar = ({ isOpen, toggleDropdown, activeDropdown }) => {
         },
         {
             label: "Manage Credits",
-            to: "/managecredit",
+            to: "/manage-credit",
             icon: creditCardIcon
         },
         {
-            label: "Manage Users",
-            to: "/manageuser",
+            label: "Manage User",
+            to: "/manage-user",
             icon: UserIcon
         },
     ];
@@ -175,7 +173,8 @@ const SideBar = ({ isOpen, toggleDropdown, activeDropdown }) => {
                                                                         {subItem.label}
                                                                     </Link>
                                                                 </li>
-                                                            )})}
+                                                            )
+                                                        })}
                                                     </ul>
                                                 )}
                                             </div>

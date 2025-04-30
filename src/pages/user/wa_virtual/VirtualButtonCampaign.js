@@ -2,8 +2,9 @@ import React, { useEffect, useRef, useState } from "react";
 import axios from "axios";
 import CreditHeader from "../../../components/CreditHeader";
 import DisplayButtonComponent from "../../../components/DisplayButtonComponent";
-import { CampaignHeading, CampaignStatus, CampaignTitle, CountryDropDown, CSVButton, DragDropButton, GroupDropDown, SendNowButton, TemplateDropdown, WhatsappTextNumber } from "../../utils/Index";
+import { CampaignHeading, CampaignStatus, CampaignTitle, CountryDropDown, CSVButton, GroupDropDown, PdfUploader, SendNowButton, TemplateDropdown, VideoUploader, WhatsappTextNumber } from "../../utils/Index";
 import CustomEditor from "../../../components/RichTextEditor";
+import ImageUploaderGroup from "../../utils/ImageUploaderGroup";
 
 const VirtualButtonCampaign = () => {
   // File and editor states
@@ -26,7 +27,45 @@ const VirtualButtonCampaign = () => {
 
   // Additional form fields
   const [campaignTitle, setCampaignTitle] = useState("");
+
   const [whatsAppNumbers, setWhatsAppNumbers] = useState("");
+  const [statsNumber, setStatsNumber] = useState({
+    total: 0,
+    valid: 0,
+    invalid: 0,
+    duplicates: 0,
+  });
+
+  // State for file uploads.
+  // For images and video, we store an object with both file and preview.
+  const [uploadedFiles, setUploadedFiles] = useState({
+    image1: null,
+    image2: null,
+    image3: null,
+    image4: null,
+    pdf: null,
+    video: null,
+  });
+
+  // New state for media captions.
+  const [mediaCaptions, setMediaCaptions] = useState({
+    image1: "",
+    image2: "",
+    image3: "",
+    image4: "",
+    pdf: "",
+    video: "",
+  });
+
+  // Refs for file inputs.
+  const inputRefs = {
+    image1: useRef(null),
+    image2: useRef(null),
+    image3: useRef(null),
+    image4: useRef(null),
+    pdf: useRef(null),
+    video: useRef(null),
+  };
 
   // Display Button Numbers 
   const [buttons, setButtons] = useState("");
@@ -49,23 +88,61 @@ const VirtualButtonCampaign = () => {
       );
   }, []);
 
-  // Handle file upload via click or drag-and-drop
-  const handleFileUpload = (e) => {
-    const file = e.target.files[0];
-    if (!file) return;
-    const fileUrl = URL.createObjectURL(file);
-    setSelectedFile(fileUrl);
-    setSelectedFileObj(file);
+  // Handle file uploads for images, PDF, and video.
+  const handleFileUpload = (e, type) => {
+    const files = e.target.files;
+    if (!files.length) {
+      console.warn("No file selected");
+      return;
+    }
+    const file = files[0];
 
-    // Determine file type and update state accordingly
-    if (file.type.startsWith("image/")) {
-      setFileType("image");
-    } else if (file.type.startsWith("video/")) {
-      setFileType("video");
-    } else if (file.type === "application/pdf") {
-      setFileType("pdf");
+    if (type.startsWith("image")) {
+      const validImageTypes = ["image/jpeg", "image/png", "image/gif"];
+      if (!validImageTypes.includes(file.type)) {
+        alert(
+          "Invalid file type. Please select a valid image (JPEG, PNG, or GIF)."
+        );
+        return;
+      }
+      const maxSizeInMB = 2;
+      if (file.size > maxSizeInMB * 1024 * 1024) {
+        alert("File size exceeds 2MB. Please select a smaller image.");
+        return;
+      }
+      const preview = URL.createObjectURL(file);
+      setUploadedFiles((prev) => ({ ...prev, [type]: { file, preview } }));
+    } else if (type === "pdf") {
+      if (file.type !== "application/pdf") {
+        alert("Invalid file type. Please select a PDF file.");
+        return;
+      }
+      const maxPdfSizeInMB = 10;
+      if (file.size > maxPdfSizeInMB * 1024 * 1024) {
+        alert("File size exceeds 10MB. Please select a smaller PDF.");
+        return;
+      }
+      setUploadedFiles((prev) => ({ ...prev, pdf: file }));
+    } else if (type === "video") {
+      const validVideoTypes = ["video/mp4"];
+      if (!validVideoTypes.includes(file.type)) {
+        alert("Invalid file type. Please select a valid video (MP4).");
+        return;
+      }
+      const maxVideoSizeInMB = 15;
+      if (file.size > maxVideoSizeInMB * 1024 * 1024) {
+        alert("File size exceeds 15MB. Please select a smaller video.");
+        return;
+      }
+      const preview = URL.createObjectURL(file);
+      setUploadedFiles((prev) => ({ ...prev, video: { file, preview } }));
     }
   };
+
+  const removeFileUpload = (type) => {
+    setUploadedFiles((prev) => ({ ...prev, [type]: null }));
+  };
+
 
   const removeFile = () => {
     setSelectedFile(null);
@@ -259,17 +336,19 @@ const VirtualButtonCampaign = () => {
             {/* WhatsApp Numbers Textarea */}
             <WhatsappTextNumber
               whatsAppNumbers={whatsAppNumbers}
-              setWhatsAppNumbers={setWhatsAppNumbers} />
+              setWhatsAppNumbers={setWhatsAppNumbers}
+              statsNumber={statsNumber}
+              setStatsNumber={setStatsNumber} />
           </div>
 
           {/* Right Column */}
           <div className="lg:w-full w-3/5 flex flex-col gap-6">
             {/* Status */}
             <CampaignStatus
-              duplicateStatus={0}
-              invalidStatus={0}
-              totalStatus={0}
-              validStatus={0}
+              duplicateStatus={statsNumber.duplicates}
+              invalidStatus={statsNumber.invalid}
+              totalStatus={statsNumber.total}
+              validStatus={statsNumber.valid}
             />
 
             {/* Template Dropdown */}
@@ -285,7 +364,7 @@ const VirtualButtonCampaign = () => {
             </div>
 
             {/* File Upload and Button Settings */}
-            <div className="w-full">
+            {/* <div className="w-full">
               <DragDropButton
                 caption={caption}
                 setCaption={setCaption}
@@ -296,10 +375,42 @@ const VirtualButtonCampaign = () => {
                 removeFile={removeFile}
                 selectedFile={selectedFile}
               />
+            </div> */}
+
+            {/* File Upload Section */}
+            <div className="bg-white rounded p-4 border border-black flex flex-col gap-6 ">
+              <ImageUploaderGroup
+                inputRefs={inputRefs}
+                uploadedFiles={uploadedFiles}
+                handleFileUpload={handleFileUpload}
+                removeFile={removeFileUpload}
+                mediaCaptions={mediaCaptions}
+                setMediaCaptions={setMediaCaptions}
+              />
+
+              <div className="grid grid-cols-1 gap-6">
+                <PdfUploader
+                  inputRef={inputRefs.pdf}
+                  uploadedFile={uploadedFiles.pdf}
+                  onFileUpload={handleFileUpload}
+                  onRemove={removeFileUpload}
+                  caption={mediaCaptions.pdf || ""}
+                  onCaptionChange={(val) => setMediaCaptions((prev) => ({ ...prev, pdf: val }))}
+                />
+
+                <VideoUploader
+                  inputRef={inputRefs.video}
+                  uploadedFile={uploadedFiles.video}
+                  onFileUpload={handleFileUpload}
+                  onRemove={removeFileUpload}
+                  caption={mediaCaptions.video || ""}
+                  onCaptionChange={(val) => setMediaCaptions((prev) => ({ ...prev, video: val }))}
+                />
+              </div>
             </div>
 
+            {/* Button Details */}
             <div className="bg-white rounded p-4 border border-black flex flex-col ">
-              {/* Button Details */}
               <DisplayButtonComponent buttons={buttons} setButtons={setButtons} />
               {/* </div> */}
             </div>

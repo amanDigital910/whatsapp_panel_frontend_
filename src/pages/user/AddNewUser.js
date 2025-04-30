@@ -20,7 +20,6 @@ function AddNewUser() {
         confirmPassword: "",
         userRole: "",
         selectedRoles: [],
-        isActive: true,
     });
 
     const userRolesOptions = [
@@ -74,13 +73,13 @@ function AddNewUser() {
             username: formData.username,
             password: formData.password,
             role: formData.userRole,
-            isActive: true,
-            permission: formData.selectedRoles,
-            // parentuser_id: user?.userid,
             email: "example11@gmail.com",
-            firstName: "Amansingh",
-            lastName: "Chauhan",
-            mobileNumber: "9234234234",
+            permission: formData.selectedRoles,
+            // isActive: true,
+            // parentuser_id: user?.userid,
+            // firstName: "Amansingh",
+            // lastName: "Chauhan",
+            // mobileNumber: "9234234234",
         };
         try {
             // Dispatch Redux action to create the user
@@ -98,38 +97,38 @@ function AddNewUser() {
             // No need for toast here since it's handled in the action
             console.error("Error dispatching createUser:", error);
         }
-
-        // try {
-        //     const headerConfig = {
-        //         headers: {
-        //             'Content-Type': 'application/json',
-        //             'Authorization': `Bearer ${localStorage.getItem("userToken")}`,
-        //         }
-        //     };
-
-        //     //   const response = formData.userid
-        //     // ? await axios.put(`${process.env.REACT_APP_API_URL}/auth/updateUser/${formData.userid}`, payload, config)
-        //     // : await axios.post(`http://147.93.106.185:3000/api/auth/CreateUser`, payload, config);
-        //     const response = await axios.post(`http://147.93.106.185:3000/api/auth/CreateUser`, payload, headerConfig);
-
-        //     if ([200, 201].includes(response.status)) {
-        //         // toast.success(formData.userid ? "User updated!" : "User created!");
-        //         toast.success("Successfully User Created")
-
-        //         setFormData({
-        //             userid: "",
-        //             username: "",
-        //             password: "",
-        //             confirmPassword: "",
-        //             userRole: "",
-        //             selectedRoles: [],
-        //         });
-        //     }
-        // } catch (err) {
-        //     console.error(err);
-        //     toast.error("Something went wrong. Try again.");
-        // }
     };
+    // try {
+    //     const headerConfig = {
+    //         headers: {
+    //             'Content-Type': 'application/json',
+    //             'Authorization': `Bearer ${localStorage.getItem("userToken")}`,
+    //         }
+    //     };
+
+    //     //   const response = formData.userid
+    //     // ? await axios.put(`${process.env.REACT_APP_API_URL}/auth/updateUser/${formData.userid}`, payload, config)
+    //     // : await axios.post(`http://147.93.106.185:3000/api/auth/CreateUser`, payload, config);
+    //     const response = await axios.post(`http://147.93.106.185:3000/api/auth/CreateUser`, payload, headerConfig);
+
+    //     if ([200, 201].includes(response.status)) {
+    //         // toast.success(formData.userid ? "User updated!" : "User created!");
+    //         toast.success("Successfully User Created")
+
+    //         setFormData({
+    //             userid: "",
+    //             username: "",
+    //             password: "",
+    //             confirmPassword: "",
+    //             userRole: "",
+    //             selectedRoles: [],
+    //         });
+    //     }
+    // } catch (err) {
+    //     console.error(err);
+    //     toast.error("Something went wrong. Try again.");
+    // }
+
 
     const renderRoleOptions = () => {
         if (!user) return null;
@@ -159,6 +158,7 @@ function AddNewUser() {
                 <CreditHeader />
                 <div className="mx-6">
                     <div className="mt-4 py-4 px-8 bg-white w-full ">
+                        <h3 className="text-2xl flex justify-center font-bold underline underline-offset-3">Add New User</h3>
                         <form onSubmit={handleSubmit} className="w-full">
                             <div className="mb-4 ">
                                 <label htmlFor="username" className="block text-lg font-medium text-black">
@@ -166,7 +166,7 @@ function AddNewUser() {
                                 </label>
                                 <input
                                     type="text"
-                                    className="w-full border-2 text-lg border-gray-400 rounded-md p-2"
+                                    className="mt-1 block w-full border-2 text-lg border-black rounded-md p-2"
                                     id="username"
                                     name="username"
                                     placeholder="Ex. (vikram_rajput)"
@@ -182,7 +182,7 @@ function AddNewUser() {
                                 <div className="relative">
                                     <input
                                         type={showPassword ? "text" : "password"}
-                                        className="mt-1 block w-full text-lg border-2 border-gray-400 rounded-md p-2"
+                                        className="mt-1 block w-full text-lg border-2 border-black rounded-md p-2"
                                         id="password"
                                         name="password"
                                         placeholder="Max 8 Characters Required"
@@ -210,7 +210,7 @@ function AddNewUser() {
                                 <div className="relative">
                                     <input
                                         type={showConfirmPassword ? "text" : "password"}
-                                        className="mt-1 block w-full border-2 text-lg border-gray-400 rounded-md p-2"
+                                        className="mt-1 block w-full border-2 text-lg border-black rounded-md p-2"
                                         id="confirmPassword"
                                         name="confirmPassword"
                                         placeholder="Write same password as above"
@@ -232,30 +232,31 @@ function AddNewUser() {
                                 )}
                             </div>
 
-                            <div className="mb-4">
-                                {user ? (
-                                    <>
-                                        <label htmlFor="userRole" className="block text-lg font-medium text-black">
-                                            User Role
-                                        </label>
-                                        <select
-                                            className="mt-1 block w-full border-2 border-gray-400 rounded-md px-2 py-2.5 "
-                                            id="userRole"
-                                            name="userRole"
-                                            value={formData.userRole}
-                                            onChange={handleChange}
-                                            required
-                                        >
-                                            {renderRoleOptions()}
-                                        </select>
-                                    </>
-                                ) : (
-                                    <p>Loading user data...</p>
-                                )}
+                            <div className="mb-4 w-full">
+                                <label htmlFor="userRole" className="text-lg font-medium text-black">
+                                    User Role
+                                </label>
+                                <select
+                                    className="mt-1 block w-full border-2 border-black rounded-md px-2 pt-[14px]  form-select focus-within:border-black focus:border-black"
+                                    id="userRole"
+                                    style={{
+                                        padding: '10px 0px',
+                                    }}
+                                    name="userRole"
+                                    value={formData.userRole}
+                                    onChange={handleChange}
+                                    required
+                                >
+                                    {user ? (
+                                        renderRoleOptions()
+                                    ) : (
+                                        <option value="" disabled>User Not Found...</option>
+                                    )}
+                                </select>
                             </div>
                             <div className="mb-4">
-                                <label className="block text-lg font-medium text-black">User Permissions</label>
-                                <div className="border-2 border-gray-400 rounded-md p-2 overflow-auto max-h-40">
+                                <label className="text-lg font-medium text-black">User Permissions</label>
+                                <div className="mt-1 block border-2 border-black rounded-md p-2 overflow-auto max-h-40">
                                     {userRolesOptions.map((role, index) => (
                                         <div key={index} className="flex items-center mb-1">
                                             <input
