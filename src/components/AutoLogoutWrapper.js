@@ -9,7 +9,7 @@ const AutoLogoutWrapper = ({ children }) => {
   const dispatch = useDispatch();
   const navigate = useNavigate();
   const timerRef = useRef(null);
-  const timeoutDuration = 90 * 1000; // 30 minutes
+  const timeoutDuration = 60 * 10 * 1000; // 30 minutes
 
   const resetTimer = () => {
     clearTimeout(timerRef.current);

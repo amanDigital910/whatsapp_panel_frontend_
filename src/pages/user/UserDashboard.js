@@ -15,110 +15,125 @@ const UserDashboard = () => {
       cardCredit: 0,
       bg: "#383387",
       redirectUrl: "/virtual-quick-csv",
+      charName: 'WV'
     },
     {
       id: 2,
-      cardName: "WA Virtual DP Campaign",
-      cardCredit: 0,
-      bg: "#383387",
-      redirectUrl: "/virtual-dp"
-    },
-    {
-      id: 3,
       cardName: "WA Virtual Button Campaign",
       cardCredit: 0,
       bg: "#383387",
-      redirectUrl: "/virtual-button"
+      redirectUrl: "/virtual-button",
+      charName: 'WVB'
+    },
+    {
+      id: 3,
+      cardName: "WA Virtual DP Campaign",
+      cardCredit: 0,
+      bg: "#383387",
+      redirectUrl: "/virtual-dp",
+      charName: 'WVD'
     },
     {
       id: 4,
       cardName: "WA Virtual Poll Campaign",
       cardCredit: 0,
       bg: "#383387",
-      redirectUrl: "/virtual-poll"
+      redirectUrl: "/virtual-poll",
+      charName: 'WVP'
     },
     {
       id: 5,
       cardName: "WA Personal Quick / CSV Campaign",
       cardCredit: 0,
-      bg: "#1eb32a",
-      redirectUrl: "/personal-quick-csv"
+      bg: "#25D366",
+      redirectUrl: "/personal-quick-csv",
+      charName: 'WP'
     },
     {
       id: 6,
       cardName: "WA Personal Button Campaign",
       cardCredit: 0,
-      bg: "#1eb32a",
-      redirectUrl: "/personal-button"
+      bg: "#25D366",
+      redirectUrl: "/personal-button",
+      charName: 'WPB'
     },
     {
       id: 7,
       cardName: "WA Personal Group / Community Campaign",
       cardCredit: 0,
-      bg: "#1eb32a",
-      redirectUrl: "/personal-personal-group-community"
+      bg: "#25D366",
+      redirectUrl: "/personal-group-community",
+      charName: 'WPG'
     },
     {
       id: 8,
       cardName: "WA Channel Create & Send Bulk Message Campaign",
       cardCredit: 0,
-      bg: "#1eb32a",
-      redirectUrl: "/personal-send-bulk-message"
+      bg: "#25D366",
+      redirectUrl: "/personal-group-community",
+      charName: 'WPG'
     },
     {
       id: 9,
       cardName: "WA Personal Poll Campaign",
       cardCredit: 0,
-      bg: "#1eb32a",
-      redirectUrl: "/virtual-poll/campaign"
+      bg: "#25D366",
+      redirectUrl: "/personal-channel-create-bulk-sms",
+      charName: 'WPCC'
     },
     {
       id: 10,
       cardName: "WA International Virtual Quick / CSV Campaign",
       cardCredit: 0,
-      bg: "#406dc7",
-      redirectUrl: "/personal-personal-community"
+      bg: "#25D366",
+      redirectUrl: "/personal-poll",
+      charName: 'WPP'
     },
     {
       id: 11,
       cardName: "WA International Virtual Button Campaign",
       cardCredit: 0,
-      bg: "#406dc7",
-      redirectUrl: "/personal-send-bulk-message"
+      bg: "#7b1111",
+      redirectUrl: "/international-virtual-button",
+      charName: 'WIVB'
     },
     {
       id: 12,
       cardName: "WA International Personal Quick / CSV Campaign",
       cardCredit: 0,
       bg: "#7b1111",
-      redirectUrl: "/virtual-poll/campaign"
+      redirectUrl: "/international-virtual-button",
+      charName: 'WIVB'
     },
     {
       id: 13,
       cardName: "WA International Personal Button Campaign",
       cardCredit: 0,
       bg: "#7b1111",
-      redirectUrl: "/virtual-poll/campaign"
+      redirectUrl: "/international-personal-button",
+      charName: 'WIPB'
     },
     {
       id: 14,
       cardName: "WA International Personal Poll Campaign",
       cardCredit: 0,
       bg: "#7b1111",
-      redirectUrl: "/virtual-poll/campaign"
+      redirectUrl: "/international-personal-poll",
+      charName: 'WIPP'
     },
     {
       id: 15,
       cardName: "Membership Valid Till",
       cardCredit: 0,
       bg: "#f03c15",
-      redirectUrl: "/membership-validity"
+      redirectUrl: "/membership-validity",
+      charName: "M"
     }
   ];
 
   return (
     <>
-      <section className="container py-5 w-full" style={{ backgroundColor: "#fff", minHeight: "100%" }}>
+      <section className="container py-5 w-full select-none" style={{ backgroundColor: "#fff", minHeight: "100%" }}>
         <div className="row g-4 ">
           {MsgCategory.map((item, index) => (
             <div className="group col-12 col-md-6 col-lg-4 cursor-pointer" key={index}>
@@ -140,13 +155,13 @@ const UserDashboard = () => {
                       {item.cardName}
                     </h2>
                     <h3 className="text-primary font-semibold text-lg transition-colors duration-300 hover:text-blue-500">
-                      Balance - {item.cardCredit}
+                      {item.id === 15 ? `Date - ${item.cardDate}` : `Balance - ${item.cardCredit}`}
                     </h3>
                   </div>
 
-                  <div className="absolute translate-y-[4%] right-0 w-12 h-12 rounded-full flex items-center justify-center text-white font-bold text-xl shadow-md transform transition-transform duration-300 hover:scale-125"
+                  <div className="absolute translate-y-[4%] right-0 w-[4rem] h-[4rem] uppercase rounded-full flex items-center justify-center text-white font-bold text-xl shadow-md transform transition-transform duration-300 hover:scale-125"
                     style={{ backgroundColor: item.bg }} >
-                    {item.cardName?.charAt(0) || 'W'}
+                    {item.charName}
                   </div>
                 </div>
               </div>
