@@ -16,6 +16,7 @@ import PersonalGroupChannelCommunity from './pages/user/wa_personal/PersonalGrou
 
 import { ToastContainer } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
+import MembershipValidTill from './components/Membership_Valid_Till.js';
 // Pages
 const Dashboard = lazy(() => import('./pages/user/UserDashboard'));
 const AdminDashboard = lazy(() => import('./pages/admin/AdminDashboard'));
@@ -98,7 +99,7 @@ const App = () => {
 
   return (
     <div>
-      <div className="flex h-full w-full flex-wrap">
+      <div className="flex h-full w-full flex-wrap select-none none">
         {/* Sidebar */}
         {/* 
         // Old Sidebar Code
@@ -185,6 +186,7 @@ const App = () => {
                     <Route path="/template" element={<TemplateCampaign />} />
 
                     <Route path='/manage-user' element={<ManageUser />} />
+                    <Route path='/membership-validity' element={<MembershipValidTill />} />
                     <Route path='/manage-credit' element={<ManageCredit />} />
                     <Route path='/add-new-user' element={<AddNewUser />} />
                     <Route path='/profile' element={<ProfilePage />} />
