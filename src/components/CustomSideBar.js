@@ -9,6 +9,7 @@ import groupIcon from '../assets/icons/group.png';
 import templateIcon from '../assets/icons/template.png';
 import ProfileIcon from '../assets/profile_Logo.png';
 import UserIcon from '../assets/icons/user1.png';
+import whatsappOfficialIcon from '../assets/icons/wp_bulk.png';
 import whatsappIcon from '../assets/icons/whatsapp.png';
 import ProfileImgBG from '../assets/profile_img_logo_bg.jpg';
 import useIsMobile from '../hooks/useMobileSize';
@@ -97,12 +98,12 @@ const SideBar = ({ isOpen, toggleDropdown, activeDropdown }) => {
             ]
         },
         {
-            label: "Whatsapp official",
-            icon: whatsappIcon,
+            label: "Whatsapp Official",
+            icon: whatsappOfficialIcon,
             dropdown: [
                 { label: "Dashboard ", to: "/whatsapp-official-dashboard" },
                 { label: "Send Whatsapp ", to: "/whatsapp-send-official" },
-                { label: "Reports", to: '/whatsapp-send-offica' },
+                { label: "Reports", to: '/whatsapp-reports' },
                 {
                     label: "Whatsapp Setting",
                     subDropdown: [
