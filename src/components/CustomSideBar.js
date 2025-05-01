@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React from 'react';
 import { Link, useLocation } from 'react-router-dom';
 import creditCardIcon from '../assets/icons/credit-card.png';
 import dashboardIcon from '../assets/icons/dashboard.png';
@@ -19,20 +19,6 @@ const SideBar = ({ isOpen, toggleDropdown, activeDropdown }) => {
     const location = useLocation();
 
     const isMobile = useIsMobile();
-
-    const [openNestedKeys, setOpenNestedKeys] = useState(new Set());
-
-
-    const toggleNestedDropdown = (parentIndex, nestedIndex) => {
-        const key = `${parentIndex}-${nestedIndex}`;
-        setOpenNestedKeys(prev => {
-          const newSet = new Set();
-          if (!prev.has(key)) {
-            newSet.add(key);
-          }
-          return newSet;
-        });
-      };
 
     const sidebarMenu = [
         {
@@ -55,9 +41,9 @@ const SideBar = ({ isOpen, toggleDropdown, activeDropdown }) => {
             icon: whatsappIcon,
             dropdown: [
                 { label: "Quick Campaign", to: "/virtual-quick-csv" },
-                { label: "Button Campaign", to: "/virtual-button" },
                 { label: "DP Campaign", to: "/virtual-dp" },
-                { label: "Poll Campaign", to: "/virtual-poll" },
+                { label: "Button Campaign", to: "/virtual-button" },
+                // { label: "CSV Campaign", to: "/user/csvvirtual" },
                 { label: "WhatsApp Report", to: "/virtual-whatsapp-report" }
             ]
         },
@@ -68,7 +54,7 @@ const SideBar = ({ isOpen, toggleDropdown, activeDropdown }) => {
                 { label: "Quick Campaign", to: "/personal-quick-csv" },
                 { label: "Button Campaign", to: "/personal-button" },
                 { label: "Group/Comm. Campaign", to: "/personal-group-community" }, //new One
-                { label: "Channel Create & \nSend Bulk Mess. Campaign", to: "/personal-channel-create-bulk-sms" }, //new One
+                { label: "Channel Create & \nSend Bulk Mess. Campaign", to: "/personal-channel-create-bulk-sms"}, //new One
                 { label: "Poll Campaign", to: "/personal-poll" },
                 { label: "WhatsApp Report", to: "/personal-whatsapp-report" },
                 { label: "WhatsApp Scan", to: "/personal-whatsapp-scan" }
@@ -95,47 +81,6 @@ const SideBar = ({ isOpen, toggleDropdown, activeDropdown }) => {
                 { label: "Whatsapp Reports", to: "/international-personal-whatsapp-report" },
                 { label: "Whatsapp Scan", to: "/international-personal-whatsapp-scan" }
             ]
-        },
-        {
-            label: "Whatsapp Offical",
-            icon: whatsappIcon,
-            dropdown: [
-                { label: "Dashboard ", to: "/whatsapp-offical-dashboard" },
-                { label: "Send Whatsapp ", to: "/whatsapp-send-offical" },
-                { label: "Reports", to: '/whatsapp-send-offica' },
-                {
-                    label: "Whatsapp Setting",
-                    subDropdown: [
-                        { label: "Phones", to: "/whatsapp-phones" },
-                        { label: "Templates", to: "/whatsapp-template" },
-                        { label: "User Trigger", to: "/whatsapp-user-trigger" },
-                        { label: "Flows", to: "/whatsapp-flows" },
-                        { label: "Pricing", to: "/whatsapp-pricing" },
-                        { label: "Webhook", to: "/whatsapp-webhook" },
-                    ]
-                },
-                { label: "Whatsapp Billing", to: "/whatsapp-billing" },
-                { label: "Whatsapp API", to: "/whatsapp-api" },
-                {
-                    label: "Setting",
-                    subDropdown: [
-                        { label: "Profile", to: "/whatsapp-profile" },
-                        { label: "Company ", to: "/whatsapp-company" },
-                        { label: "Team", to: "/whatsapp-team" },
-                        { label: "Security", to: "/whatsapp-security" },
-                    ],
-                }
-            ]
-        },
-        {
-            icon: whatsappIcon,
-            label: "Setting",
-            dropdown: [
-                { label: "Profile", to: "/new-profile" },
-                { label: "Company ", to: "/new-company" },
-                { label: "Team", to: "/new-team" },
-                { label: "Security", to: "/new-security" },
-            ],
         },
         {
             label: "Template",
@@ -188,9 +133,7 @@ const SideBar = ({ isOpen, toggleDropdown, activeDropdown }) => {
                         <ul className="space-y-1 py-0 px-0">
                             {sidebarMenu.map((item, index) => {
                                 const isActiveParent = item.to && location.pathname === item.to;
-                                // const isDropdownActive = item.dropdown?.some(sub => location.pathname === sub.to);
-                                const isDropdownActive = item.dropdown?.some(sub => location.pathname === sub.to || sub.subDropdown?.some(nested => location.pathname === nested.to));
-
+                                const isDropdownActive = item.dropdown?.some(sub => location.pathname === sub.to);
 
                                 return (
                                     <li key={index} className="text-white">
@@ -217,59 +160,18 @@ const SideBar = ({ isOpen, toggleDropdown, activeDropdown }) => {
                                                 </button>
 
                                                 {activeDropdown === index && isOpen && (
-                                                    <ul className="mt-1 space-y-1 duration-300 ease-in-out p-0">
+                                                    <ul className="mt-1 space-y-1  duration-300 ease-in-out p-0">
                                                         {item.dropdown.map((subItem, subIndex) => {
-                                                            const isActiveSub = subItem.to && location.pathname === subItem.to;
-                                                            const isSubDropdownActive = subItem.subDropdown?.some(subItem => location.pathname === subItem.to);
-                                                            const nestedKey = `${index}-${subIndex}`;
-                                                            const isNestedOpen = openNestedKeys.has(nestedKey);
-
-                                                            const hasNested = Array.isArray(subItem.subDropdown);
+                                                            const isActiveSub = location.pathname === subItem.to;
 
                                                             return (
-                                                                <li key={subIndex}>
+                                                                <li key={subIndex} className='p-0' >
                                                                     <Link
                                                                         to={subItem.to}
-                                                                        key={subIndex}
-                                                                        onClick={() => {
-                                                                            if (hasNested) toggleNestedDropdown(index, subIndex);
-                                                                        }}
-                                                                        className={`py-0 m-0 flex items-center justify-between pr-4 ${isActiveSub || isSubDropdownActive ? 'bg-green-700 font-semibold' : ''} `}>
-                                                                        <p className={`block m-0 pl-[42px] pr-2 py-2 text-base text-white no-underline hover:underline underline-offset-4 `}>
-                                                                            {subItem.label}
-                                                                        </p>
-                                                                        {hasNested && (
-                                                                            <svg
-                                                                                className={`w-4 h-4 transition-transform duration-200 text-white ${isNestedOpen ? 'rotate-180' : ''
-                                                                                    }`}
-                                                                                fill="none"
-                                                                                stroke="currentColor"
-                                                                                viewBox="0 0 24 24"
-                                                                            >
-                                                                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
-                                                                            </svg>
-                                                                        )}
+                                                                        className={`block pl-[42px] pr-2 py-2 text-base text-white no-underline hover:underline underline-offset-4 ${isActiveSub ? 'bg-green-700 font-semibold' : ''}`}
+                                                                    >
+                                                                        {subItem.label}
                                                                     </Link>
-                                                                    {hasNested && isNestedOpen && (
-                                                                        <ul className="mt-1 p-0">
-                                                                            {subItem.subDropdown.map((nestedItem, nestedIndex) => {
-                                                                                
-                                                                                return (
-                                                                                    <li key={nestedIndex} className='mt-1 space-y-1 duration-300 ease-in-out p-0'>
-                                                                                        <Link
-                                                                                            to={nestedItem.to}
-                                                                                            className={`py-2  pl-14 m-0 flex items-center justify-between text-white no-underline hover:underline ${location.pathname === nestedItem.to
-                                                                                                ? 'bg-green-500 font-bold'
-                                                                                                : ''
-                                                                                                }`}
-                                                                                        >
-                                                                                            {nestedItem.label}
-                                                                                        </Link>
-                                                                                    </li>
-                                                                                )
-                                                                            })}
-                                                                        </ul>
-                                                                    )}
                                                                 </li>
                                                             )
                                                         })}
