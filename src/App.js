@@ -165,7 +165,7 @@ const App = () => {
                     <Route path="/personal-button" element={<PersonalButton />} />
                     {/* <Route path='/personal-Personalbutton' element={<PersonalCSVButton/> } /> */}
                     <Route path="/personal-whatsapp-report" element={<PersonalCampaign />} />
-                    <Route path="/personal-whatsapp-scan" element={<PersonalCampaignScan />} />
+                    <Route path="/personal-scan-whatsapp" element={<PersonalCampaignScan />} />
                     <Route path="/personal-group-community" element={<PersonalCampaignChannel />} />
                     <Route path="/personal-channel-create-bulk-sms" element={<PersonalGroupChannelCommunity />} />
 
@@ -182,7 +182,7 @@ const App = () => {
                     <Route path="/international-personal-button" element={<InternationalCampaignButton />} />
                     <Route path="/international-personal-poll" element={<InternationalCampaignPoll />} />
                     <Route path="/international-personal-whatsapp-report" element={<InternationalReport />} />
-                    <Route path="/international-personal-whatsapp-scan" element={<InternationalPersonalScan />} />
+                    <Route path="/international-personal-scan-whatsapp" element={<InternationalPersonalScan />} />
 
                     <Route path="/group" element={<GroupCampaign />} />
                     <Route path="/template" element={<TemplateCampaign />} />

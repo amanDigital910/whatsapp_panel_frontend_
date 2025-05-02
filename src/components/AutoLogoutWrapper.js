@@ -1,35 +1,37 @@
 /* eslint-disable react-hooks/exhaustive-deps */
-// components/AutoLogoutWrapper.jsx
-import { useEffect, useRef } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useEffect, useRef, useCallback } from 'react';
 import { useDispatch } from 'react-redux';
 import { logout } from '../redux/actions';
+import { useNavigate } from 'react-router-dom';
 
 const AutoLogoutWrapper = ({ children }) => {
   const dispatch = useDispatch();
   const navigate = useNavigate();
   const timerRef = useRef(null);
   const timeoutDuration = 60 * 10 * 1000; // 30 minutes
+  // const timeoutDuration = 1 * 30 * 1000; // 30 Seconds
 
-  const resetTimer = () => {
+  const handleLogout = () => {
+    dispatch(logout());
+    navigate("/login");
+  }
+
+  const resetTimer = useCallback(() => {
     clearTimeout(timerRef.current);
-    timerRef.current = setTimeout(() => {
-      dispatch(logout());
-      navigate('/login');
-    }, timeoutDuration);
-  };
+    timerRef.current = setTimeout(handleLogout, timeoutDuration);
+  }, [handleLogout, timeoutDuration]);
 
   useEffect(() => {
     const events = ['mousemove', 'click', 'keydown', 'scroll'];
-    events.forEach((event) => window.addEventListener(event, resetTimer));
 
-    resetTimer(); // set the initial timer
+    for (const event of events) { window.addEventListener(event, resetTimer); }
 
+    resetTimer(); // set the initialB2B Database Software
     return () => {
-      events.forEach((event) => window.removeEventListener(event, resetTimer));
+      for (const event of events) { window.removeEventListener(event, resetTimer); }
       clearTimeout(timerRef.current);
     };
-  }, []);
+  }, [resetTimer]);
 
   return children;
 };

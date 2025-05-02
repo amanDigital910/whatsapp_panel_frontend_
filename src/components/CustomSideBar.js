@@ -72,7 +72,7 @@ const SideBar = ({ isOpen, toggleDropdown, activeDropdown }) => {
                 { label: "Channel Create & \nSend Bulk Mess. Campaign", to: "/personal-channel-create-bulk-sms" }, //new One
                 { label: "Poll Campaign", to: "/personal-poll" },
                 { label: "WhatsApp Report", to: "/personal-whatsapp-report" },
-                { label: "WhatsApp Scan", to: "/personal-whatsapp-scan" }
+                { label: "Scan Whatsapp", to: "/personal-scan-whatsapp" }
             ]
         },
         {
@@ -94,7 +94,7 @@ const SideBar = ({ isOpen, toggleDropdown, activeDropdown }) => {
                 { label: "Button Campaign", to: "/international-personal-button" },
                 { label: "Poll Campaign", to: "/international-personal-poll" },
                 { label: "Whatsapp Reports", to: "/international-personal-whatsapp-report" },
-                { label: "Whatsapp Scan", to: "/international-personal-whatsapp-scan" }
+                { label: "Scan Whatsapp", to: "/international-personal-scan-whatsapp" }
             ]
         },
         {

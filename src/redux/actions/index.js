@@ -11,7 +11,7 @@ export const CREATE_USER_REQUEST = "CREATE_USER_REQUEST";
 export const CREATE_USER_SUCCESS = "CREATE_USER_SUCCESS";
 export const CREATE_USER_FAILURE = "CREATE_USER_FAILURE";
 
-const REACT_APP_API_URL = "http://147.93.106.185:3000";
+// const REACT_APP_API_URL = "http://147.93.106.185:3000";
 
 // Action Creators
 export const loginRequest = () => ({ type: LOGIN_REQUEST });
@@ -24,7 +24,7 @@ export const login = (username, password) => async (dispatch) => {
   dispatch(loginRequest());
 
   try {
-    const response = await axios.post(`${REACT_APP_API_URL}/api/auth/login`, {
+    const response = await axios.post(`${process.env.REACT_APP_API_URL}/api/auth/login`, {
       username,
       password,
     });
@@ -75,7 +75,7 @@ export const createUser = (userData) => async (dispatch) => {
 
   try {
     const response = await axios.post(
-      `${REACT_APP_API_URL}/api/auth/CreateUser`,
+      `${process.env.REACT_APP_API_URL}/api/auth/CreateUser`,
       userData,
       {
         headers: {
