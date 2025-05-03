@@ -8,27 +8,41 @@ const AutoLogoutWrapper = ({ children }) => {
   const dispatch = useDispatch();
   const navigate = useNavigate();
   const timerRef = useRef(null);
-  const timeoutDuration = 60 * 10 * 1000; // 30 minutes
-  // const timeoutDuration = 1 * 30 * 1000; // 30 Seconds
+  // const timeoutDuration = 30 * 60 * 1000; // 30 minute
+  const timeoutDuration = 10 * 60 * 1000; // 10 Minute
 
-  const handleLogout = () => {
+  const handleLogout = useCallback(() => {
+    localStorage.removeItem('logoutTime');
     dispatch(logout());
     navigate("/login");
-  }
+  }, [dispatch, navigate]);
 
   const resetTimer = useCallback(() => {
     clearTimeout(timerRef.current);
+    const logoutTime = Date.now() + timeoutDuration;
+    localStorage.setItem('logoutTime', logoutTime);
     timerRef.current = setTimeout(handleLogout, timeoutDuration);
-  }, [handleLogout, timeoutDuration]);
+  }, [handleLogout]);
 
+  // On initial load, check if the user should be logged out
   useEffect(() => {
+    const logoutTime = parseInt(localStorage.getItem('logoutTime'), 10);
+    if (logoutTime && Date.now() > logoutTime) {
+      handleLogout();
+    } else {
+      resetTimer();
+    }
+
     const events = ['mousemove', 'click', 'keydown', 'scroll'];
 
-    for (const event of events) { window.addEventListener(event, resetTimer); }
+    for (const event of events) {
+      window.addEventListener(event, resetTimer);
+    }
 
-    resetTimer(); // set the initialB2B Database Software
     return () => {
-      for (const event of events) { window.removeEventListener(event, resetTimer); }
+      for (const event of events) {
+        window.removeEventListener(event, resetTimer);
+      }
       clearTimeout(timerRef.current);
     };
   }, [resetTimer]);
