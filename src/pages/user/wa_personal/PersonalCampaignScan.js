@@ -82,7 +82,7 @@ const PersonalCampaignScan = () => {
               className="text-2xl text-black font-semibold pl-4"
               style={{ fontSize: "32px" }}
             >
-              Whatsapp Scan
+              Scan Whatsapp
             </h1>
             <button
               onClick={handleAddChannel}

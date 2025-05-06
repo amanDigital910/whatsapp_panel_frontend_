@@ -61,99 +61,103 @@ function TransitionCReditUser() {
 
     return (
         <>
-            <section className="w-[100%] bg-gray-200  pt-3 flex justify-center flex-col pb-10">
+            <section className="w-full h-full bg-gray-200 flex justify-center flex-col pb-10">
                 <CreditHeader />
-                <div className="w-full px-3 mt-8">
-                    <div className="container-fluid mt-4">
-                        {/* Add User Button and Search Bar */}
-                        <div className="d-flex justify-content-end align-items-center mb-3">
-                            <div className="d-flex">
-                                <input
-                                    type="text"
-                                    className="form-control me-2"
-                                    placeholder="Search..   "
-                                    value={searchQuery}
-                                    onChange={(e) => setSearchQuery(e.target.value)}
-                                />
-                                <button className="btn btn-dark" onClick={handleSearch}>
-                                    Search
-                                </button>
-                            </div>
-                        </div>
 
-                        {/* Data Table */}
-                        <div className="card">
-                            <div className="card-body">
-                                {loading ? (
-                                    <div className="text-center">Loading...</div>
-                                ) : error ? (
-                                    <div className="text-center text-danger">{error}</div>
-                                ) : (
-                                    <>
-                                        <table className="table table-bordered table-striped">
-                                            <thead className="table-dark bg-dark">
-                                                <tr>
-                                                    <th>S.No.</th>
-                                                    <th>From User</th>
-                                                    <th>To User</th>
-                                                    <th>Credit Type</th>
-                                                    <th>Credit</th>
-                                                    <th>Transaction Date</th>
-                                                    <th>Name</th>
-                                                </tr>
-                                            </thead>
-                                            <tbody>
-                                                {currentRecords.length > 0 ? (
-                                                    currentRecords.map((log, index) => (
-                                                        <tr key={log.id}>
-                                                            <td>{indexOfFirstRecord + index + 1}</td>
-                                                            <td>{log.from_user_name}</td>
-                                                            <td>{log.to_user_name}</td>
-                                                            <td>{log.credit_type}</td>
-                                                            <td>{log.credit}</td>
-                                                            <td>{new Date(log.transaction_date).toLocaleString()}</td>
-                                                            <td>{log.name}</td>
-                                                        </tr>
-                                                    ))
-                                                ) : (
-                                                    <tr>
-                                                        <td colSpan="7" className="text-center">
-                                                            No records found
+
+                <div className="px-4 mt-14">
+                    {/* Add User Button and Search Bar */}
+                    <div className="flex justify-end items-center mb-3">
+                        <div className="flex items-center space-x-2 rounded-md border-black border">
+                            <input
+                                type="text"
+                                className="h-10 px-3 py-2 border border-gray-300 focus:outline-none rounded-l-md focus:ring-2 focus:ring-blue-500"
+                                placeholder="Search..."
+                                value={searchQuery}
+                                onChange={(e) => setSearchQuery(e.target.value)}
+                            />
+                            <button
+                                className="h-10 px-4 m-0 bg-gray-800 text-white rounded-r-[0.3rem] hover:bg-gray-700 transition"
+                                onClick={handleSearch}
+                            >
+                                Search
+                            </button>
+                        </div>
+                    </div>
+
+                    {/* Data Table */}
+                    <div className="px-4 bg-white py-3 rounded-md shadow">
+                        {loading ? (
+                            <div className="text-center text-gray-500">Loading...</div>
+                        ) : error ? (
+                            <div className="text-center text-red-600 text-xl font-semibold">Something went wrong!!</div>
+                        ) : (
+                            <>
+                                <div className="overflow-x-auto">
+                                    <table className="min-w-full border border-gray-300 rounded-md">
+                                        <thead className="bg-gray-800 text-white">
+                                            <tr>
+                                                <th className="px-4 py-2 text-left border">S.No.</th>
+                                                <th className="px-4 py-2 text-left border">From User</th>
+                                                <th className="px-4 py-2 text-left border">To User</th>
+                                                <th className="px-4 py-2 text-left border">Credit Type</th>
+                                                <th className="px-4 py-2 text-left border">Credit</th>
+                                                <th className="px-4 py-2 text-left border">Transaction Date</th>
+                                                <th className="px-4 py-2 text-left border">Name</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody>
+                                            {currentRecords.length > 0 ? (
+                                                currentRecords.map((log, index) => (
+                                                    <tr key={log.id} className="hover:bg-gray-100">
+                                                        <td className="px-4 py-2 border">{indexOfFirstRecord + index + 1}</td>
+                                                        <td className="px-4 py-2 border">{log.from_user_name}</td>
+                                                        <td className="px-4 py-2 border">{log.to_user_name}</td>
+                                                        <td className="px-4 py-2 border">{log.credit_type}</td>
+                                                        <td className="px-4 py-2 border">{log.credit}</td>
+                                                        <td className="px-4 py-2 border">
+                                                            {new Date(log.transaction_date).toLocaleString()}
                                                         </td>
+                                                        <td className="px-4 py-2 border">{log.name}</td>
                                                     </tr>
-                                                )}
-                                            </tbody>
-                                        </table>
+                                                ))
+                                            ) : (
+                                                <tr>
+                                                    <td colSpan="7" className="text-center py-4 text-gray-600">
+                                                        No records found
+                                                    </td>
+                                                </tr>
+                                            )}
+                                        </tbody>
+                                    </table>
+                                </div>
 
-                                        {/* Pagination Controls */}
-                                        <div className="d-flex justify-content-end align-items-center gap-4 mt-3">
-                                            <button
-                                                className="btn btn-dark"
-                                                onClick={handlePrevious}
-                                                disabled={currentPage === 1}
-                                            >
-                                                &lt;
-                                            </button>
-                                            <div>
-                                                {indexOfFirstRecord + 1} -{' '}
-                                                {Math.min(indexOfLastRecord, filteredLogs.length)} of{' '}
-                                                {filteredLogs.length}
-                                            </div>
-                                            <button
-                                                className="btn btn-dark"
-                                                onClick={handleNext}
-                                                disabled={currentPage === totalPages}
-                                            >
-                                                &gt;
-                                            </button>
-                                        </div>
-                                    </>
-                                )}
-                            </div>
-                        </div>
+                                {/* Pagination Controls */}
+                                <div className="flex justify-end items-center space-x-4 mt-4">
+                                    <button
+                                        className="px-3 py-2 bg-gray-800 text-white rounded-md disabled:opacity-50"
+                                        onClick={handlePrevious}
+                                        disabled={currentPage === 1}
+                                    >
+                                        &lt;
+                                    </button>
+                                    <div className="text-sm text-gray-700">
+                                        {indexOfFirstRecord + 1} - {Math.min(indexOfLastRecord, filteredLogs.length)} of {filteredLogs.length}
+                                    </div>
+                                    <button
+                                        className="px-3 py-2 bg-gray-800 text-white rounded-md disabled:opacity-50"
+                                        onClick={handleNext}
+                                        disabled={currentPage === totalPages}
+                                    >
+                                        &gt;
+                                    </button>
+                                </div>
+                            </>
+                        )}
                     </div>
                 </div>
             </section>
+
         </>
     );
 }

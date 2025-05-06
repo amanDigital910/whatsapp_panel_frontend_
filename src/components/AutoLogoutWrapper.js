@@ -1,35 +1,51 @@
 /* eslint-disable react-hooks/exhaustive-deps */
-// components/AutoLogoutWrapper.jsx
-import { useEffect, useRef } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useEffect, useRef, useCallback } from 'react';
 import { useDispatch } from 'react-redux';
 import { logout } from '../redux/actions';
+import { useNavigate } from 'react-router-dom';
 
 const AutoLogoutWrapper = ({ children }) => {
   const dispatch = useDispatch();
   const navigate = useNavigate();
   const timerRef = useRef(null);
-  const timeoutDuration = 60 * 10 * 1000; // 30 minutes
+  // const timeoutDuration = 30 * 60 * 1000; // 30 minute
+  const timeoutDuration = 10 * 60 * 1000; // 10 Minute
 
-  const resetTimer = () => {
+  const handleLogout = useCallback(() => {
+    localStorage.removeItem('logoutTime');
+    dispatch(logout());
+    navigate("/login");
+  }, [dispatch, navigate]);
+
+  const resetTimer = useCallback(() => {
     clearTimeout(timerRef.current);
-    timerRef.current = setTimeout(() => {
-      dispatch(logout());
-      navigate('/login');
-    }, timeoutDuration);
-  };
+    const logoutTime = Date.now() + timeoutDuration;
+    localStorage.setItem('logoutTime', logoutTime);
+    timerRef.current = setTimeout(handleLogout, timeoutDuration);
+  }, [handleLogout]);
 
+  // On initial load, check if the user should be logged out
   useEffect(() => {
-    const events = ['mousemove', 'click', 'keydown', 'scroll'];
-    events.forEach((event) => window.addEventListener(event, resetTimer));
+    const logoutTime = parseInt(localStorage.getItem('logoutTime'), 10);
+    if (logoutTime && Date.now() > logoutTime) {
+      handleLogout();
+    } else {
+      resetTimer();
+    }
 
-    resetTimer(); // set the initial timer
+    const events = ['mousemove', 'click', 'keydown', 'scroll'];
+
+    for (const event of events) {
+      window.addEventListener(event, resetTimer);
+    }
 
     return () => {
-      events.forEach((event) => window.removeEventListener(event, resetTimer));
+      for (const event of events) {
+        window.removeEventListener(event, resetTimer);
+      }
       clearTimeout(timerRef.current);
     };
-  }, []);
+  }, [resetTimer]);
 
   return children;
 };

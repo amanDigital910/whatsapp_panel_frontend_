@@ -40,7 +40,10 @@ const UserLogin = () => {
       } else if (userRole === "user" || userRole === "reseller") {
         toast.success('Welcome User!');
         navigate('/dashboard');
+      } else {
+        navigate('/login')
       }
+
     }
   }, [isAuthenticated, navigate, user]);
 
