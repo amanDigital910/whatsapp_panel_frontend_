@@ -7,6 +7,7 @@ import world from '../assets/icons/world.png';
 import exchange from '../assets/icons/exchange.png';
 import groupIcon from '../assets/icons/group.png';
 import templateIcon from '../assets/icons/template.png';
+import DeveloperAPI from '../assets/icons/developers-api.png';
 import ProfileIcon from '../assets/profile_Logo.png';
 import UserIcon from '../assets/icons/user1.png';
 import whatsappOfficialIcon from '../assets/icons/wp_bulk.png';
@@ -101,18 +102,28 @@ const SideBar = ({ isOpen, toggleDropdown, activeDropdown }) => {
             label: "Whatsapp Official",
             icon: whatsappOfficialIcon,
             dropdown: [
-                { label: "Dashboard ", to: "/whatsapp-official-dashboard" },
-                { label: "Send Whatsapp ", to: "/whatsapp-send-official" },
-                { label: "Reports", to: '/whatsapp-reports' },
+                { label: "Dashboard ", to: "/whatsapp-dashboard" },
+                { label: "Send Whatsapp ", to: "/whatsapp-send" },
+                {
+                    label: "Reports",
+                    subDropdown: [
+                        { label: "Campaigns", to: "/whatsapp-reports/campaigns" },
+                        { label: "WhatsApp Logs", to: "/whatsapp-reports/whatsapp-logs" },
+                        { label: "Click Logs", to: "/whatsapp-reports/click-logs" },
+                        { label: "Daily Stats", to: "/whatsapp-reports/daily-stats" },
+                        { label: "User Response", to: "/whatsapp-reports/user-responses" },
+                        { label: "Exports", to: "/whatsapp-reports/exports" },
+                    ]
+                },
                 {
                     label: "Whatsapp Setting",
                     subDropdown: [
-                        { label: "Phones", to: "/whatsapp-phones" },
-                        { label: "Templates", to: "/whatsapp-template" },
-                        { label: "User Trigger", to: "/whatsapp-user-trigger" },
-                        { label: "Flows", to: "/whatsapp-flows" },
-                        { label: "Pricing", to: "/whatsapp-pricing" },
-                        { label: "Webhook", to: "/whatsapp-webhook" },
+                        { label: "Phones", to: "/whatsapp-settings/phones" },
+                        { label: "Templates", to: "/whatsapp-settings/templates" },
+                        { label: "User Trigger", to: "/whatsapp-settings/user-trigger" },
+                        { label: "Flows", to: "/whatsapp-settings/flows" },
+                        { label: "Pricing", to: "/whatsapp-settings/pricing" },
+                        { label: "Webhook", to: "/whatsapp-settings/webhook" },
                     ]
                 },
                 { label: "Whatsapp Billing", to: "/whatsapp-billing" },
@@ -120,11 +131,33 @@ const SideBar = ({ isOpen, toggleDropdown, activeDropdown }) => {
                 {
                     label: "Setting",
                     subDropdown: [
-                        { label: "Profile", to: "/whatsapp-profile" },
-                        { label: "Company ", to: "/whatsapp-company" },
-                        { label: "Team", to: "/whatsapp-team" },
-                        { label: "Security", to: "/whatsapp-security" },
+                        { label: "Profile", to: "/whatsapp-profile/setting" },
+                        { label: "Company ", to: "/whatsapp-profile/company" },
+                        { label: "Team", to: "/whatsapp-profile/team" },
+                        { label: "Security", to: "/whatsapp-profile/security" },
                     ],
+                }
+            ]
+        },
+        {
+            label: "Developer API",
+            icon: DeveloperAPI,
+            dropdown: [
+                {
+                    label: "Personal API",
+                    subDropdown: [
+                        { label: "Manage API", to: "/personal/developer-api" },
+                        { label: "Whatsapp Report", to: "/personal/whatsapp-report" }
+                    ]
+
+                },
+                {
+                    label: "International API",
+                    subDropdown: [
+                        { label: "Manage API", to: "/international/developer-api" },
+                        { label: "Whatsapp Report", to: "/international/whatsapp-report" }
+                    ]
+
                 }
             ]
         },
@@ -223,7 +256,7 @@ const SideBar = ({ isOpen, toggleDropdown, activeDropdown }) => {
                                                                         onClick={() => {
                                                                             if (hasNested) toggleNestedDropdown(index, subIndex);
                                                                         }}
-                                                                        className={`py-0 m-0 flex items-center justify-between pr-4 ${isActiveSub || isSubDropdownActive ? 'bg-green-700 font-semibold' : ''} `}>
+                                                                        className={`py-0 m-0 flex items-center no-underline justify-between pr-4 ${isActiveSub || isSubDropdownActive ? 'bg-green-700 font-semibold' : ''} `}>
                                                                         <p className={`block m-0 pl-[42px] pr-2 py-2 text-base text-white no-underline hover:underline underline-offset-4 `}>
                                                                             {subItem.label}
                                                                         </p>
