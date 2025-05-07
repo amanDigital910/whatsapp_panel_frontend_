@@ -125,7 +125,7 @@ export const DashboardBarChart = () => {
 
 
   return (
-    <div className="border rounded shadow-md lg:w-full overflow-auto h-[400px] overflow-y-auto p-1 custom-Scroll">
+    <div className="border rounded shadow-md lg:w-full overflow-auto h-[400px] overflow-y-auto custom-horizontal-scroll">
       <div className="flex gap-4 w-full justify-center pt-3">
         <DatePicker
           className='w-60 px-2 border-2 border-black '

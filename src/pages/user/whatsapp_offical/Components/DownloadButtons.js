@@ -1,4 +1,5 @@
 import React from 'react';
+import { toast } from 'react-toastify';
 
 const DownloadButtons = ({ dataLogs, headers }) => {
   const getFlattenedRow = (row) => {
@@ -10,17 +11,37 @@ const DownloadButtons = ({ dataLogs, headers }) => {
     });
   };
 
+  const copyToClipboard = () => {
+    try {
+      const jsonString = JSON.stringify(dataLogs, null, 2);
+      console.log(jsonString);
+
+      navigator.clipboard.writeText(jsonString)
+        .then(() => {
+          toast.success('Log details copied to clipboard as JSON!');
+        })
+        .catch(err => {
+          console.error('Failed to copy: ', err);
+        });
+    } catch (error) {
+      console.error('Error converting to JSON: ', error);
+      toast.error('Failed to convert data to JSON.');
+    }
+  };
+
+
   const convertToCSV = (rows) => {
     const csvHeaders = headers.map(h => h.label).join(',');
     const csvRows = rows.map(row => getFlattenedRow(row)
       .map(value => {
         const strValue = String(value);
         const needsTextFormat = /^\d{9,}$/.test(strValue); // 11+ digit number
-        const safeValue = needsTextFormat ? `+91${strValue}` : strValue; // prefix with single quote
+        const safeValue = needsTextFormat ? `+91 ${strValue}` : strValue; // prefix with single quote
         return `"${safeValue.replace(/"/g, '""')}"`;
       })
       .join(',')
     );
+    toast.success('Logs details Download in Excel');
     return [csvHeaders, ...csvRows].join('\r\n');
   };
 
@@ -45,10 +66,13 @@ const DownloadButtons = ({ dataLogs, headers }) => {
         <title>Download PDF</title>
         <style>
           table { width: 100%; border-collapse: collapse; font-family: monospace; font-size: 11px; }
-          th, td { border: 1px solid #ccc; padding: 4px; text-align: left; white-space: nowrap; }
+          th, td { border: 1px solid #ccc; padding: 2px; text-align: left; white-space: wrap; }
           th { background-color: #f2f2f2; }
           h2 { font-family: Arial, sans-serif; }
-          @media print { button { display: none; } }
+          @media print {
+            @page { size: landscape; }
+            button { display: none; }
+          }
         </style>
       </head>
       <body>
@@ -65,22 +89,31 @@ const DownloadButtons = ({ dataLogs, headers }) => {
             `).join('')}
           </tbody>
         </table>
-        <button onclick="window.print();">Print / Save as PDF</button>
-      </body>
-      </html>
-    `;
+        <script>
+        window.onload = function() {
+          window.print();
+          setTimeout(() => window.close(), 1000);
+        };
+      </script>
+    </body>
+    </html>
+  `;
 
-    const printWindow = window.open('', '', 'width=800,height=600');
-    printWindow.document.write(htmlContent);
-    printWindow.document.close();
-  };
+  const blob = new Blob([htmlContent], { type: 'text/html' });
+  const url = URL.createObjectURL(blob);
+  window.open(url, '_blank');
+};
+
 
   return (
     <div className='flex gap-4 md:justify-start justify-around'>
-      <button className='px-3 py-1 border border-black rounded-xl' onClick={downloadCSV}>
+      <button className='px-3 py-1 text-base font-medium border-2 border-[#0d6efd] text-[#0d6efd] rounded-md hover:text-white hover:bg-[#0d6efd]' onClick={copyToClipboard}>
+        Copy
+      </button>
+      <button className='px-3 py-1 text-base font-medium border-2 border-[#dc3545] text-[#dc3545] rounded-md hover:text-white hover:bg-[#dc3545]' onClick={downloadCSV}>
         CSV
       </button>
-      <button className='px-3 py-1 border border-black rounded-xl' onClick={downloadPDF}>
+      <button className='px-3 py-1 text-base font-medium border-2 border-[#198754] text-[#198754] rounded-md hover:text-white hover:bg-[#198754]' onClick={downloadPDF}>
         PDF
       </button>
     </div>

@@ -1,11 +1,31 @@
-.custom-Scroll {
-    scrollbar-width: none;
-    /* Firefox */
-    -ms-overflow-style: none;
-    /* IE and Edge */
-}
-
-.custom-Scroll::-webkit-scrollbar {
-    display: none;
-    /* Chrome, Safari, Opera */
-}
+.custom-horizontal-scroll {
+    overflow: auto;
+    white-space: nowrap;           /* Keep items in one line */
+    -webkit-overflow-scrolling: touch;
+  }
+  
+  /* WebKit browsers (Chrome, Safari, Edge Chromium) */
+  .custom-horizontal-scroll::-webkit-scrollbar {
+    height: 8px;                   /* Horizontal scrollbar height */
+  }
+  
+  .custom-horizontal-scroll::-webkit-scrollbar-track {
+    background: #f1f1f1;           /* Track color */
+    border-radius: 4px;
+  }
+  
+  .custom-horizontal-scroll::-webkit-scrollbar-thumb {
+    background: #383387;              /* Scrollbar thumb color */
+    border-radius: 4px;
+  }
+  
+  .custom-horizontal-scroll::-webkit-scrollbar-thumb:hover {
+    background: #383387;              /* Thumb on hover */
+  }
+  
+  /* Firefox scrollbar styling */
+  .custom-horizontal-scroll {
+    scrollbar-width: thin;         /* Thin scrollbar */
+    scrollbar-color: #383387 #f1f1f1; /* Thumb color, Track color */
+  }
+  
