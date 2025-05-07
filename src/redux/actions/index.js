@@ -30,10 +30,16 @@ export const login = (username, password) => async (dispatch) => {
     });
 
     if (response.status === 200) {
-      const UserData = response?.data?.data
-      localStorage.setItem('userData', JSON.stringify(UserData?.user));
-      localStorage.setItem('userToken', UserData.token);
-      dispatch(loginSuccess(UserData?.user));
+      const userData = response?.data?.data;
+      const { user, token, requirePasswordChange } = userData;
+
+      localStorage.setItem('userData', JSON.stringify(user));
+      localStorage.setItem('userToken', token);
+
+      dispatch(loginSuccess(user));
+
+      // Return this flag so the UI can redirect
+      return { requirePasswordChange };
     }
   } catch (error) {
     let errorMessage = 'An unknown error occurred. Please try again.';
@@ -57,16 +63,34 @@ export const login = (username, password) => async (dispatch) => {
     }
 
     dispatch(loginFailure(errorMessage));
+    return { error: errorMessage };
   }
 };
 
 // Logout
-export const logout = () => (dispatch) => {
-  localStorage.removeItem('userToken');
-  localStorage.removeItem('userData');
-  // toast.error('Logout Successfully.');
-
-  dispatch({ type: LOGOUT });
+export const logout = () => async (dispatch) => {
+  try {
+    // toast.error('Logout Successfully.');
+    // await axios.post(
+    //   `${process.env.REACT_APP_API_URL}/api/auth/logout`,
+    //   {
+    //     headers: {
+    //       "Content-Type": "application/json",
+    //       Authorization: `Bearer ${localStorage.getItem("userToken")}`,
+    //     },
+    //   }
+    // );
+    localStorage.removeItem('userToken');
+    localStorage.removeItem('userData');
+    dispatch({ type: LOGOUT });
+  }
+  catch (error) {
+    dispatch({
+      type: CREATE_USER_FAILURE,
+      payload: error?.response?.data?.message || "Something went wrong",
+    });
+    console.error("Logout failed:", error);
+  }
 };
 
 // Create New User

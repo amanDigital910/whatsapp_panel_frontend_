@@ -18,8 +18,6 @@ const NavBar = ({ setIsOpen, isOpen }) => {
     const dispatch = useDispatch();
     const navigate = useNavigate();
     const usersData = JSON.parse(localStorage.getItem("userData"));
-    console.log(usersData?.firstName);
-    
 
     const handleOutsideClick = (event) => {
         if (

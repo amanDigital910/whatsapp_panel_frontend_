@@ -1,5 +1,5 @@
-import React, { lazy, Suspense, useState } from 'react';
-import { BrowserRouter as Router, Routes, Route, Navigate, useLocation } from 'react-router-dom';
+import React, { lazy, Suspense, useEffect, useState } from 'react';
+import { BrowserRouter as Router, Routes, Route, Navigate, useLocation, useNavigate } from 'react-router-dom';
 import 'bootstrap/dist/css/bootstrap.min.css';
 import 'bootstrap/dist/js/bootstrap.bundle.min.js';
 import CustomSideBar from './components/CustomSideBar';
@@ -25,6 +25,7 @@ const AdminDashboard = lazy(() => import('./pages/admin/AdminDashboard'));
 const TransitionCReditUser = lazy(() => import('./pages/admin/TransitionCReditUser'))
 
 const LoginScreen = lazy(() => import('./pages/auth/UserLogin'));
+const ChangePassword = lazy(() => import('./pages/auth/ChangePassword.js'));
 
 const VirtualCampaign = lazy(() => import("./pages/user/wa_virtual/VirtualCampaign"));
 // const CsvVirtualCampaign = lazy(() => import("./pages/user/wa_virtual/CSV_Campaign"));
@@ -53,6 +54,39 @@ const InternationalCampaignPoll = lazy(() => import("./pages/user/wa_int_persona
 const InternationalReport = lazy(() => import("./pages/user/wa_int_personal/internationalReport"));
 const InternationalPersonalScan = lazy(() => import("./pages/user/wa_int_personal/InternationalPersonalScan"));
 
+// Whatsapp Offical Pages
+const WhatsappDashboard = lazy(() => import("./pages/user/whatsapp_offical/Dashboard.js"))
+const WhatsappBilling = lazy(() => import("./pages/user/whatsapp_offical/Billing.js"))
+const WhatsappSend = lazy(() => import("./pages/user/whatsapp_offical/SendWhatsapp.js"))
+const WhatsappAPI = lazy(() => import("./pages/user/whatsapp_offical/WhatsappAPI.js"))
+
+// Whatsapp Official Settings
+const WhatsappSettingPhones = lazy(() => import("./pages/user/whatsapp_offical/whatsapp_settings/Phones.js"))
+const WhatsappSettingTemplates = lazy(() => import("./pages/user/whatsapp_offical/whatsapp_settings/Templates.js"))
+const WhatsappSettingUserTrigger = lazy(() => import("./pages/user/whatsapp_offical/whatsapp_settings/UserTrigger.js"))
+const WhatsappSettingFlows = lazy(() => import("./pages/user/whatsapp_offical/whatsapp_settings/Flows.js"))
+const WhatsappSettingWebhook = lazy(() => import("./pages/user/whatsapp_offical/whatsapp_settings/WebHook.js"))
+const WhatsappSettingPricing = lazy(() => import("./pages/user/whatsapp_offical/whatsapp_settings/Pricing.js"))
+
+// Whatsapp Profiles Settings
+const WhatsappProfileSetting = lazy(() => import("./pages/user/whatsapp_offical/settings/SettingProfile.js"))
+const WhatsappProfileCompany = lazy(() => import("./pages/user/whatsapp_offical/settings/CompanyProfile.js"))
+const WhatsappProfileTeam = lazy(() => import("./pages/user/whatsapp_offical/settings/TeamProfile.js"))
+const WhatsappProfileSecurity = lazy(() => import("./pages/user/whatsapp_offical/settings/SecurityProfile.js"))
+
+// Whatsapp Official Report Pages
+const CampaignReport = lazy(() => import("./pages/user/whatsapp_offical/reports/ReportCampaignReport.js"));
+const WhatsappLogsReport = lazy(() => import("./pages/user/whatsapp_offical/reports/WhatsappLogsReport.js"));
+const ClickLogsReport = lazy(() => import("./pages/user/whatsapp_offical/reports/ClickLogsReport.js"));
+const DailyStatsReport = lazy(() => import("./pages/user/whatsapp_offical/reports/DailyStatsReport.js"));
+const UserResponseReport = lazy(() => import("./pages/user/whatsapp_offical/reports/UserResponseReport.js"));
+const ExportReport = lazy(() => import("./pages/user/whatsapp_offical/reports/ExportsReport.js"));
+
+// Developer API Pages
+const PersonalDeveloperAPI = lazy(() => import("./pages/user/Developer-API/Personal-API/PersonalAPIManage.js"));
+const PersonalDeveloperReport = lazy(() => import("./pages/user/Developer-API/Personal-API/PersonalReport.js"));
+const InternationalDeveloperAPI = lazy(() => import("./pages/user/Developer-API/International-API/InternationalAPIManage.js"));
+const InternationalDeveloperReport = lazy(() => import("./pages/user/Developer-API/International-API/InternationalReport.js"));
 
 const GroupCampaign = lazy(() => import("./pages/user/GroupCampaign"));
 const TemplateCampaign = lazy(() => import("./pages/user/TemplateCampaign"));
@@ -66,42 +100,27 @@ const App = () => {
   const [isOpen, setIsOpen] = useState(true);
   const [activeDropdown, setActiveDropdown] = useState(null);
 
-  // Loader effect
-  // const [show, setShow] = useState(false);
-
-  // useEffect(() => {
-  //   const timer = setTimeout(() => setShow(true), [30000]); // delay 1s
-  //   // return () => clearTimeout(timer);
-  //   return timer;
-  // }, []);
-
   const toggleDropdown = (index) =>
     setActiveDropdown(activeDropdown === index ? null : index);
 
   // Disable Side bar in Login Screen
   const location = useLocation();
+  const navigate = useNavigate();
   const isLoginPage = location.pathname === '/login';
+  const isChangePassword = location.pathname === '/change-password';
 
-  // Determine if the current page should show sidebar and navbar
-  // const isLoginPage = location.pathname === '/login';
+  // const isLoggedIn = !!localStorage.getItem('userToken'); // or check auth state from Redux
 
-  //Blog right click from the entire website
-  // eslint-disable-next-line no-lone-blocks
-  {/* useEffect(() => {
-    const handleContextMenu = (e) => {
-      e.preventDefault();
-    }
+  // 🔐 Redirect if not logged in and on protected path
+  // useEffect(() => {
+  //   if (!isChangePassword) {
+  //     navigate('/login');
+  //   }
+  // }, [isLoggedIn, isChangePassword, navigate]);
   
-    document.addEventListener("contextmenu", handleContextMenu);
-  
-    return () => {
-      document.removeEventListener("contextmenu", handleContextMenu);
-    }
-  }, []); */}
-
   return (
     <div>
-      <div className="flex h-full w-full flex-wrap select-none">
+      <div className="flex h-full w-full flex-wrap select-none  hide-scrollbar">
         {/* Sidebar */}
         {/* 
         // Old Sidebar Code
@@ -109,7 +128,7 @@ const App = () => {
           <SideBar isOpen={isOpen} setIsSidebarOpen={setIsOpen} />
         </div> 
         */}
-        {!isLoginPage && <CustomSideBar
+        {(!isLoginPage && !isChangePassword) && <CustomSideBar
           isOpen={isOpen}
           setIsOpen={setIsOpen}
           activeDropdown={activeDropdown}
@@ -120,12 +139,12 @@ const App = () => {
         <div className="flex-1 flex flex-col ">
 
           {/* Topbar */}
-          {!isLoginPage && <NavBar
+          {(!isLoginPage && !isChangePassword) && <NavBar
             isOpen={isOpen}
             setIsOpen={setIsOpen} />}
 
           {/* Main Content */}
-          <div className={`flex-1 flex flex-col h-full  ${!isLoginPage ? ' mt-[70px]' : ''} `}>
+          <div className={`flex-1 flex flex-col h-full  ${!isLoginPage && !isChangePassword ? ' mt-[70px]' : ''} `}>
             {/* Scrollable content area */}
             <div className="h-[100%] overflow-y-auto">
               <Suspense  >
@@ -140,11 +159,11 @@ const App = () => {
                   {/* Public routes like login */}
                   <Route element={<PublicRoute />}>
                     <Route path="/login" element={<LoginScreen />} />
+                    <Route path="/change-password" element={<ChangePassword />} />
                   </Route>
 
                   {/* Protected routes */}
                   <Route element={<PrivateRoute />}>
-                    <Route path="/login" element={<LoginScreen />} />
                     {/* Dashboard admin and user */}
                     <Route path="/admin-dashboard" element={<AdminDashboard />} />
                     <Route path='/transitiontable' element={<TransitionCReditUser />} />
@@ -183,6 +202,43 @@ const App = () => {
                     <Route path="/international-personal-poll" element={<InternationalCampaignPoll />} />
                     <Route path="/international-personal-whatsapp-report" element={<InternationalReport />} />
                     <Route path="/international-personal-scan-whatsapp" element={<InternationalPersonalScan />} />
+
+                    {/* Whatsapp Offical Pages Routing */}
+                    <Route path="/whatsapp-dashboard" element={<WhatsappDashboard />} />
+                    <Route path="/whatsapp-send" element={<WhatsappSend />} />
+                    <Route path="/whatsapp-billing" element={<WhatsappBilling />} />
+                    <Route path="/whatsapp-api" element={<WhatsappAPI />} />
+
+                    {/* Whatsapp Offical Profile Pages Routing */}
+                    <Route path='/whatsapp-profile/setting' element={<WhatsappProfileSetting />} />
+                    <Route path='/whatsapp-profile/company' element={<WhatsappProfileCompany />} />
+                    <Route path='/whatsapp-profile/team' element={<WhatsappProfileTeam />} />
+                    <Route path='/whatsapp-profile/security' element={<WhatsappProfileSecurity />} />
+
+                    {/* Whatsapp Offical Settings Pages Routing */}
+                    <Route path='/whatsapp-settings/phones' element={<WhatsappSettingPhones />} />
+                    <Route path='/whatsapp-settings/templates' element={<WhatsappSettingTemplates />} />
+                    <Route path='/whatsapp-settings/user-trigger' element={<WhatsappSettingUserTrigger />} />
+                    <Route path='/whatsapp-settings/flows' element={<WhatsappSettingFlows />} />
+                    <Route path='/whatsapp-settings/webhook' element={<WhatsappSettingWebhook />} />
+                    <Route path='/whatsapp-settings/pricing' element={<WhatsappSettingPricing />} />
+
+                    {/* Whatsapp Offical Report Page Routing */}
+                    <Route path="/whatsapp-reports/campaigns" element={<CampaignReport activeDropdown={activeDropdown} isOpen={isOpen} />} />
+                    <Route path="/whatsapp-reports/whatsapp-logs" element={<WhatsappLogsReport />} />
+                    <Route path="/whatsapp-reports/click-logs" element={<ClickLogsReport />} />
+                    <Route path="/whatsapp-reports/daily-stats" element={<DailyStatsReport />} />
+                    <Route path="/whatsapp-reports/user-responses" element={<UserResponseReport />} />
+                    <Route path="/whatsapp-reports/exports" element={<ExportReport />} />
+
+                    {/* Developer API Pages*/}
+                    {/* Personal Developer API */}
+                    <Route path="/personal/developer-api" element={<PersonalDeveloperAPI />} />
+                    <Route path="/personal/whatsapp-report" element={<PersonalDeveloperReport />} />
+                    {/* International Developer API */}
+                    <Route path="/international/developer-api" element={<InternationalDeveloperAPI />} />
+                    <Route path="/international/whatsapp-report" element={<InternationalDeveloperReport />} />
+
 
                     <Route path="/group" element={<GroupCampaign />} />
                     <Route path="/template" element={<TemplateCampaign />} />
