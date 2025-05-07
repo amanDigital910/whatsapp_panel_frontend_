@@ -87,7 +87,7 @@ const Dashboard = () => {
                 ))}
               </div>
 
-              <div className="relative overflow-x-auto rounded-b-lg bg-gray-300 h-[400px] flex flex-wrap custom-Scroll">
+              <div className="relative overflow-x-auto rounded-b-lg bg-gray-300 h-[400px] flex flex-wrap custom-horizontal-scroll">
                 {/* Copy Button */}
                 <button
                   onClick={copyToClipboard}
