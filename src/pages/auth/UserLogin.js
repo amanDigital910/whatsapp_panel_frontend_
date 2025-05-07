@@ -10,7 +10,8 @@ import './style.css';
 import { toast } from 'react-toastify';
 
 const UserLogin = () => {
-  const { loading = false, error = null, isAuthenticated = false, user = null } = useSelector((state) => state.userLogin) || {};
+  const { loading = false, error = null, isAuthenticated = false, user = null, requirePasswordChange } = useSelector((state) => state.userLogin) || {};
+
   const [localLoading, setLocalLoading] = useState(loading);
   const [username, setUsername] = useState('');
   const [password, setPassword] = useState('');
@@ -18,17 +19,44 @@ const UserLogin = () => {
   const dispatch = useDispatch();
   const navigate = useNavigate();
   const [errorValid, setErrorValid] = useState("");
+  console.log("requirePasswordChange ", requirePasswordChange);
 
   const handleLogin = async (e) => {
     e.preventDefault();
+
+    // Redirect if password change is required
+
     if (!username || !password) {
       setErrorValid("Please enter both username and password.");
       return;
     } else if (username || password) {
       setErrorValid("")
     }
-    dispatch(login(username, password)); // Dispatch login action
+
+    setErrorValid("");
+
+    // Dispatch and wait for login to complete
+    const result = dispatch(login(username, password));
+
+    // If login failed, exit early
+    if (result?.error) {
+      return;
+
+    }
+
   };
+
+
+  // const handleLogin = async (e) => {
+  //   e.preventDefault();
+  //   if (!username || !password) {
+  //     setErrorValid("Please enter both username and password.");
+  //     return;
+  //   } else if (username || password) {
+  //     setErrorValid("")
+  //   }
+  //   dispatch(login(username, password)); // Dispatch login action
+  // };
 
   useEffect(() => {
     if (isAuthenticated) {

@@ -1,5 +1,5 @@
-import { LOGOUT, LOGIN_REQUEST, LOGIN_SUCCESS, LOGIN_FAILURE } from '../actions';
-import { CREATE_USER_REQUEST, CREATE_USER_SUCCESS, CREATE_USER_FAILURE, } from "../actions";
+/* eslint-disable default-case */
+import { LOGOUT, LOGIN_REQUEST, LOGIN_SUCCESS, LOGIN_FAILURE, CREATE_USER_REQUEST, CREATE_USER_SUCCESS, CREATE_USER_FAILURE, } from '../actions';
 const loginInitialState = {
     user: null,
     isAuthenticated: false,
@@ -29,6 +29,7 @@ export const loginReducer = (state = loginInitialState, action) => {
                 isAuthenticated: true,
                 loading: false,
                 token: action.payload.token,
+                requirePasswordChange: action.payload.requirePasswordChange,
                 error: '',
             };
         case LOGIN_FAILURE:

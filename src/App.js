@@ -25,6 +25,7 @@ const AdminDashboard = lazy(() => import('./pages/admin/AdminDashboard'));
 const TransitionCReditUser = lazy(() => import('./pages/admin/TransitionCReditUser'))
 
 const LoginScreen = lazy(() => import('./pages/auth/UserLogin'));
+const ChangePassword = lazy(() => import('./pages/auth/ChangePassword.js'));
 
 const VirtualCampaign = lazy(() => import("./pages/user/wa_virtual/VirtualCampaign"));
 // const CsvVirtualCampaign = lazy(() => import("./pages/user/wa_virtual/CSV_Campaign"));
@@ -99,38 +100,22 @@ const App = () => {
   const [isOpen, setIsOpen] = useState(true);
   const [activeDropdown, setActiveDropdown] = useState(null);
 
-  // Loader effect
-  // const [show, setShow] = useState(false);
-
-  // useEffect(() => {
-  //   const timer = setTimeout(() => setShow(true), [30000]); // delay 1s
-  //   // return () => clearTimeout(timer);
-  //   return timer;
-  // }, []);
-
   const toggleDropdown = (index) =>
     setActiveDropdown(activeDropdown === index ? null : index);
 
   // Disable Side bar in Login Screen
   const location = useLocation();
   const isLoginPage = location.pathname === '/login';
+  const isChangePassword = location.pathname === '/change-password';
 
-  // Determine if the current page should show sidebar and navbar
-  // const isLoginPage = location.pathname === '/login';
+  // const isLoggedIn = !!localStorage.getItem('userToken'); // or check auth state from Redux
 
-  //Blog right click from the entire website
-  // eslint-disable-next-line no-lone-blocks
-  {/* useEffect(() => {
-    const handleContextMenu = (e) => {
-      e.preventDefault();
-    }
-  
-    document.addEventListener("contextmenu", handleContextMenu);
-  
-    return () => {
-      document.removeEventListener("contextmenu", handleContextMenu);
-    }
-  }, []); */}
+  // Redirect if not logged in and on protected path
+  // useEffect(() => {
+  //   if (!isChangePassword) {
+  //     navigate('/login');
+  //   }
+  // }, [isLoggedIn, isChangePassword, navigate]);
 
   return (
     <div>
@@ -142,7 +127,7 @@ const App = () => {
           <SideBar isOpen={isOpen} setIsSidebarOpen={setIsOpen} />
         </div> 
         */}
-        {!isLoginPage && <CustomSideBar
+        {(!isLoginPage && !isChangePassword) && <CustomSideBar
           isOpen={isOpen}
           setIsOpen={setIsOpen}
           activeDropdown={activeDropdown}
@@ -153,12 +138,12 @@ const App = () => {
         <div className="flex-1 flex flex-col ">
 
           {/* Topbar */}
-          {!isLoginPage && <NavBar
+          {(!isLoginPage && !isChangePassword) && <NavBar
             isOpen={isOpen}
             setIsOpen={setIsOpen} />}
 
           {/* Main Content */}
-          <div className={`flex-1 flex flex-col h-full  ${!isLoginPage ? ' mt-[70px]' : ''} `}>
+          <div className={`flex-1 flex flex-col h-full  ${!isLoginPage && !isChangePassword ? ' mt-[70px]' : ''} `}>
             {/* Scrollable content area */}
             <div className="h-[100%] overflow-y-auto">
               <Suspense  >
@@ -173,11 +158,11 @@ const App = () => {
                   {/* Public routes like login */}
                   <Route element={<PublicRoute />}>
                     <Route path="/login" element={<LoginScreen />} />
+                    <Route path="/change-password" element={<ChangePassword />} />
                   </Route>
 
                   {/* Protected routes */}
                   <Route element={<PrivateRoute />}>
-                    <Route path="/login" element={<LoginScreen />} />
                     {/* Dashboard admin and user */}
                     <Route path="/admin-dashboard" element={<AdminDashboard />} />
                     <Route path='/transitiontable' element={<TransitionCReditUser />} />
