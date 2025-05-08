@@ -7,7 +7,7 @@ import './style.css';
 import { FaPowerOff } from 'react-icons/fa';
 import { BsPersonCircle } from 'react-icons/bs';
 import { Link, useNavigate } from 'react-router-dom';
-import { useDispatch } from 'react-redux';
+import { useDispatch, useSelector } from 'react-redux';
 import { logout } from '../redux/actions';
 
 const NavBar = ({ setIsOpen, isOpen }) => {
@@ -17,7 +17,9 @@ const NavBar = ({ setIsOpen, isOpen }) => {
     const toggleRef = useRef(null);
     const dispatch = useDispatch();
     const navigate = useNavigate();
-    const usersData = JSON.parse(localStorage.getItem("userData"));
+    const usersData = useSelector((state) => state?.userLogin.user);
+    const userToken = useSelector((state) => state?.userLogin.token);
+    console.log("USers Data", usersData,userToken);
 
     const handleOutsideClick = (event) => {
         if (
@@ -66,7 +68,7 @@ const NavBar = ({ setIsOpen, isOpen }) => {
                 <img src={bulkicon} alt="icon" width="30px" className='ms-4 h-8 flex' />
                 <h1 className="font-bold text-[30px] m-0 md:hidden">Whatsapp Bulk Marketing</h1>
             </div>
-            <div className={`absolute top-4 right-6 flex flex-row hover:opacity-40 text-white cursor-pointer ${!isMobile ? isOpen ? " mr-60 " : "mr-24" : " mr-6"}`}
+            <div className={`absolute top-4 right-6 flex flex-row hover:opacity-40 text-white cursor-pointer ${!isMobile ? isOpen ? " mr-64 " : "mr-24" : " mr-6"}`}
                 onClick={(e) => { setIsOpenMenu(prev => !prev); }}
                 ref={toggleRef}
             >

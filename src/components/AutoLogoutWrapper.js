@@ -12,7 +12,7 @@ const AutoLogoutWrapper = ({ children }) => {
   const timeoutDuration = 10 * 60 * 1000; // 10 Minute
 
   const handleLogout = useCallback(() => {
-    localStorage.removeItem('logoutTime');
+    // localStorage.removeItem('logoutTime');
     dispatch(logout());
     navigate("/login");
   }, [dispatch, navigate]);

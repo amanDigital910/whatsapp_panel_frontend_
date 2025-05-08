@@ -1,3 +1,4 @@
+/* eslint-disable array-callback-return */
 import React, { useState } from 'react';
 import { Link, useLocation } from 'react-router-dom';
 import creditCardIcon from '../assets/icons/credit-card.png';
@@ -15,10 +16,13 @@ import whatsappIcon from '../assets/icons/whatsapp.png';
 import ProfileImgBG from '../assets/profile_img_logo_bg.jpg';
 import useIsMobile from '../hooks/useMobileSize';
 import './style.css'
+import { useSelector } from 'react-redux';
 
 const SideBar = ({ isOpen, toggleDropdown, activeDropdown }) => {
 
     const location = useLocation();
+    const userRole = useSelector((state) => state?.userLogin.user?.role);
+    console.log(userRole);
 
     const isMobile = useIsMobile();
 
@@ -183,6 +187,12 @@ const SideBar = ({ isOpen, toggleDropdown, activeDropdown }) => {
         },
     ];
 
+    const filteredSidebarMenu = sidebarMenu.filter(item => {
+        if (userRole === "reseller" || userRole === "super_admin") return true;
+        return item.label !== "Admin Dashboard" && item.label !== "Transaction Logs";
+
+    });
+
     return (
         <>
             {(!isMobile || isOpen) && (
@@ -210,7 +220,7 @@ const SideBar = ({ isOpen, toggleDropdown, activeDropdown }) => {
 
                         {/* Menu Items */}
                         <ul className="space-y-1 py-0 px-0">
-                            {sidebarMenu.map((item, index) => {
+                            {filteredSidebarMenu.map((item, index) => {
                                 const isActiveParent = item.to && location.pathname === item.to;
                                 const isDropdownActive = item.dropdown?.some(sub => location.pathname === sub.to || sub.subDropdown?.some(nested => location.pathname === nested.to));
 

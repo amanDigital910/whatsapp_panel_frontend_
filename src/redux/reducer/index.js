@@ -1,11 +1,14 @@
 /* eslint-disable default-case */
 import { LOGOUT, LOGIN_REQUEST, LOGIN_SUCCESS, LOGIN_FAILURE, CREATE_USER_REQUEST, CREATE_USER_SUCCESS, CREATE_USER_FAILURE, } from '../actions';
+import { getAuthCookies } from '../../components/Cookies';
+
+const stored = getAuthCookies();
 const loginInitialState = {
-    user: null,
-    isAuthenticated: false,
-    loading: false,
-    error: '',
-    token: null,
+  user: stored?.user || null,
+  token: stored?.token || null,
+  isAuthenticated: !!stored?.user,
+  loading: false,
+  error: '',
 };
 
 const createUserInitialState = {
@@ -25,11 +28,10 @@ export const loginReducer = (state = loginInitialState, action) => {
         case LOGIN_SUCCESS:
             return {
                 ...state,
-                user: action.payload,
+                user: action.payload.user,
+                token: action.payload.token,
                 isAuthenticated: true,
                 loading: false,
-                token: action.payload.token,
-                requirePasswordChange: action.payload.requirePasswordChange,
                 error: '',
             };
         case LOGIN_FAILURE:
@@ -57,7 +59,7 @@ export const createUserReducer = (state = createUserInitialState, action) => {
         case CREATE_USER_REQUEST:
             return { ...state, loading: true, error: null };
         case CREATE_USER_SUCCESS:
-            return { ...state, loading: false, addNewUser: action.payload,  error: null };
+            return { ...state, loading: false, addNewUser: action.payload, error: null };
         case CREATE_USER_FAILURE:
             return { ...state, loading: false, error: action.payload };
         default:

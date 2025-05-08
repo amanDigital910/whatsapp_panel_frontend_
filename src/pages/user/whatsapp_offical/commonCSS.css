@@ -11,12 +11,12 @@
   
   .custom-horizontal-scroll::-webkit-scrollbar-track {
     background: #f1f1f1;           /* Track color */
-    border-radius: 4px;
+    border-radius: 1px;
   }
   
   .custom-horizontal-scroll::-webkit-scrollbar-thumb {
     background: #383387;              /* Scrollbar thumb color */
-    border-radius: 4px;
+    border-radius: 1px;
   }
   
   .custom-horizontal-scroll::-webkit-scrollbar-thumb:hover {

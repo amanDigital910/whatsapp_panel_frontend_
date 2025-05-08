@@ -10,7 +10,7 @@ import './style.css';
 import { toast } from 'react-toastify';
 
 const UserLogin = () => {
-  const { loading = false, error = null, isAuthenticated = false, user = null, requirePasswordChange } = useSelector((state) => state.userLogin) || {};
+  const { loading = false, error = null, isAuthenticated = false, user = null, } = useSelector((state) => state.userLogin) || {};
 
   const [localLoading, setLocalLoading] = useState(loading);
   const [username, setUsername] = useState('');
@@ -19,7 +19,6 @@ const UserLogin = () => {
   const dispatch = useDispatch();
   const navigate = useNavigate();
   const [errorValid, setErrorValid] = useState("");
-  console.log("requirePasswordChange ", requirePasswordChange);
 
   const handleLogin = async (e) => {
     e.preventDefault();
@@ -62,16 +61,21 @@ const UserLogin = () => {
     if (isAuthenticated) {
       // Navigate based on user role
       const userRole = user?.role;
-      if (userRole === "super_admin" || userRole === 'admin') {
-        toast.success('Welcome Admin!');
-        navigate('/admin-dashboard');
-      } else if (userRole === "user" || userRole === "reseller") {
-        toast.success('Welcome User!');
-        navigate('/dashboard');
-      } else {
-        navigate('/login')
-      }
 
+      const roleMap = {
+        super_admin: { message: 'Welcome Admin!', path: '/admin-dashboard' },
+        reseller: { message: 'Welcome Reseller!', path: '/admin-dashboard' },
+        user: { message: 'Welcome User!', path: '/dashboard' },
+      };
+      
+      const roleData = roleMap[userRole];
+      
+      if (roleData) {
+        toast.success(roleData.message);
+        navigate(roleData.path);
+      } else {
+        navigate('/login');
+      }      
     }
   }, [isAuthenticated, navigate, user]);
 
