@@ -244,7 +244,7 @@ const App = () => {
 
                     <Route path='/manage-user' element={<ManageUser />} />
                     <Route path='/membership-validity' element={<MembershipValidTill />} />
-                    <Route path='/manage-credit' element={<ManageCredit />} />
+                    <Route path='/manage-credit' element={<ManageCredit isOpen={isOpen} />} />
                     <Route path='/add-new-user' element={<AddNewUser />} />
                     <Route path='/profile' element={<ProfilePage />} />
                     <Route path='*' element={<NotFoundPage />} />

@@ -1,5 +1,6 @@
 // PrivateRoute.js
 import { Navigate, Outlet } from 'react-router-dom';
+import { getSecureItem } from '../pages/utils/SecureLocalStorage';
 
 export const PrivateRoute = () => {
   return isAuthenticated() ? <Outlet /> : <Navigate to="/" />;
@@ -11,5 +12,5 @@ export const PublicRoute = () => {
 };
 
 const isAuthenticated = () => {
-  return !!localStorage.getItem('userToken');
+  return !!getSecureItem('userToken');
 };

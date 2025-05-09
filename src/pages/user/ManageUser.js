@@ -4,6 +4,7 @@ import 'react-toastify/dist/ReactToastify.css'; // Import Toastify CSS
 import { ToastContainer, toast } from 'react-toastify'; // Import Toastify
 import axios from 'axios';
 import { useNavigate } from "react-router-dom";
+import { getSecureItem } from "../utils/SecureLocalStorage";
 
 function ManageUser() {
     const navigate = useNavigate();
@@ -28,7 +29,7 @@ function ManageUser() {
 
     // Simulating user data fetching from localStorage
     useEffect(() => {
-        const storedData = localStorage.getItem("userData");
+        const storedData = getSecureItem("userData");
         if (storedData) {
             const parsedData = JSON.parse(storedData);
             setUser(parsedData.user);
