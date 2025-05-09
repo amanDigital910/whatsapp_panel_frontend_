@@ -12,33 +12,27 @@ const AutoLogoutWrapper = ({ children }) => {
   const timeoutDuration = 10 * 60 * 1000; // 10 Minute
 
   const handleLogout = useCallback(() => {
-    localStorage.removeItem('logoutTime');
     dispatch(logout());
     navigate("/login");
   }, [dispatch, navigate]);
 
   const resetTimer = useCallback(() => {
+    // Clear the existing timer
     clearTimeout(timerRef.current);
-    const logoutTime = Date.now() + timeoutDuration;
-    localStorage.setItem('logoutTime', logoutTime);
+    // Set a new timer
     timerRef.current = setTimeout(handleLogout, timeoutDuration);
-  }, [handleLogout]);
+  }, [handleLogout, timeoutDuration]);
 
-  // On initial load, check if the user should be logged out
   useEffect(() => {
-    const logoutTime = parseInt(localStorage.getItem('logoutTime'), 10);
-    if (logoutTime && Date.now() > logoutTime) {
-      handleLogout();
-    } else {
-      resetTimer();
-    }
-
+    resetTimer();
+    // Define the events to listen for
     const events = ['mousemove', 'click', 'keydown', 'scroll'];
-
+    // Add event listeners to reset the timer
     for (const event of events) {
       window.addEventListener(event, resetTimer);
     }
 
+    // Cleanup function to remove event listeners and clear the timer
     return () => {
       for (const event of events) {
         window.removeEventListener(event, resetTimer);

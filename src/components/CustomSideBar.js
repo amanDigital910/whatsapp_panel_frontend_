@@ -15,6 +15,7 @@ import whatsappIcon from '../assets/icons/whatsapp.png';
 import ProfileImgBG from '../assets/profile_img_logo_bg.jpg';
 import useIsMobile from '../hooks/useMobileSize';
 import './style.css'
+import { getSecureItem } from '../pages/utils/SecureLocalStorage';
 
 const SideBar = ({ isOpen, toggleDropdown, activeDropdown }) => {
 
@@ -183,6 +184,13 @@ const SideBar = ({ isOpen, toggleDropdown, activeDropdown }) => {
         },
     ];
 
+    const userRole = JSON.parse(getSecureItem("userData"));
+    
+    const filteredSidebarMenu = sidebarMenu.filter(item => {
+        if (userRole?.role === "admin" || userRole?.role === "super_admin") return true;
+        return item.label !== "Admin Dashboard" && item.label !== "Transaction Logs";
+    });
+
     return (
         <>
             {(!isMobile || isOpen) && (
@@ -210,7 +218,7 @@ const SideBar = ({ isOpen, toggleDropdown, activeDropdown }) => {
 
                         {/* Menu Items */}
                         <ul className="space-y-1 py-0 px-0">
-                            {sidebarMenu.map((item, index) => {
+                            {filteredSidebarMenu.map((item, index) => {
                                 const isActiveParent = item.to && location.pathname === item.to;
                                 const isDropdownActive = item.dropdown?.some(sub => location.pathname === sub.to || sub.subDropdown?.some(nested => location.pathname === nested.to));
 
