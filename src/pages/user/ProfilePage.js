@@ -121,7 +121,7 @@ const ProfilePage = () => {
                   />
                 </div>
               </div>
-              <div className="flex flex-col gap-4 w-80 md:w-full md:justify-center justify-around ">
+              <div className="flex flex-col gap-4 w-80 md:w-full md:justify-center justify-start ">
                 <input
                   type="file"
                   accept="image/jpeg, image/jpg, image/png"
@@ -135,9 +135,9 @@ const ProfilePage = () => {
                 >
                   Upload
                 </label>
-                <span className="w-full text-center text-black m-0 border-none text-xl font-semibold px-4 py-2 rounded-md bg-gray-400 cursor-not-allowed">
+                {/* <span className="w-full text-center text-black m-0 border-none text-xl font-semibold px-4 py-2 rounded-md bg-gray-400 cursor-not-allowed">
                   User Name
-                </span>
+                </span> */}
               </div>
             </div>
             <div className="mb-4 ">
@@ -149,9 +149,10 @@ const ProfilePage = () => {
                 className="mt-1 block w-full border-2 text-lg border-black rounded-md p-2"
                 id="username"
                 name="username"
-                placeholder="Ex. (vikram_rajput)"
+                placeholder="Ex. (vikram)"
                 value={formData.username}
                 onChange={handleChange}
+                readOnly
                 required
               />
             </div>
