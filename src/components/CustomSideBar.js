@@ -1,3 +1,4 @@
+/* eslint-disable array-callback-return */
 import React, { useState } from 'react';
 import { Link, useLocation } from 'react-router-dom';
 import creditCardIcon from '../assets/icons/credit-card.png';
@@ -15,11 +16,16 @@ import whatsappIcon from '../assets/icons/whatsapp.png';
 import ProfileImgBG from '../assets/profile_img_logo_bg.jpg';
 import useIsMobile from '../hooks/useMobileSize';
 import './style.css'
+
+import { useSelector } from 'react-redux';
+
 import { getSecureItem } from '../pages/utils/SecureLocalStorage';
 
 const SideBar = ({ isOpen, toggleDropdown, activeDropdown }) => {
 
     const location = useLocation();
+    const userRole = useSelector((state) => state?.userLogin.user?.role);
+    console.log(userRole);
 
     const isMobile = useIsMobile();
 

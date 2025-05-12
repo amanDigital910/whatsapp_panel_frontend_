@@ -175,11 +175,11 @@ const ReportCampaign = ({ isOpen }) => {
     { key: 'to', label: 'Phone No.' },
     { key: 'readStatus', label: 'Read Status' },
     { key: 'status', label: 'Status' },
-    { key: 'messageId', label: 'Message ID' },
+    // { key: 'messageId', label: 'Message ID' },
     { key: 'sender', label: 'Sender' },
-    { key: 'credits', label: 'Credits' },
+    // { key: 'credits', label: 'Credits' },
     { key: 'templateId', label: 'Template ID' },
-    { key: 'variables', label: 'Variables' },
+    // { key: 'variables', label: 'Variables' },
     { key: 'route', label: 'Route' },
     { key: 'error', label: 'Error' },
     { key: 'submitted_failed', label: 'Timestamps' }
@@ -293,11 +293,11 @@ const ReportCampaign = ({ isOpen }) => {
                   <td className="px-2 py-2 border border-gray-900">+91{log.to}</td>
                   <td className="px-2 py-2 border border-gray-900">{log.readStatus || '-'}</td>
                   <td className="px-2 py-2 border border-gray-900 text-red-600">{log.status}</td>
-                  <td className="px-2 py-2 border border-gray-900 max-w-[200px] truncate">{log.messageId}</td>
+                  {/* <td className="px-2 py-2 border border-gray-900 max-w-[200px] truncate">{log.messageId}</td> */}
                   <td className="px-2 py-2 border border-gray-900">+91{log.sender}</td>
-                  <td className="px-2 py-2 border border-gray-900">{log.credits}</td>
+                  {/* <td className="px-2 py-2 border border-gray-900">{log.credits}</td> */}
                   <td className="px-2 py-2 border border-gray-900">{log.templateId}</td>
-                  <td className="px-2 py-2 border border-gray-900">{log.variables || '-'}</td>
+                  {/* <td className="px-2 py-2 border border-gray-900">{log.variables || '-'}</td> */}
                   <td className="px-2 py-2 border border-gray-900">{log.route}</td>
                   <td className="px-2 py-2 border border-gray-900 w-40">{log.error || '-'}</td>
                   <td className="px-2 py-2 border border-gray-900 w-48">

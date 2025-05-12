@@ -1,6 +1,7 @@
 import axios from "axios";
 import { getSecureItem, removeSecureItem, setSecureItem } from "../../pages/utils/SecureLocalStorage";
 
+
 // Action Types
 export const LOGIN_REQUEST = 'LOGIN_REQUEST';
 export const LOGIN_SUCCESS = 'LOGIN_SUCCESS';
@@ -32,15 +33,15 @@ export const login = (username, password) => async (dispatch) => {
 
     if (response.status === 200) {
       const userData = response?.data?.data;
-      const { user, token, requirePasswordChange } = userData;
+      const { user, token, } = userData;
 
       setSecureItem('userData', JSON.stringify(user));
       setSecureItem('userToken', token);
 
-      dispatch(loginSuccess(user));
+      // Set a session cookie with the encrypted token
+      setAuthCookies(user, token);
+      dispatch(loginSuccess({ user, token }));
 
-      // Return this flag so the UI can redirect
-      return { requirePasswordChange };
     }
   } catch (error) {
     let errorMessage = 'An unknown error occurred. Please try again.';
@@ -71,16 +72,20 @@ export const login = (username, password) => async (dispatch) => {
 // Logout
 export const logout = () => async (dispatch) => {
   try {
-    // toast.error('Logout Successfully.');
-    // await axios.post(
-    //   `${process.env.REACT_APP_API_URL}/api/auth/logout`,
+    // const encryptToken = Cookies.get("userToken");
+    // const userToken = decryptData(encryptToken);
+    // console.log(userToken);
+
+    // // toast.error('Logout Successfully.');
+    // await axios.post(`${process.env.REACT_APP_API_URL}/api/auth/logout`, {},
     //   {
     //     headers: {
     //       "Content-Type": "application/json",
-    //       Authorization: `Bearer ${localStorage.getItem("userToken")}`,
+    //       Authorization: `Bearer ${userToken}`,
     //     },
     //   }
     // );
+
     removeSecureItem('userToken');
     removeSecureItem('userData');
     dispatch({ type: LOGOUT });

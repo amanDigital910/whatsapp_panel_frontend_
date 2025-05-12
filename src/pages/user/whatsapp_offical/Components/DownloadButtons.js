@@ -70,7 +70,6 @@ const DownloadButtons = ({ dataLogs, headers }) => {
           th { background-color: #f2f2f2; }
           h2 { font-family: Arial, sans-serif; }
           @media print {
-            @page { size: landscape; }
             button { display: none; }
           }
         </style>
