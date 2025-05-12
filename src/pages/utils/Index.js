@@ -665,7 +665,8 @@ export const ProfileImageUploader = ({
 
     return (
         <div className="w-[20%] lg:w-full items-center flex flex-col gap-2 border border-black rounded-lg bg-white px-2 pt-3 ">
-            <div className="max-w-32 max-h-32 lg:h-52 lg:w-52 relative rounded-full overflow-hidden border-2 border-gray-300">
+            {/* Profile Image */}
+            <div className="h-24 w-24 relative rounded-full overflow-hidden border-2 border-gray-300">
                 <img
                     src={userprofilePreview || userImage}
                     alt="Profile"
@@ -673,22 +674,24 @@ export const ProfileImageUploader = ({
                 />
             </div>
 
-            {/* <label className="text-sm flex-row text-gray-700 font-medium">Select an image:</label> */}
+            {/* Upload or Remove Button */}
             {userprofilePreview ? (
                 <button
                     onClick={handleClear}
-                    className="bg-red-600 text-white px-3 py-2 text-sm rounded hover:underline  underline-offset-2 lg:whitespace-nowrap"
+                    className="bg-red-600 text-white px-2 py-2 md:text-sm text-[12px] rounded hover:underline underline-offset-2 whitespace-nowrap"
                 >
                     Remove Image
                 </button>
             ) : (
                 <label
                     htmlFor="profile-upload"
-                    className="flex w-full lg:w-fit px-3 text-center text-sm bg-blue-600 text-white py-2 justify-center items-center lg:whitespace-nowrap rounded cursor-pointer hover:bg-blue-700 transition duration-200 hover:underline  underline-offset-2"
+                    className="flex w-full lg:w-fit px-2 text-center md:text-sm text-[12px] bg-blue-600 text-white py-2 justify-center items-center lg:whitespace-nowrap rounded cursor-pointer hover:bg-blue-700 transition duration-200 hover:underline  underline-offset-2"
                 >
                     Upload Image
                 </label>
             )}
+
+            {/* Hidden File Input */}
             <input
                 id="profile-upload"
                 type="file"
@@ -699,13 +702,13 @@ export const ProfileImageUploader = ({
                     }
                 }}
                 className="hidden"
-                // className="text-sm w-full text-gray-600 file:text-white file:bg-blue-600 file:px-4 file:py-1 file:rounded file:cursor-pointer"
                 accept="image/jpeg, image/jpg, image/png"
             />
 
+            {/* File Name */}
             {imageName && (
-                <span className="text-xs text-gray-500 mt-1 px-2 whitespace-normal truncate">
-                    Selected: {imageName}
+                <span className="text-xs text-gray-500 mb-3 break-words whitespace-normal block">
+                    {imageName}
                 </span>
             )}
         </div>

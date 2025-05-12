@@ -29,7 +29,6 @@ export const loginReducer = (state = loginInitialState, action) => {
                 isAuthenticated: true,
                 loading: false,
                 token: action.payload.token,
-                requirePasswordChange: action.payload.requirePasswordChange,
                 error: '',
             };
         case LOGIN_FAILURE:

@@ -8,7 +8,7 @@ import './App.css'
 import { Provider } from 'react-redux';
 import store from './redux/store';
 
-import { PrivateRoute, PublicRoute } from './components/ProtectedRoutes';
+import { PrivateRoute, PublicRoute, ROLES } from './components/ProtectedRoutes';
 import NotFoundPage from './components/NotFoundPage';
 import AutoLogoutWrapper from './components/AutoLogoutWrapper';
 import PersonalGroupChannelCommunity from './pages/user/wa_personal/PersonalGroupChannel-Community.js';
@@ -162,10 +162,12 @@ const App = () => {
                   </Route>
 
                   {/* Protected routes */}
-                  <Route element={<PrivateRoute />}>
+                  <Route element={<PrivateRoute allowedRoles={[ROLES.SUPER_ADMIN]} />}>
                     {/* Dashboard admin and user */}
                     <Route path="/admin-dashboard" element={<AdminDashboard />} />
                     <Route path='/transitiontable' element={<TransitionCReditUser />} />
+                  </Route>
+                  <Route element={<PrivateRoute allowedRoles={[ROLES.ADMIN, ROLES.RESELLER, ROLES.USER]} />}>
                     <Route path="/dashboard" element={<Dashboard />} />
 
                     {/* Wa virtual campaige */}
@@ -233,20 +235,21 @@ const App = () => {
                     {/* Developer API Pages*/}
                     {/* Personal Developer API */}
                     <Route path="/personal/developer-api" element={<PersonalDeveloperAPI isOpen={isOpen} />} />
-                    <Route path="/personal/whatsapp-report"  element={<PersonalDeveloperReport />} />
+                    <Route path="/personal/whatsapp-report" element={<PersonalDeveloperReport />} />
                     {/* International Developer API */}
-                    <Route path="/international/developer-api" element={<InternationalDeveloperAPI />}  />
-                    <Route path="/international/whatsapp-report" element={<InternationalDeveloperReport />}  />
+                    <Route path="/international/developer-api" element={<InternationalDeveloperAPI />} />
+                    <Route path="/international/whatsapp-report" element={<InternationalDeveloperReport />} />
 
 
                     <Route path="/group" element={<GroupCampaign />} />
                     <Route path="/template" element={<TemplateCampaign />} />
 
-                    <Route path='/manage-user' element={<ManageUser  isOpen={isOpen} />} />
+                    <Route path='/manage-user' element={<ManageUser isOpen={isOpen} />} />
                     <Route path='/membership-validity' element={<MembershipValidTill />} />
                     <Route path='/manage-credit' element={<ManageCredit isOpen={isOpen} />} />
                     <Route path='/add-new-user' element={<AddNewUser />} />
                     <Route path='/profile' element={<ProfilePage />} />
+                    <Route path='/unauthorized' element={<NotFoundPage />} />
                     <Route path='*' element={<NotFoundPage />} />
                   </Route>
                 </Routes>
@@ -256,7 +259,7 @@ const App = () => {
         </div>
       </div>
       <ToastContainer />
-    </div>
+    </div >
   );
 };
 

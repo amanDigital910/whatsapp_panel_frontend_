@@ -1,3 +1,4 @@
+/* eslint-disable array-callback-return */
 import React, { useState } from 'react';
 import { Link, useLocation } from 'react-router-dom';
 import creditCardIcon from '../assets/icons/credit-card.png';
