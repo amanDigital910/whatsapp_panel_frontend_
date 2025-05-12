@@ -170,7 +170,7 @@ function AddNewUser() {
                                     className="mt-1 block w-full border-2 text-lg border-black rounded-md p-2"
                                     id="username"
                                     name="username"
-                                    placeholder="Ex. (vikram_rajput)"
+                                    placeholder="Ex. (vikram)"
                                     value={formData.username}
                                     onChange={handleChange}
                                     required

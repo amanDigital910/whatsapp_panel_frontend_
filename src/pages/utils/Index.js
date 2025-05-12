@@ -2,6 +2,8 @@ import './style.css'
 import { MdDelete } from "react-icons/md"
 import { FaFileCsv } from "react-icons/fa6"
 import { useEffect, useRef, useState } from "react"
+import { LuArrowDown, LuArrowUp } from 'react-icons/lu'
+import { toast } from 'react-toastify'
 
 const RequireMark = () => {
     return (
@@ -352,7 +354,7 @@ export const CountryDropDown = ({ selectedCountry, setSelectedCountry, countries
 
 // New whatsapp Text Numbers
 export const WhatsappTextNumber = ({ setWhatsAppNumbers, whatsAppNumbers, statsNumber, setStatsNumber }) => {
-    
+
     const handleInputChange = (event) => {
         setWhatsAppNumbers(event.target.value);
     };
@@ -768,6 +770,62 @@ export const VideoUploader = ({ inputRef, uploadedFile, onFileUpload, onRemove, 
     </div>
 );
 
+export const CustomizeTable = ({
+    headers = [],
+    data = [],
+    sortConfig = {},
+    onSort = () => { },
+    renderRow,
+    className = '',
+    theadClassName = '',
+    emptyMessage = 'No data available.',
+}) => {
+    const renderSortIcon = (key) => {
+        if (sortConfig.key === key) {
+            return sortConfig.direction === 'asc' ? <LuArrowUp /> : <LuArrowDown />;
+        }
+        return (
+            <span className="text-white flex flex-row">
+                <LuArrowUp />
+                <LuArrowDown />
+            </span>
+        );
+    };
+
+    return (
+        <table className={`min-w-full text-sm ${className}`}>
+            <thead className={`sticky top-0 z-10 ${theadClassName}`}>
+                <tr>
+                    {headers.map(({ label, key }) => (
+                        <th
+                            key={key}
+                            onClick={() => onSort(key)}
+                            className="px-4 py-2 text-left cursor-pointer select-none whitespace-nowrap bg-gray-900 text-white"
+                        >
+                            <div className="flex items-center justify-between gap-3">
+                                {label}
+                                <div className="w-8">{renderSortIcon(key)}</div>
+                            </div>
+                        </th>
+                    ))}
+                </tr>
+            </thead>
+            <tbody>
+                {data.length > 0 ? (
+                    data.map((item, index) => renderRow(item, index))
+                ) : (
+                    <tr>
+                        <td colSpan={headers.length} className="text-center py-2 text-red-500 tracking-wider text-lg font-semibold">
+                            {emptyMessage}
+                        </td>
+                    </tr>
+                )}
+            </tbody>
+        </table>
+    );
+};
+
+
 export const SendNowButton = ({ handleSendCampaign }) => {
     return (
         <div className="px-3 mb-4">
@@ -777,5 +835,77 @@ export const SendNowButton = ({ handleSendCampaign }) => {
                 Send Now
             </button>
         </div>
+    )
+}
+
+export const CopyToClipboard = ({ activeSnippet }) => {
+
+    // Copy to Clipboard Button
+    const copyToClipboard = () => {
+        const textToCopy = activeSnippet.code.join('\n');
+        navigator.clipboard.writeText(textToCopy).then(() => {
+            // alert(`Copied ${activeSnippet.language} code to clipboard!`);
+            toast.success(`Copied ${activeSnippet.language} code to clipboard!`)
+        }).catch(err => {
+            console.error('Failed to copy:', err);
+        });
+    };
+    return (
+        <button className='px-3 py-1 text-base font-medium border-2 border-[#0d6efd] text-[#0d6efd] rounded-md hover:text-white
+         hover:bg-[#0d6efd]' onClick={copyToClipboard}>
+            Copy
+        </button>
+    )
+}
+
+export const DownloadCSVButton = ({ headers, dataLogs }) => {
+    const convertToCSV = (rows) => {
+        const csvHeaders = headers.map(h => h.label).join(',');
+
+        const csvRows = rows.map(row =>
+            headers.map(h => {
+                const strValue = String(row[h.key] ?? '');
+                const needsTextFormat = /^\d{9,}$/.test(strValue);
+                const safeValue = needsTextFormat ? `+91 ${strValue}` : strValue;
+                return `"${safeValue.replace(/"/g, '""')}"`;
+            }).join(',')
+        );
+
+        toast.success('Logs details downloaded as CSV');
+        return [csvHeaders, ...csvRows].join('\r\n');
+    };
+
+    const downloadCSV = () => {
+        const csv = convertToCSV(dataLogs);
+        const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
+        const url = URL.createObjectURL(blob);
+
+        const a = document.createElement('a');
+        a.href = url;
+        a.setAttribute('download', 'data.csv');
+        document.body.appendChild(a);
+        a.click();
+        document.body.removeChild(a);
+        URL.revokeObjectURL(url);
+    };
+
+    return (
+        <button
+            className='px-3 py-1 text-base font-medium border-2 border-[#dc3545] text-[#dc3545] rounded-md hover:text-white hover:bg-[#dc3545]'
+            onClick={downloadCSV}
+        >
+            CSV
+        </button>
+    );
+};
+export const DownloadPDFButton = () => {
+    const downloadPDF = () => {
+
+    }
+
+    return (
+        <button className='px-3 py-1 text-base font-medium border-2 border-[#198754] text-[#198754] rounded-md hover:text-white hover:bg-[#198754]' onClick={downloadPDF}>
+            PDF
+        </button>
     )
 }

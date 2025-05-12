@@ -26,15 +26,15 @@ const GroupCampaign = () => {
     try {
       console.log(`${process.env.REACT_APP_API_URL}`);
 
-      const response = await fetch(
-        `${process.env.REACT_APP_API_URL}/msggroup/`
-      );
-      if (response.ok) {
-        const data = await response.json();
-        setGroup(data);
-      } else {
-        toast.error("Failed to fetch templates.");
-      }
+      // const response = await fetch(
+      //   `${process.env.REACT_APP_API_URL}/msggroup/`
+      // );
+      // if (response.ok) {
+      //   const data = await response.json();
+      //   setGroup(data);
+      // } else {
+      //   toast.error("Failed to fetch templates.");
+      // }
     } catch (error) {
       toast.error(`Error: ${error.message}`);
     }
@@ -53,37 +53,37 @@ const GroupCampaign = () => {
       group_number: groupNub,
     };
 
-    try {
-      const method = editingId ? "PUT" : "POST";
-      const url = editingId
-        ? `${process.env.REACT_APP_API_URL}/msggroup//${editingId}`
-        : `${process.env.REACT_APP_API_URL}/msggroup/`;
-      const response = await fetch(url, {
-        method,
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify(payload),
-      });
+    // try {
+    //   const method = editingId ? "PUT" : "POST";
+    //   const url = editingId
+    //     ? `${process.env.REACT_APP_API_URL}/msggroup//${editingId}`
+    //     : `${process.env.REACT_APP_API_URL}/msggroup/`;
+    //   const response = await fetch(url, {
+    //     method,
+    //     headers: {
+    //       "Content-Type": "application/json",
+    //     },
+    //     body: JSON.stringify(payload),
+    //   });
 
-      if (response.ok) {
-        const data = await response.json();
-        toast.success(
-          editingId
-            ? "Template updated successfully!"
-            : "Template added successfully!"
-        );
-        setGroupName("");
-        setGroupNum("");
-        setEditingId(null);
-        fetchTemplates();
-      } else {
-        const errorData = await response.json();
-        toast.error(errorData.message || "Something went wrong.");
-      }
-    } catch (error) {
-      toast.error(`Error: ${error.message}`);
-    }
+    //   if (response.ok) {
+    //     const data = await response.json();
+    //     toast.success(
+    //       editingId
+    //         ? "Template updated successfully!"
+    //         : "Template added successfully!"
+    //     );
+    //     setGroupName("");
+    //     setGroupNum("");
+    //     setEditingId(null);
+    //     fetchTemplates();
+    //   } else {
+    //     const errorData = await response.json();
+    //     toast.error(errorData.message || "Something went wrong.");
+    //   }
+    // } catch (error) {
+    //   toast.error(`Error: ${error.message}`);
+    // }
   };
 
   const editTemplate = (id) => {
@@ -96,24 +96,24 @@ const GroupCampaign = () => {
   };
 
   const deleteTemplate = async (id) => {
-    try {
-      const response = await fetch(
-        `${process.env.REACT_APP_API_URL}/msggroup/${id}`,
-        {
-          method: "DELETE",
-        }
-      );
+    // try {
+    //   const response = await fetch(
+    //     `${process.env.REACT_APP_API_URL}/msggroup/${id}`,
+    //     {
+    //       method: "DELETE",
+    //     }
+    //   );
 
-      if (response.ok) {
-        toast.success("Template deleted successfully!");
-        fetchTemplates();
-      } else {
-        const errorData = await response.json();
-        toast.error(errorData.message || "Something went wrong.");
-      }
-    } catch (error) {
-      toast.error(`Error: ${error.message}`);
-    }
+    //   if (response.ok) {
+    //     toast.success("Template deleted successfully!");
+    //     fetchTemplates();
+    //   } else {
+    //     const errorData = await response.json();
+    //     toast.error(errorData.message || "Something went wrong.");
+    //   }
+    // } catch (error) {
+    //   toast.error(`Error: ${error.message}`);
+    // }
   };
 
   const indexOfLastRecord = currentPage * recordsPerPage;
