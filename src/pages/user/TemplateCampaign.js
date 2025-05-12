@@ -139,25 +139,25 @@ const TemplateCampaign = () => {
 
     try {
       let response;
-      if (editingId) {
-        // Update existing template
-        response = await fetch(`${process.env.REACT_APP_API_URL}/msgtemplate/${editingId}`, {
-          method: "PUT",
-          headers: {
-            "Content-Type": "application/json",
-          },
-          body: JSON.stringify(payload),
-        });
-      } else {
-        // Create new template
-        response = await fetch(`${process.env.REACT_APP_API_URL}/msgtemplate/`, {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-          },
-          body: JSON.stringify(payload),
-        });
-      }
+      // if (editingId) {
+      //   // Update existing template
+      //   response = await fetch(`${process.env.REACT_APP_API_URL}/msgtemplate/${editingId}`, {
+      //     method: "PUT",
+      //     headers: {
+      //       "Content-Type": "application/json",
+      //     },
+      //     body: JSON.stringify(payload),
+      //   });
+      // } else {
+      //   // Create new template
+      //   response = await fetch(`${process.env.REACT_APP_API_URL}/msgtemplate/`, {
+      //     method: "POST",
+      //     headers: {
+      //       "Content-Type": "application/json",
+      //     },
+      //     body: JSON.stringify(payload),
+      //   });
+      // }
 
       if (response.ok) {
         setFeedback(editingId ? "Template updated successfully!" : "Template added successfully!");
@@ -165,7 +165,7 @@ const TemplateCampaign = () => {
         setTemplateName("");
         setTemplateMsg("");
         setEditingId(null); // Reset editing state
-        fetchTemplates(); // Refresh the table after submission
+        // fetchTemplates(); // Refresh the table after submission
       } else {
         const errorData = await response.json();
         setFeedback(`Error: ${errorData.message || "Something went wrong."}`);
@@ -186,24 +186,24 @@ const TemplateCampaign = () => {
   };
 
   const deleteTemplate = async (id) => {
-    try {
-      const response = await fetch(`${process.env.REACT_APP_API_URL}/msgtemplate/${id}`, {
-        method: "DELETE",
-      });
+    // try {
+    //   const response = await fetch(`${process.env.REACT_APP_API_URL}/msgtemplate/${id}`, {
+    //     method: "DELETE",
+    //   });
 
-      if (response.ok) {
-        setFeedback("Template deleted successfully!");
-        toast.success("Template deleted successfully!");
-        fetchTemplates(); // Refresh the templates list after deletion
-      } else {
-        const errorData = await response.json();
-        setFeedback(`Error: ${errorData.message || "Something went wrong."}`);
-        toast.error(errorData.message || "Something went wrong.");
-      }
-    } catch (error) {
-      setFeedback(`Error: ${error.message}`);
-      toast.error(`Error: ${error.message}`);
-    }
+    //   if (response.ok) {
+    //     setFeedback("Template deleted successfully!");
+    //     toast.success("Template deleted successfully!");
+    //     fetchTemplates(); // Refresh the templates list after deletion
+    //   } else {
+    //     const errorData = await response.json();
+    //     setFeedback(`Error: ${errorData.message || "Something went wrong."}`);
+    //     toast.error(errorData.message || "Something went wrong.");
+    //   }
+    // } catch (error) {
+    //   setFeedback(`Error: ${error.message}`);
+    //   toast.error(`Error: ${error.message}`);
+    // }
   };
 
   // Pagination Logic
@@ -218,9 +218,9 @@ const TemplateCampaign = () => {
   };
 
   // Fetch templates on component mount
-  useEffect(() => {
-    fetchTemplates();
-  }, []);
+  // useEffect(() => {
+  //   fetchTemplates();
+  // }, []);
 
   return (
     <>

@@ -1,11 +1,14 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useMemo } from "react";
 import CreditHeader from "../../components/CreditHeader";
 import 'react-toastify/dist/ReactToastify.css'; // Import Toastify CSS
 import { ToastContainer, toast } from 'react-toastify'; // Import Toastify
 import axios from 'axios';
 import { useNavigate } from "react-router-dom";
+import { getSecureItem } from "../utils/SecureLocalStorage";
+import { CampaignHeading, CustomizeTable } from "../utils/Index";
+import useIsMobile from "../../hooks/useMobileSize";
 
-function ManageUser() {
+function ManageUser({ isOpen }) {
     const navigate = useNavigate();
 
     const [user, setUser] = useState(null); // Current user data
@@ -14,6 +17,9 @@ function ManageUser() {
     const [searchQuery, setSearchQuery] = useState(""); // Search query state
     const [currentPage, setCurrentPage] = useState(1);
     const recordsPerPage = 5; // Number of records per page
+    const [sortConfig, setSortConfig] = useState({ key: '', direction: 'asc' });
+    const [searchTerm, setSearchTerm] = useState('');
+    const isMobile = useIsMobile();
 
     const [formData, setFormData] = useState({
         userid: "",
@@ -24,11 +30,20 @@ function ManageUser() {
         selectedRoles: [], // Initialize as an empty array
     });
 
+    const headers = [
+        { key: 'id', label: 'S.No.' },
+        { key: 'userName', label: 'Username' },
+        { key: 'userType', label: 'User Type' },
+        { key: 'date', label: 'Date' },
+        { key: 'action', label: 'Action' }
+    ];
+
+
     const [isLoading, setIsLoading] = useState(false); // Loading state for API calls
 
     // Simulating user data fetching from localStorage
     useEffect(() => {
-        const storedData = localStorage.getItem("userData");
+        const storedData = getSecureItem("userData");
         if (storedData) {
             const parsedData = JSON.parse(storedData);
             setUser(parsedData.user);
@@ -88,7 +103,7 @@ function ManageUser() {
 
     // Handle search input change
     const handleSearch = (e) => {
-        const query = e.target.value.toLowerCase();
+        const query = setSearchTerm(e.target.value.toLowerCase());
         setSearchQuery(query);
 
         if (query.trim() === "") {
@@ -117,40 +132,109 @@ function ManageUser() {
         navigate('/add-new-user');
     }
 
+    const renderRow = (log, index) => (
+        <tr key={index} className="text-white border border-gray-700 hover:bg-gray-500 whitespace-nowrap">
+            <td className="px-2 py-2 border border-gray-900">{log.id}</td>
+            <td className="px-2 py-2 border border-gray-900 text-blue-600 underline cursor-pointer">{log.to_user_name}</td>
+            <td className="px-2 py-2 border border-gray-900">
+                {log.credit_type.charAt(0).toUpperCase() + log.credit_type.slice(1)}
+            </td>
+            <td className="px-2 py-2 border border-gray-900">{log.credit || '-'}</td>
+            <td className="px-2 py-2 border border-gray-900 ">{log.name}</td>
+            <td className="px-2 py-2 border border-gray-900 max-w-[200px] truncate">
+                {new Date(log.transaction_date).toLocaleString()}
+            </td>
+        </tr>
+    );
+
+    const filteredAndSortedLogs = useMemo(() => {
+        const term = searchTerm.toLowerCase().trim();
+
+        const filtered = currentRecords.filter(log => {
+            // Search term filter (matches phone, campaign, status, or read status)
+            const matchesSearch =
+                log.to.trim().includes(term);
+            // log.campaignName.toLowerCase().trim().includes(term) ||
+            // log.status.toLowerCase().trim().includes(term) ||
+            // log.readStatus.toLowerCase().trim().includes(term);
+
+            // Date filter (matches based on start date and end date)
+            return matchesSearch;
+        });
+
+        // Sorting logic
+        if (sortConfig.key) {
+            filtered.sort((a, b) => {
+                const aVal = a[sortConfig.key] || '';
+                const bVal = b[sortConfig.key] || '';
+                if (aVal < bVal) return sortConfig.direction === 'asc' ? -1 : 1;
+                if (aVal > bVal) return sortConfig.direction === 'asc' ? 1 : -1;
+                return 0;
+            });
+        }
+
+        return filtered;
+    }, [currentRecords, searchTerm, sortConfig]);
+
+    const handleSort = (key) => {
+        setSortConfig(prev => ({
+            key,
+            direction: prev.key === key && prev.direction === 'asc' ? 'desc' : 'asc'
+        }));
+    };
+
+    const userData = JSON.parse(getSecureItem("userData"));
+
     return (
         <>
-            <section className="w-full bg-gray-200  flex justify-center flex-col pb-10">
+            <section className='w-[100%] bg-gray-200 h-full min-h-[calc(100vh-70px)] flex flex-col '>
                 <CreditHeader />
-                <div className="w-full px-3 mt-8">
-                    <div className="container-fluid mt-4">
-                        <div className="flex justify-between items-center mb-3">
-                            <button className="btn btn-dark" onClick={handleAddNewUser}>
-                                Add User
-                            </button>
-                            <div className="flex">
-                                <input
-                                    type="text"
-                                    className="form-control me-2"
-                                    placeholder="Search User"
-                                    value={searchQuery}
-                                    onChange={handleSearch}
-                                />
+                <div className="w-full mt-8">
+                    <CampaignHeading campaignHeading="Manage User" />
+                    <div className='px-3 pt-3'>
+                        <div className='bg-white px-3 py-3 w-full'>
+                            <div className="container-fluid p-0">
+                                <div className={`w-full flex ${userData.role === "user" ? "justify-end" : "justify-between"} items-center mb-3`}>
+                                    {userData.role !== "user" && <button className={`" btn btn-dark "}`} onClick={handleAddNewUser}>
+                                        Add User
+                                    </button>}
+                                    <div className="flex justify-end ">
+                                        <input
+                                            type="text"
+                                            className="form-control me-2 border border-black"
+                                            placeholder="Search User"
+                                            value={searchQuery}
+                                            onChange={handleSearch}
+                                        />
 
-                                <button className="btn btn-dark">Search</button>
-                            </div>
-                        </div>
-
-                        <div className="card">
-                            <div className="card-body">
-                                {isLoading ? (
-                                    <div className="text-center my-4">
-                                        <div className="spinner-border text-dark" role="status">
-                                            <span className="visually-hidden">Loading...</span>
-                                        </div>
+                                        <button className="btn btn-dark">Search</button>
                                     </div>
-                                ) : (
-                                    <>
-                                        <table className="table table-bordered table-striped">
+                                </div>
+
+                                <div className="py-3 border-t border-[#383387] ">
+                                    {isLoading ? (
+                                        <div className="text-center my-4">
+                                            <div className="spinner-border text-dark" role="status">
+                                                <span className="visually-hidden">Loading...</span>
+                                            </div>
+                                        </div>
+                                    ) : (
+                                        <div className={`min-w-max`}>
+                                            <div className={`w-full bg-gray-300 flex-shrink-0 overflow-auto custom-horizontal-scroll select-text h-full ${!isMobile ? (isOpen ? "max-w-[calc(100vw-50px)]" : "max-w-[calc(100vw-65px)]") : "max-w-[calc(100vw-64px)]"}`}>
+                                                <CustomizeTable
+                                                    headers={headers}
+                                                    emptyMessage='No transaction logs available.'
+                                                    sortConfig={sortConfig}
+                                                    onSort={handleSort}
+                                                    renderRow={renderRow}
+                                                    data={filteredAndSortedLogs}
+                                                    className="table-auto border-collapse"
+                                                    theadClassName="px-4 py-2 text-left cursor-pointer select-none whitespace-nowrap"
+                                                    rowClassName=''
+                                                // className="text-center py-3 text-lg font-semibold"
+                                                />
+                                            </div>
+                                            {/* <table className="table table-bordered table-striped">
                                             <thead className="table-dark">
                                                 <tr>
                                                     <th>S.No.</th>
@@ -197,36 +281,37 @@ function ManageUser() {
                                                     </tr>
                                                 )}
                                             </tbody>
-                                        </table>
+                                        </table> */}
 
-                                        <div className="d-flex justify-content-end gap-3 align-items-center mt-3">
-                                            <button
-                                                className="btn btn-dark"
-                                                onClick={handlePrevious}
-                                                disabled={currentPage === 1}
-                                            >
-                                                &lt;
-                                            </button>
-                                            <div>
-                                                {indexOfFirstRecord + 1} -{' '}
-                                                {Math.min(indexOfLastRecord, filteredUsers.length)} of{' '}
-                                                {filteredUsers.length}
+                                            <div className="d-flex justify-content-end gap-3 align-items-center mt-3">
+                                                <button
+                                                    className="btn btn-dark"
+                                                    onClick={handlePrevious}
+                                                    disabled={currentPage === 1}
+                                                >
+                                                    &lt;
+                                                </button>
+                                                <div>
+                                                    {indexOfFirstRecord + 1} -{' '}
+                                                    {Math.min(indexOfLastRecord, filteredUsers.length)} of{' '}
+                                                    {filteredUsers.length}
+                                                </div>
+                                                <button
+                                                    className="btn btn-dark"
+                                                    onClick={handleNext}
+                                                    disabled={currentPage === totalPages}
+                                                >
+                                                    &gt;
+                                                </button>
                                             </div>
-                                            <button
-                                                className="btn btn-dark"
-                                                onClick={handleNext}
-                                                disabled={currentPage === totalPages}
-                                            >
-                                                &gt;
-                                            </button>
                                         </div>
-                                    </>
-                                )}
+                                    )}
+                                </div>
                             </div>
                         </div>
                     </div>
                 </div>
-            </section>
+            </section >
 
             {/* Modal
             {isModalOpen && (

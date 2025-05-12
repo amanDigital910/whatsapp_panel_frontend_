@@ -1,7 +1,6 @@
 import axios from "axios";
-import Cookies from 'js-cookie';
-import { encryptData } from "../../components/EnCryptionKeys";
-import { clearAuthCookies, setAuthCookies } from "../../components/Cookies";
+import { getSecureItem, removeSecureItem, setSecureItem } from "../../pages/utils/SecureLocalStorage";
+
 
 // Action Types
 export const LOGIN_REQUEST = 'LOGIN_REQUEST';
@@ -36,8 +35,8 @@ export const login = (username, password) => async (dispatch) => {
       const userData = response?.data?.data;
       const { user, token, } = userData;
 
-      // localStorage.setItem('userData', JSON.stringify(user));
-      // localStorage.setItem('userToken', token);
+      setSecureItem('userData', JSON.stringify(user));
+      setSecureItem('userToken', token);
 
       // Set a session cookie with the encrypted token
       setAuthCookies(user, token);
@@ -86,9 +85,9 @@ export const logout = () => async (dispatch) => {
     //     },
     //   }
     // );
-    // localStorage.removeItem('userToken');
-    // localStorage.removeItem('userData');
-    clearAuthCookies();
+
+    removeSecureItem('userToken');
+    removeSecureItem('userData');
     dispatch({ type: LOGOUT });
   }
   catch (error) {
@@ -111,7 +110,7 @@ export const createUser = (userData) => async (dispatch) => {
       {
         headers: {
           "Content-Type": "application/json",
-          Authorization: `Bearer ${localStorage.getItem("userToken")}`,
+          Authorization: `Bearer ${getSecureItem("userToken")}`,
         },
       }
     );

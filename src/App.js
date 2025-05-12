@@ -82,10 +82,10 @@ const UserResponseReport = lazy(() => import("./pages/user/whatsapp_offical/repo
 const ExportReport = lazy(() => import("./pages/user/whatsapp_offical/reports/ExportsReport.js"));
 
 // Developer API Pages
-const PersonalDeveloperAPI = lazy(() => import("./pages/user/Developer-API/Personal-API/PersonalAPIManage.js"));
-const PersonalDeveloperReport = lazy(() => import("./pages/user/Developer-API/Personal-API/PersonalReport.js"));
-const InternationalDeveloperAPI = lazy(() => import("./pages/user/Developer-API/International-API/InternationalAPIManage.js"));
-const InternationalDeveloperReport = lazy(() => import("./pages/user/Developer-API/International-API/InternationalReport.js"));
+const PersonalDeveloperAPI = lazy(() => import("./pages/user/developer-api/personal-api/PersonalAPIManage.js"));
+const PersonalDeveloperReport = lazy(() => import("./pages/user/developer-api/personal-api/PersonalReport.js"));
+const InternationalDeveloperAPI = lazy(() => import("./pages/user/developer-api/international-api/InternationalAPIManage.js"));
+const InternationalDeveloperReport = lazy(() => import("./pages/user/developer-api/international-api/InternationalReport.js"));
 
 const GroupCampaign = lazy(() => import("./pages/user/GroupCampaign"));
 const TemplateCampaign = lazy(() => import("./pages/user/TemplateCampaign"));
@@ -230,7 +230,7 @@ const App = () => {
 
                     {/* Developer API Pages*/}
                     {/* Personal Developer API */}
-                    <Route path="/personal/developer-api" element={<PersonalDeveloperAPI />} />
+                    <Route path="/personal/developer-api" element={<PersonalDeveloperAPI isOpen={isOpen} />} />
                     <Route path="/personal/whatsapp-report"  element={<PersonalDeveloperReport />} />
                     {/* International Developer API */}
                     <Route path="/international/developer-api" element={<InternationalDeveloperAPI />}  />
@@ -240,9 +240,9 @@ const App = () => {
                     <Route path="/group" element={<GroupCampaign />} />
                     <Route path="/template" element={<TemplateCampaign />} />
 
-                    <Route path='/manage-user' element={<ManageUser />} />
+                    <Route path='/manage-user' element={<ManageUser  isOpen={isOpen} />} />
                     <Route path='/membership-validity' element={<MembershipValidTill />} />
-                    <Route path='/manage-credit' element={<ManageCredit />} />
+                    <Route path='/manage-credit' element={<ManageCredit isOpen={isOpen} />} />
                     <Route path='/add-new-user' element={<AddNewUser />} />
                     <Route path='/profile' element={<ProfilePage />} />
                     <Route path='*' element={<NotFoundPage />} />

@@ -9,6 +9,7 @@ import { BsPersonCircle } from 'react-icons/bs';
 import { Link, useNavigate } from 'react-router-dom';
 import { useDispatch, useSelector } from 'react-redux';
 import { logout } from '../redux/actions';
+import { getSecureItem } from '../pages/utils/SecureLocalStorage';
 
 const NavBar = ({ setIsOpen, isOpen }) => {
     const isMobile = useIsMobile();
@@ -17,9 +18,8 @@ const NavBar = ({ setIsOpen, isOpen }) => {
     const toggleRef = useRef(null);
     const dispatch = useDispatch();
     const navigate = useNavigate();
-    const usersData = useSelector((state) => state?.userLogin.user);
-    const userToken = useSelector((state) => state?.userLogin.token);
-    console.log("USers Data", usersData,userToken);
+
+    const usersData = JSON.parse(getSecureItem("userData"));
 
     const handleOutsideClick = (event) => {
         if (

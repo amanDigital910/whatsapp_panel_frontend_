@@ -6,6 +6,7 @@ import { ToastContainer, toast } from 'react-toastify'; // Import Toastify
 import { FaEye, FaEyeSlash } from "react-icons/fa";
 import { useDispatch, } from "react-redux";
 import { createUser } from "../../redux/actions";
+import { getSecureItem } from "../utils/SecureLocalStorage";
 
 function AddNewUser() {
     const [user, setUser] = useState(null);
@@ -31,7 +32,7 @@ function AddNewUser() {
 
     // Get logged-in user data from localStorage
     useEffect(() => {
-        const storedData = localStorage.getItem("userData");
+        const storedData = getSecureItem("userData");
         if (storedData) {
             const parsed = JSON.parse(storedData);
             setUser(parsed?.user || parsed); // Fallback if `user` key isn't nested
@@ -169,7 +170,7 @@ function AddNewUser() {
                                     className="mt-1 block w-full border-2 text-lg border-black rounded-md p-2"
                                     id="username"
                                     name="username"
-                                    placeholder="Ex. (vikram_rajput)"
+                                    placeholder="Ex. (vikram)"
                                     value={formData.username}
                                     onChange={handleChange}
                                     required

@@ -16,7 +16,10 @@ import whatsappIcon from '../assets/icons/whatsapp.png';
 import ProfileImgBG from '../assets/profile_img_logo_bg.jpg';
 import useIsMobile from '../hooks/useMobileSize';
 import './style.css'
+
 import { useSelector } from 'react-redux';
+
+import { getSecureItem } from '../pages/utils/SecureLocalStorage';
 
 const SideBar = ({ isOpen, toggleDropdown, activeDropdown }) => {
 
@@ -187,10 +190,11 @@ const SideBar = ({ isOpen, toggleDropdown, activeDropdown }) => {
         },
     ];
 
+    const userRole = JSON.parse(getSecureItem("userData"));
+    
     const filteredSidebarMenu = sidebarMenu.filter(item => {
-        if (userRole === "reseller" || userRole === "super_admin") return true;
+        if (userRole?.role === "admin" || userRole?.role === "super_admin") return true;
         return item.label !== "Admin Dashboard" && item.label !== "Transaction Logs";
-
     });
 
     return (

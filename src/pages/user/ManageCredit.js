@@ -1,15 +1,23 @@
+/* eslint-disable react-hooks/exhaustive-deps */
 import axios from 'axios';
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useMemo, useState } from "react";
 import { toast } from 'react-toastify'; // Import Toastify
 import 'react-toastify/dist/ReactToastify.css'; // Import Toastify CSS
 import CreditHeader from "../../components/CreditHeader";
+import useIsMobile from '../../hooks/useMobileSize';
+import '../user/whatsapp_offical/commonCSS.css'
+import { LuArrowDown, LuArrowUp } from 'react-icons/lu';
+import { CampaignHeading, CustomizeTable } from '../utils/Index';
 
-function ManageCredit() {
+function ManageCredit({ isOpen }) {
     const [user, setUser] = useState(null); // User state
     const [usersList, setUsersList] = useState([]); // List of users fetched from the API
     const [categories, setCategories] = useState([]); // List of categories
     const [transactionLogs, setTransactionLogs] = useState([]); // Transaction logs
     const [currentPage, setCurrentPage] = useState(1);
+    const [sortConfig, setSortConfig] = useState({ key: '', direction: 'asc' });
+    const [searchTerm, setSearchTerm] = useState('');
+    const isMobile = useIsMobile();
     const recordsPerPage = 5; // You can adjust this as needed
 
     const [formData, setFormData] = useState({
@@ -19,12 +27,66 @@ function ManageCredit() {
         creditDebit: "",
     }); // Form data state
 
+    const headers = [
+        // UserName Balance Type Balance Credit Type Credit Date
+        { key: 'id', label: 'ID' },
+        { key: 'userName', label: 'UserName' },
+        { key: 'balanceType', label: 'Balance Type' },
+        { key: 'balance', label: 'Balance' },
+        { key: 'creditType', label: 'Credit Type' },
+        { key: 'creditDate', label: 'Credit Date' },
+    ]
+
+    const dummyData = [
+        {
+            id: 1,
+            userName: "john_doe",
+            balanceType: "Savings",
+            balance: 1500.75,
+            creditType: "Salary",
+            creditDate: "2025-04-28",
+        },
+        {
+            id: 2,
+            userName: "jane_smith",
+            balanceType: "Checking",
+            balance: 234.50,
+            creditType: "Refund",
+            creditDate: "2025-05-01",
+        },
+        {
+            id: 3,
+            userName: "michael_lee",
+            balanceType: "Savings",
+            balance: 9876.00,
+            creditType: "Bonus",
+            creditDate: "2025-04-15",
+        },
+        {
+            id: 4,
+            userName: "emily_watson",
+            balanceType: "Investment",
+            balance: 15000.00,
+            creditType: "Dividend",
+            creditDate: "2025-03-30",
+        },
+        {
+            id: 5,
+            userName: "david_clark",
+            balanceType: "Checking",
+            balance: 512.35,
+            creditType: "Transfer",
+            creditDate: "2025-05-05",
+        },
+    ];
+
+
     // Simulating user data fetching from localStorage
     useEffect(() => {
         const storedData = localStorage.getItem("userData");
         if (storedData) {
-            const parsedData = JSON.parse(storedData);
-            setUser(parsedData.user);
+            const parsedData = (storedData);
+            setUser(parsedData?.user);
             // Fetch all necessary data
             // fetchUsers(parsedData.user.userid);
             // fetchTransactionLogs(parsedData.user.userid);
@@ -189,144 +251,226 @@ function ManageCredit() {
         }
     };
 
+    const renderRow = (item, index) => (
+        <tr key={index} className="text-black border border-gray-700 hover:bg-gray-500">
+            <td className="px-4 py-2 border border-gray-700">{item.id}</td>
+            <td className="px-4 py-2 border border-gray-700">{item.userName}</td>
+            <td className="px-4 py-2 border border-gray-700">{item.balanceType}</td>
+            <td className="px-4 py-2 border border-gray-700">${item.balance.toFixed(2)}</td>
+            <td className="px-4 py-2 border border-gray-700">{item.creditType}</td>
+            <td className="px-4 py-2 border border-gray-700">{item.creditDate}</td>
+        </tr>
+    );
+
+    const filteredAndSortedLogs = useMemo(() => {
+        const term = searchTerm.toLowerCase().trim();
+
+        const filtered = dummyData.filter(data => {
+            const userMatch = data?.userName?.toLowerCase().includes(term);
+            return userMatch;
+        });
+
+        if (sortConfig.key) {
+            return [...filtered].sort((a, b) => {
+                const aVal = a[sortConfig.key];
+                const bVal = b[sortConfig.key];
+
+                // Handle strings and numbers gracefully
+                if (typeof aVal === 'string' && typeof bVal === 'string') {
+                    return sortConfig.direction === 'asc'
+                        ? aVal.localeCompare(bVal)
+                        : bVal.localeCompare(aVal);
+                }
+
+                if (typeof aVal === 'number' && typeof bVal === 'number') {
+                    return sortConfig.direction === 'asc' ? aVal - bVal : bVal - aVal;
+                }
+
+                return 0;
+            });
+        }
+
+        return filtered;
+    }, [searchTerm, sortConfig, dummyData]);
+
+    console.log("Filter Dummy Data", filteredAndSortedLogs);
+
+    const handleSort = (key) => {
+        setSortConfig(prev => ({
+            key,
+            direction: prev.key === key && prev.direction === 'asc' ? 'desc' : 'asc'
+        }));
+    };
 
     return (
         <>
-            <section className='w-[100%] bg-gray-200  flex justify-center flex-col pb-10'>
+            <section className='w-[100%] bg-gray-200 h-full min-h-[calc(100vh-70px)] flex flex-col '>
                 <CreditHeader />
-                <div className="w-full px-3 ">
-                    <div className="container-fluid p-3 mt-5">
-                        {/* Filters Section */}
-                        <form >
-                            <div className="row mb-4 me-0">
-                                {/* Left Section */}
-                                <div className="col-md-6 d-flex gap-3 align-items-center ">
-                                    <div className="flex-grow-1">
-                                        <select
-                                            name="sendUser"
-                                            value={formData.sendUser}
-                                            onChange={handleChange}
-                                            className="form-select"
-                                        >
-                                            <option value="">Select User</option>
-                                            {usersList.map((user) => (
-                                                <option key={user.userid} value={user.userid}>
-                                                    {user.userName}
-                                                </option>
-                                            ))}
-                                        </select>
+                <div className="w-full mt-8">
+                    <CampaignHeading campaignHeading="Manage Credits" />
+                    <div className="w-full px-3 pt-3 ">
+                        <div className='bg-white px-3 py-3'>
+                            {/* Filters Section */}
+                            <form onSubmit={handleSubmit}>
+                                <div className="me-0 flex md:flex-col gap-3 pb-3 border-b border-[#383387]">
+                                    {/* Left Section */}
+                                    <div className="flex sm:flex-col w-full gap-3 align-items-center ">
+                                        <div className="grow w-full">
+                                            <select
+                                                name="sendUser"
+                                                value={formData.sendUser}
+                                                onChange={handleChange}
+                                                className="form-select border border-black w-full"
+                                            >
+                                                <option value="">Select User</option>
+                                                {usersList.map((user) => (
+                                                    <option key={user.userid} value={user.userid}>
+                                                        {user.userName}
+                                                    </option>
+                                                ))}
+                                            </select>
+                                        </div>
+                                        <div className="grow w-full">
+                                            <select
+                                                name="selectedCategory"
+                                                value={formData.selectedCategory}
+                                                onChange={handleChange}
+                                                className="form-select border border-black w-full"
+                                            >
+                                                <option value="">Select Category</option>
+                                                {categories.map((category) => (
+                                                    <option key={category.id} value={category.id}>
+                                                        {category.name}
+                                                    </option>
+                                                ))}
+                                            </select>
+                                        </div>
                                     </div>
-                                    <div className="flex-grow-1">
-                                        <select
-                                            name="selectedCategory"
-                                            value={formData.selectedCategory}
-                                            onChange={handleChange}
-                                            className="form-select"
-                                        >
-                                            <option value="">Select Category</option>
-                                            {categories.map((category) => (
-                                                <option key={category.id} value={category.id}>
-                                                    {category.name}
-                                                </option>
-                                            ))}
-                                        </select>
+
+                                    {/* Right Section */}
+                                    <div className="flex sm:flex-col w-full gap-3 align-items-center">
+                                        <div className="grow w-full">
+                                            <select
+                                                name="creditDebit"
+                                                value={formData.creditDebit}
+                                                onChange={handleChange}
+                                                className="form-select border border-black w-full"
+                                            >
+                                                <option value="Credit">Credit</option>
+                                                <option value="Debit">Debit</option>
+                                            </select>
+                                        </div>
+                                        <div className="grow w-full">
+                                            <input
+                                                type="text"
+                                                name="balance"
+                                                value={formData.balance}
+                                                onChange={handleChange}
+                                                className="form-control border border-black w-full"
+                                                placeholder="Balance"
+                                            />
+                                        </div>
+                                        <div className="grow w-fit ">
+                                            <button type="submit" className="btn text-white bg-black w-100 px-4">Submit</button>
+                                        </div>
                                     </div>
                                 </div>
+                            </form>
 
-                                {/* Right Section */}
-                                <div className="col-md-6 d-flex gap-3 align-items-center p-2">
-                                    <div className="flex-grow-1">
-                                        <select
-                                            name="creditDebit"
-                                            value={formData.creditDebit}
-                                            onChange={handleChange}
-                                            className="form-select"
-                                        >
-                                            <option value="Credit">Credit</option>
-                                            <option value="Debit">Debit</option>
-                                        </select>
-                                    </div>
-                                    <div className="flex-grow-1">
-                                        <input
-                                            type="text"
-                                            name="balance"
-                                            value={formData.balance}
-                                            onChange={handleChange}
-                                            className="form-control"
-                                            placeholder="Balance"
-                                        />
-                                    </div>
-                                    <div className="flex-grow-1">
-                                        <button type="submit" className="btn btn-dark w-100">Submit</button>
-                                    </div>
+                            {/* Buttons Section */}
+                            <div className="d-flex justify-content-between align-items-center py-3 border-b border-[#383387] smm:flex-col w-full gap-4">
+                                <div className="d-flex align-items-center gap-3">
+                                    <button className="btn btn-outline-primary">Copy</button>
+                                    <button className="btn btn-outline-success">Excel</button>
+                                    <button className="btn btn-outline-danger">PDF</button>
+                                </div>
+
+                                <div className="d-flex align-items-center sm:w-full">
+                                    {/* <label className="me-2 mb-0">Search:</label> */}
+                                    <input
+                                        type="text" placeholder='Search...'
+                                        onChange={e => setSearchTerm(e.target.value)}
+                                        className="form-control d-inline-block border-black border" />
                                 </div>
                             </div>
-                        </form>
 
-                        {/* Buttons Section */}
-                        <div className="d-flex justify-content-between align-items-center mb-3">
-                            <div className="d-flex align-items-center">
-                                <button className="btn btn-outline-primary me-2">Copy</button>
-                                <button className="btn btn-outline-success me-2">Excel</button>
-                                <button className="btn btn-outline-danger me-2">PDF</button>
-                            </div>
-
-                            <div className="d-flex align-items-center">
-                                <label className="me-2 mb-0">Search:</label>
-                                <input type="text" className="form-control d-inline-block w-auto" />
-                            </div>
-                        </div>
-
-                        {/* Table Section */}
-                        <table className="table table-bordered">
-                            <thead className="table-dark">
-                                <tr>
-                                    <th>ID</th>
-                                    <th>UserName</th>
-                                    <th>Balance Type</th>
-                                    <th>Balance</th>
-                                    <th>Credit Type</th>
-                                    <th>Credit Date</th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                                {currentRecords.length > 0 ? (
-                                    currentRecords.map((log) => (
-                                        <tr key={log.id}>
-                                            <td>{log.id}</td>
-                                            <td>{log.to_user_name}</td>
-                                            <td>{log.credit_type.charAt(0).toUpperCase() + log.credit_type.slice(1)}</td>
-                                            <td>{log.credit}</td>
-                                            <td>{log.name}</td>
-                                            <td>{new Date(log.transaction_date).toLocaleString()}</td>
+                            {/* Table Section */}
+                            <div className={`min-w-max py-3`}>
+                                <div className={`w-full bg-gray-300 flex-shrink-0 overflow-auto custom-horizontal-scroll select-text h-full ${!isMobile ? (isOpen ? "max-w-[calc(100vw-50px)]" : "max-w-[calc(100vw-65px)]") : "max-w-[calc(100vw-64px)]"}`}>
+                                    {/* <table className="min-w-full text-sm">
+                                    <thead className="bg-gray-100 sticky top-0 z-10 ">
+                                        <tr>
+                                            {headers.map(({ label, key }) => (
+                                                <th
+                                                    key={key}
+                                                    onClick={() => handleSort(key)}
+                                                    className="px-4 py-2 text-left cursor-pointer select-none whitespace-nowrap bg-gray-300"
+                                                >
+                                                    <div className="flex items-center justify-between gap-3">
+                                                        {label}
+                                                        <div className='w-8'>
+                                                            {sortConfig.key === key ? (
+                                                                sortConfig.direction === 'asc' ? <LuArrowUp /> : <LuArrowDown />
+                                                            ) : (
+                                                                <span className="text-gray-600 flex flex-row"><LuArrowUp /><LuArrowDown /></span>
+                                                            )}
+                                                        </div>
+                                                    </div>
+                                                </th>
+                                            ))}
                                         </tr>
-                                    ))
-                                ) : (
-                                    <tr>
-                                        <td colSpan="6" className="text-center">
-                                            No transaction logs available.
-                                        </td>
-                                    </tr>
-                                )}
-                            </tbody>
-                        </table>
-                        {/* Pagination Controls */}
-                        <div className="d-flex justify-content-end align-items-center gap-3 mt-3">
-                            <button className="btn btn-dark" onClick={handlePrevious} disabled={currentPage === 1}>
-                                &lt;
-                            </button>
-                            <div>
-                                {indexOfFirstRecord + 1} - {Math.min(indexOfLastRecord, totalRecords)} of {totalRecords}
-                            </div>
-                            <button
-                                className="btn btn-dark"
-                                onClick={handleNext}
-                                disabled={currentPage === Math.ceil(totalRecords / recordsPerPage)}
-                            >
-                                &gt;
-                            </button>
-                        </div>
+                                    </thead>
+                                    <tbody>
+                                        {filteredAndSortedLogs.length > 0 ? (
+                                            filteredAndSortedLogs?.map((log, index) => (
+                                                <tr key={index} className="bg-white hover:bg-gray-50 whitespace-nowrap border border-black">
+                                                    <td className="px-2 py-2 border border-gray-900">{log.id}</td>
+                                                    <td className="px-2 py-2 border border-gray-900 text-blue-600 underline cursor-pointer">{log.to_user_name}</td>
+                                                    <td className="px-2 py-2 border border-gray-900">{log.credit_type.charAt(0).toUpperCase() + log.credit_type.slice(1)}</td>
+                                                    <td className="px-2 py-2 border border-gray-900">{log.credit || '-'}</td>
+                                                    <td className="px-2 py-2 border border-gray-900 text-red-600">{log.name}</td>
+                                                    <td className="px-2 py-2 border border-gray-900 max-w-[200px] truncate">{new Date(log.transaction_date).toLocaleString()}</td>
+                                                </tr>
+                                            ))) : (
+                                            <tr>
+                                                <td colSpan="6" className="text-center py-3 text-red-500 text-lg font-semibold">
+                                                    No transaction logs available.
+                                                </td>
+                                            </tr>
+                                        )}
+                                    </tbody>
+                                </table> */}
 
+                                    <CustomizeTable
+                                        headers={headers}
+                                        data={filteredAndSortedLogs}
+                                        sortConfig={sortConfig}
+                                        onSort={handleSort}
+                                        emptyMessage='No Credits Available'
+                                        renderRow={renderRow}
+                                        className="table-auto border-collapse"
+                                        theadClassName="bg-gray-800"
+                                    />
+                                </div>
+                            </div>
+                            {/* Pagination Controls */}
+                            <div className="d-flex justify-content-end align-items-center gap-3 mt-3">
+                                <button className="btn btn-dark" onClick={handlePrevious} disabled={currentPage === 1}>
+                                    &lt;
+                                </button>
+                                <div>
+                                    {indexOfFirstRecord + 1} - {Math.min(indexOfLastRecord, totalRecords)} of {totalRecords}
+                                </div>
+                                <button
+                                    className="btn btn-dark"
+                                    onClick={handleNext}
+                                    disabled={currentPage === Math.ceil(totalRecords / recordsPerPage)}
+                                >
+                                    &gt;
+                                </button>
+                            </div>
+
+                        </div>
                     </div>
                 </div>
             </section>
