@@ -1,11 +1,12 @@
 /* eslint-disable default-case */
 import { LOGOUT, LOGIN_REQUEST, LOGIN_SUCCESS, LOGIN_FAILURE, CREATE_USER_REQUEST, CREATE_USER_SUCCESS, CREATE_USER_FAILURE, } from '../actions';
-import { getAuthCookies } from '../../components/Cookies';
+import { getSecureItem } from '../../pages/utils/SecureLocalStorage';
 
-const stored = getAuthCookies();
+const stored = JSON.parse(getSecureItem('userData'));
+const storedToken = getSecureItem('userToken');
 const loginInitialState = {
   user: stored?.user || null,
-  token: stored?.token || null,
+  token: storedToken || null,
   isAuthenticated: !!stored?.user,
   loading: false,
   error: '',
