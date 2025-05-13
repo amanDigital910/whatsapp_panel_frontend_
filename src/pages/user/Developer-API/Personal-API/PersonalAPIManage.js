@@ -8,45 +8,56 @@ import { CodeSnippet } from '../../whatsapp_offical/CodeSnippet'
 import useIsMobile from '../../../../hooks/useMobileSize'
 import { useState } from 'react'
 import { useMemo } from 'react'
-import { IoIosArrowUp,IoIosArrowDown  } from "react-icons/io";
+import { IoIosArrowUp, IoIosArrowDown } from "react-icons/io";
+import Notes from '../../../../components/Notes'
 
 
 const PersonalAPIManage = ({ isOpen }) => {
   const [sortConfig, setSortConfig] = useState({ key: '', direction: 'asc' });
   const [searchTerm, setSearchTerm] = useState('');
   const isMobile = useIsMobile();
-  const [isToggle, setIsToggle] = useState(null);
 
   const [data, setData] = useState([
     {
-      id: "185x6723-0912",
+      id: "1",
       key: "a1b2c3d4e5f6478a98b7b2e31d9e456f",
       status: "active",
     },
     {
-      id: "192x3489-0771",
+      id: "2",
       key: "d3e4f5a6b7c8490c12d3f4b5c6d7e8f9",
       status: "inactive",
     },
     {
-      id: "163x4105-0822",
+      id: "3",
       key: "11223344556677889900aabbccddeeff",
-      status: "active",
-    },
-    {
-      id: "178x5943-0345",
-      key: "ffeeddccbbaa00998877665544332211",
       status: "inactive",
     },
     {
-      id: "199x7602-0630",
+      id: "4",
+      key: "ffeeddccbbaa00998877665544332211",
+      status: "active",
+    },
+    {
+      id: "199x7602-063",
       key: "abcd1234efgh5678ijkl9012mnop3456",
       status: "active",
     }
   ]);
 
+  const [openDropdownIndex, setOpenDropdownIndex] = useState(null);
+
   const toggleDropdown = (index) => {
-    setIsToggle(prevIndex => (prevIndex === index ? null : index));
+    setOpenDropdownIndex((prevIndex) => (prevIndex === index ? null : index));
+  };
+
+  const handleStatusChange = (newStatus, index) => {
+    setData((prevData) =>
+      prevData.map((item, i) =>
+        i === index ? { ...item, status: newStatus } : item
+      )
+    );
+    setOpenDropdownIndex(null);
   };
 
   const headers = [
@@ -56,11 +67,8 @@ const PersonalAPIManage = ({ isOpen }) => {
     { key: 'action', label: 'Action' },
   ];
 
-  const handleStatus = (e, index) => {
-
-  };
-
   const renderRow = (log, index) => {
+
     return (
       <tr key={index} className="text-black border border-gray-700 hover:bg-gray-400 whitespace-nowrap ">
         <td className="px-2 py-2 border border-gray-900 w-fit">{log.id}</td>
@@ -82,14 +90,27 @@ const PersonalAPIManage = ({ isOpen }) => {
             </select>
           </div>  */}
         <td className="px-2 py-2 border border-gray-900 pointer">
-          <CustomDropdown
-            log={log}
-            index={index}
-            handleStatus={handleStatus}
-            toggleDropdown={() => toggleDropdown(index)}
-            isToggle={isToggle === index}
-          />
+          <div className={`rounded px-3 py-1 font-medium flex items-center justify-between w-full cursor-pointer ${log.status === 'active' ? 'bg-[#34bc47]' : 'bg-[#ff0000]'} text-white`} onClick={() => toggleDropdown(index)}>
+            {log.status === 'active' ? 'Active' : 'Inactive'}
+            <span>{openDropdownIndex === index ? <IoIosArrowUp /> : <IoIosArrowDown />}</span>
+          </div>
 
+          {openDropdownIndex === index && (
+            <div className="absolute z-50 bg-[#34bc47] text-black  rounded-md shadow-md w-32 mt-1 text-center">
+              <div
+                className="px-3 py-2 hover:bg-[#383387] hover:rounded-t-md cursor-pointer"
+                onClick={() => handleStatusChange("active", index)}
+              >
+                Active
+              </div>
+              <div
+                className="px-3 py-2 hover:bg-[#383387] hover:rounded-b-md cursor-pointer"
+                onClick={() => handleStatusChange("inactive", index)}
+              >
+                Inactive
+              </div>
+            </div>
+          )}
         </td>
         <td className="px-2 py-2 border border-gray-900 flex justify-center">
           <button className="px-3 py-1 rounded-md m-0 p-0 pt-1 text-base bg-[#ff0000] text-white">
@@ -104,28 +125,29 @@ const PersonalAPIManage = ({ isOpen }) => {
   const filteredAndSortedLogs = useMemo(() => {
     const term = searchTerm.toLowerCase().trim();
 
-    const filtered = data.filter(log => {
-      // Search term filter (matches phone, campaign, status, or read status)
-      const matchesSearch =
-        log.key.trim().includes(term);
-      // log.status.toLowerCase().trim().includes(term) ||
-      // log.status.toLowerCase().trim().includes(term) ||
-      // log.readStatus.toLowerCase().trim().includes(term);
+    // derive which fields we actually want to search
+    const searchableKeys = headers
+      .map(h => h.key)
+      .filter(k => k !== 'action');
 
-      // Date filter (matches based on start date and end date)
-      return matchesSearch;
+    const filtered = data.filter(log => {
+      // check if any searchable field contains the term
+      return searchableKeys.some(key => {
+        const val = (log[key] ?? '').toString().toLowerCase().trim();
+        return val.includes(term);
+      });
     });
 
-    // Sorting logic
-    if (sortConfig.key) {
-      filtered.sort((a, b) => {
-        const aVal = a[sortConfig.key] || '';
-        const bVal = b[sortConfig.key] || '';
-        if (aVal < bVal) return sortConfig.direction === 'asc' ? -1 : 1;
-        if (aVal > bVal) return sortConfig.direction === 'asc' ? 1 : -1;
-        return 0;
-      });
-    }
+    // ...then do your “exclude last, sort the rest, re-append” logic
+    if (!sortConfig.key || filtered.length <= 1) return filtered;
+
+    filtered.sort((a, b) => {
+      const aVal = (a[sortConfig.key] ?? '').toString();
+      const bVal = (b[sortConfig.key] ?? '').toString();
+      if (aVal < bVal) return sortConfig.direction === 'asc' ? -1 : 1;
+      if (aVal > bVal) return sortConfig.direction === 'asc' ? 1 : -1;
+      return 0;
+    });
 
     return filtered;
   }, [data, searchTerm, sortConfig]);
@@ -146,7 +168,7 @@ const PersonalAPIManage = ({ isOpen }) => {
         <span className="bg-[#ff0000] w-fit text-lg text-white flex items-center gap-3 py-2 px-3 rounded-md font-medium hover:bg-[#383387] cursor-pointer"><LuRefreshCwOff />Generate API Key</span>
       </div>
       <div className="px-3 py-3 ">
-        <div className="px-3 py-3 bg-white flex gap-3 flex-col">
+        <div className="px-3 py-3 bg-white flex gap-3 flex-col rounded-md">
           <div className="flex  md:justify-start justify-between gap-3 ">
             <div className="flex gap-3  ">
               <CopyToClipboard activeSnippet={activeSnippet} />
@@ -173,7 +195,7 @@ const PersonalAPIManage = ({ isOpen }) => {
             </div>
           </div>
           <div className={`min-w-max`}>
-            <div className={`w-full bg-gray-300 flex-shrink-0 overflow-auto custom-horizontal-scroll select-text h-[300px] ${!isMobile ? (isOpen ? "max-w-[calc(100vw-50px)]" : "max-w-[calc(100vw-65px)]") : "max-w-[calc(100vw-64px)]"}`}>
+            <div className={`w-full bg-gray-300 flex-shrink-0 overflow-auto custom-horizontal-scroll select-text h-[300px] ${!isMobile ? (isOpen ? "max-w-[calc(100vw-50px)]" : "max-w-[calc(100vw-65px)]") : "max-w-[calc(100%)]"}`}>
               <CustomizeTable
                 headers={headers}
                 emptyMessage='No transaction logs available.'
@@ -184,11 +206,88 @@ const PersonalAPIManage = ({ isOpen }) => {
                 className="table-auto border-collapse"
                 theadClassName="px-4 py-2 text-left cursor-pointer select-none whitespace-nowrap"
                 rowClassName=''
-              // className="text-center py-3 text-lg font-semibold"
               />
             </div>
           </div>
         </div>
+      </div>
+      <div className="px-3 w-full">
+        <div className=" flex flex-col items-start h-fit bg-[#383387] border-black border rounded-md">
+          <p className="w-full py-2 px-3 bg-[#383387] whitespace-nowrap text-white text-start font-semibold 
+            text-xl m-0 rounded-t-md ">
+            WAPP API
+          </p>
+          <div className='py-3 px-3 border-t border-white w-full select-text'>
+            <div className='flex flex-col px-3 py-3 bg-[#1c4d0d] gap-4'>
+              {/* <div style="background-color:#ff9102;padding: 10px; font-weight: bold;"> Response </div> */}
+              <p className='text-white font-bold text-xl m-0 p-0'>Response</p>
+              <p className='text-white font-bold text-xl m-0 p-0'>Array : https://wahbulk.com/api/wapi?apikey=
+                <HighlightAPI message={"Key"} />
+                &mobile=
+                <HighlightAPI message={"MobileNumber"} />
+                &msg=
+                <HighlightAPI message={"TextMessage"} />
+              </p>
+              <p className='text-white font-bold text-xl m-0 p-0'>Json : https://wahbulk.com/api/wapi?json=true&apikey=
+                <HighlightAPI message={"Key"} />
+                &mobile=
+                <HighlightAPI message={"MobileNumber"} />
+                &msg=
+                <HighlightAPI message={"TextMessage"} />
+              </p>
+            </div>
+            <div className=" flex flex-col h-fit mt-3 ">
+              <p className="w-full whitespace-nowrap text-white font-semibold 
+            text-xl m-0 flex flex-col px-3 py-3 bg-[#1c4d0d] gap-4 text-center">
+                Send Message
+              </p>
+
+              <table className="min-w-full text-white text-sm">
+                <thead>
+                  <tr className="bg-[#383387] text-white ">
+                    <th className="text-left py-2 px-4">Parameter</th>
+                    <th className="text-left py-2 px-4">Values</th>
+                    <th className="text-left py-2 px-4">Priority</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {TableSendMsg.map((item, index) => (
+                    <tr key={index} className="border-t-2 border-gray-200 hover:bg-[#383372]">
+                      <td className="py-2 px-4">{item.parameter}</td>
+                      <td className="py-2 px-4">{item.values}</td>
+                      <td className="py-2 px-4">{item.priority}</td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+            <div className=" flex flex-col h-fit mt-3 ">
+              <p className="w-full whitespace-nowrap text-white font-semibold 
+            text-xl m-0 flex flex-col px-3 py-3 bg-[#1c4d0d] gap-4 text-center">
+                Send Message With Button for Client Reply
+              </p>
+              <table className="min-w-full text-white text-sm">
+                <thead>
+                  <tr className="bg-[#383387] text-white ">
+                    <th className="text-left py-2 px-4">Parameter</th>
+                    <th className="text-left py-2 px-4">Values</th>
+                    <th className="text-left py-2 px-4">Priority</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {TableClientReply.map((item, index) => (
+                    <tr key={index} className="border-t-2 border-gray-200 hover:bg-[#383372]">
+                      <td className="py-2 px-4">{item.parameter}</td>
+                      <td className="py-2 px-4">{item.values}</td>
+                      <td className="py-2 px-4">{item.priority}</td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+        <Notes />
       </div>
     </section>
   )
@@ -196,40 +295,41 @@ const PersonalAPIManage = ({ isOpen }) => {
 
 export default PersonalAPIManage
 
-
-const CustomDropdown = ({ log, index, handleStatus, toggleDropdown, isToggle }) => {
-  const [selectedStatus, setSelectedStatus] = useState(log.status);
-
-
-  const handleOptionClick = (status) => {
-    setSelectedStatus(status);
-    handleStatus(status, index); // Call parent function to update status
-    toggleDropdown(); // Close dropdown after selection
-  };
-
+const HighlightAPI = ({ message }) => {
   return (
-    <div className={`relative ${selectedStatus === 'active' ? 'bg-[#008000]' : 'bg-[#ff0000]'} text-white rounded`}>
-      <div onClick={toggleDropdown}
-        className="px-3 py-1 font-medium cursor-pointer flex justify-center items-center gap-2">
+    <span className='text-[#ff2f2f]'>
+      {message}
+    </span>
+  )
+}
 
-        {selectedStatus === 'active' ? 'Active' : 'In Active'}
-        <span className="">{isToggle ? <IoIosArrowUp />  : <IoIosArrowDown />}</span>
-      </div>
 
-      {isToggle && (
-        <div className="absolute top-full left-0 right-0 z-50 bg-slate-700 text-white rounded-b shadow-lg"
-          onClick={(e) => e.stopPropagation()}
-        >
-          <div className="px-3 py-2 cursor-pointer hover:bg-[#383387]"
-            onClick={() => handleOptionClick('active')} >
-            Active
-          </div>
-          <div className="px-3 py-2 cursor-pointer hover:bg-[#383387]"
-            onClick={() => handleOptionClick('inactive')} >
-            InActive
-          </div>
-        </div>
-      )}
-    </div>
-  );
-};
+const TableSendMsg = [
+  { parameter: "&apikey=", values: "Scan api key", priority: "Mandatory" },
+  { parameter: "&mobile=", values: "Put mobile number in which you want to send message", priority: "Mandatory" },
+  { parameter: "&msg=", values: "Message for user", priority: "Mandatory" },
+  { parameter: "&img1=", values: "Send image (gif, jpg, jpeg, png)", priority: "Optional" },
+  { parameter: "&img2=", values: "Send image (gif, jpg, jpeg, png)", priority: "Optional" },
+  { parameter: "&img3=", values: "Send image (gif, jpg, jpeg, png)", priority: "Optional" },
+  { parameter: "&img4=", values: "Send image (gif, jpg, jpeg, png)", priority: "Optional" },
+  { parameter: "&pdf=", values: "Send image (pdf)", priority: "Optional" },
+  { parameter: "&audio=", values: "Send image (mp3, m4a, amr)", priority: "Optional" }
+];
+
+const TableClientReply = [
+  { parameter: "&apikey=", values: "Scan api key", priority: "Mandatory" },
+  { parameter: "&mobile=", values: "Put mobile number in which you want to send message", priority: "Mandatory" },
+  { parameter: "&msg=", values: "Message for user", priority: "Mandatory" },
+  { parameter: "&bt1=", values: "Button 1 Display Text", priority: "Mandatory" },
+  { parameter: "&bt2=", values: "Button 2 Display Text", priority: "Mandatory" },
+  { parameter: "&btcall=", values: "Valid Mobile Number", priority: "Mandatory" },
+  { parameter: "&bturl=", values: "Enter valid URL", priority: "Mandatory" },
+  { parameter: "&footer=", values: "Set footer Message for URL, Links, Mobile Number.", priority: "Optional" },
+  { parameter: "&img1=", values: "Send image (gif, jpg, jpeg, png)", priority: "Optional" },
+  { parameter: "&img2=", values: "Send image (gif, jpg, jpeg, png)", priority: "Optional" },
+  { parameter: "&img3=", values: "Send image (gif, jpg, jpeg, png)", priority: "Optional" },
+  { parameter: "&img4=", values: "Send image (gif, jpg, jpeg, png)", priority: "Optional" },
+  { parameter: "&pdf=", values: "Send image (pdf)", priority: "Optional" },
+  { parameter: "&audio=", values: "Send image (mp3, m4a, amr)", priority: "Optional" },
+  { parameter: "&video=", values: "Send image (MP4, mp4, WMV, AVI, 3gp, MOV)", priority: "Optional" }
+];
