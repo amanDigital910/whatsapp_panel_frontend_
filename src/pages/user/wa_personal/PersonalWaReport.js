@@ -1,11 +1,116 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useMemo } from "react";
 import axios from "axios";
 import CreditHeader from "../../../components/CreditHeader";
+import useIsMobile from "../../../hooks/useMobileSize";
+import { CampaignHeading, CopyToClipboard, CustomizeTable, DownloadCSVButton, DownloadPDFButton } from "../../utils/Index";
 
-const WhatsappReport = () => {
+const WhatsappReport = ({ isOpen }) => {
+  const isMobile = useIsMobile();
   const [campaigns, setCampaigns] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
+  const [searchTerm, setSearchTerm] = useState('');
+  const [sortConfig, setSortConfig] = useState({ key: '', direction: 'asc' });
+  const [dummyData, setDummyData] = useState([
+    {
+      "campaignId": "CMP1001",
+      "userName": "Alice Johnson",
+      "numberCount": 120,
+      "campaignTitle": "Spring Sale",
+      "campaignReport": "Completed",
+      "templateStatus": "Approved",
+      "campaignSubmit": "2025-05-10 14:00"
+    },
+    {
+      "campaignId": "CMP1002",
+      "userName": "Bob Smith",
+      "numberCount": 85,
+      "campaign": "Event Reminder",
+      "campaignReport": "Pending",
+      "templateStatus": "Pending",
+      "campaignSubmit": "2025-05-11 09:30"
+    },
+    {
+      "campaignId": "CMP1003",
+      "userName": "Clara Green",
+      "numberCount": 200,
+      "campaign": "Product Launch",
+      "campaignReport": "Completed",
+      "templateStatus": "Rejected",
+      "campaignSubmit": "2025-05-12 16:45"
+    },
+    {
+      "campaignId": "CMP1004",
+      "userName": "Daniel White",
+      "numberCount": 50,
+      "campaign": "Feedback Request",
+      "campaignReport": "Failed",
+      "templateStatus": "Approved",
+      "campaignSubmit": "2025-05-13 11:15"
+    }])
+
+  const headers = [
+    { key: "CampaignId", label: 'Campaign ID' },
+    { key: "userName", label: 'User Name' },
+    { key: "numberCount", label: 'Number Count' },
+    { key: "campaignTitle", label: 'Campaign Title' },
+    { key: "campaignReport", label: 'Campaign Report' },
+    { key: "templateStatus", label: 'Template Status' },
+    { key: "campaignSubmit", label: 'Campaign Submit' }
+  ];
+
+  const renderRow = (log, index) => (
+    <tr key={index} className="text-black border border-gray-700 hover:bg-gray-500 whitespace-wrap">
+      <td className="px-2 py-2 border border-gray-900">{log.campaignId ?? '-'}</td>
+      <td className="px-2 py-2 border border-gray-900 text-blue-600 underline cursor-pointer">
+        {log.userName || 'N/A'}
+      </td>
+      <td className="px-2 py-2 border border-gray-900">
+        {log.numberCount || 'N/A'}
+      </td>
+      <td className="px-2 py-2 border border-gray-900">{log.campaignTitle ?? '-'}</td>
+      <td className="px-2 py-2 border border-gray-900">{log.campaignReport || 'N/A'}</td>
+      <td className="px-2 py-2 border border-gray-900">{log.templateStatus || 'Invalid date'}</td>
+      <td className="px-2 py-2 border border-gray-900">{log.campaignSubmit || 'N/A'}</td>
+    </tr>
+  );
+
+
+  const filteredAndSortedLogs = useMemo(() => {
+    const term = searchTerm.toLowerCase().trim();
+
+    const filtered = dummyData.filter(log => {
+      // Search term filter (matches phone, campaign, status, or read status)
+      const matchesSearch =
+        log.campaignId.includes(term);
+      // log.campaignName.toLowerCase().trim().includes(term) ||
+      // log.status.toLowerCase().trim().includes(term) ||
+      // log.readStatus.toLowerCase().trim().includes(term);
+
+      // Date filter (matches based on start date and end date)
+      return matchesSearch;
+    });
+
+    // Sorting logic
+    if (sortConfig.key) {
+      filtered.sort((a, b) => {
+        const aVal = a[sortConfig.key] || '';
+        const bVal = b[sortConfig.key] || '';
+        if (aVal < bVal) return sortConfig.direction === 'asc' ? -1 : 1;
+        if (aVal > bVal) return sortConfig.direction === 'asc' ? 1 : -1;
+        return 0;
+      });
+    }
+
+    return filtered;
+  }, [dummyData, searchTerm, sortConfig]);
+
+  const handleSort = (key) => {
+    setSortConfig(prev => ({
+      key,
+      direction: prev.key === key && prev.direction === 'asc' ? 'desc' : 'asc'
+    }));
+  };
 
   // Fetch campaigns from an endpoint that returns an array
   useEffect(() => {
@@ -27,25 +132,19 @@ const WhatsappReport = () => {
 
   return (
     <>
-      <section className="w-[100%] bg-gray-200 pb-[200px] ">
+      <section className={`w-[100%] h-full pb-3 bg-gray-200 min-h-[calc(100vh-70px)] ${!isMobile ? isOpen ? "ml-[240px] 60 w-[calc(100vw-246px)]" : "ml-20 w-[calc(100vw-80px)]" : ""} `}>
         <CreditHeader />
-        <div className="w-full px-4 mt-8">
-          <div className="w-full py-2 mb-3 bg-white">
-            <h1
-              className="text-2xl text-black font-semibold pl-4"
-              style={{ fontSize: "32px" }}
-            >
-              Whatsapp Report
-            </h1>
-          </div>
-
-          <div className="w-full flex gap-3 justify-content-between align-items-center py-2 bg-white px-3">
-            <div className="flex items-center gap-3 w-[30%]">
-              <p className="font-[600] text-[20px] mt-2">To</p>
+        <div className="w-full mt-8">
+          <CampaignHeading campaignHeading="Whatsapp Report" />
+        </div>
+        <div className="px-3 flex flex-col gap-2">
+          <div className="w-full flex gap-3 justify-content-between md:items-start items-center md:flex-col py-2 bg-white px-3">
+            <div className="flex items-center gap-2 min-w-[30%]">
+              <p className="font-[600] text-[20px] m-0">To</p>
               <input type="date" className="form-control" />
             </div>
-            <div className="flex items-center gap-3 w-[30%]">
-              <p className="font-[600] text-[20px] mt-2">From</p>
+            <div className="flex items-center gap-2 min-w-[30%]">
+              <p className="font-[600] text-[20px] m-0">From</p>
               <input type="date" className="form-control" />
             </div>
             <button className="px-10 py-2 rounded text-white bg-brand_colors">
@@ -53,94 +152,47 @@ const WhatsappReport = () => {
             </button>
           </div>
 
-          <br />
-          <div className="w-[100%] bg-white px-3 pb-4 rounded">
-            <div className="w-[100%] flex justify-between items-center gap-[150px] px-10 text-black">
-              <div className="flex items-center gap-4 w-[100%]"></div>
-            </div>
-            <br />
-            <div className="w-[100%] flex justify-between items-center">
+          <div className=" bg-white flex flex-col gap-3 px-3 py-3 rounded-md">
+            <div className=" flex justify-between md:flex-col gap-4 items-center">
               <div className="flex items-center gap-3">
-                <button className="px-3 py-1 rounded bg-brand_color_4 text-white font-[600]">
-                  Copy
-                </button>
-                <button className="px-3 py-1 rounded bg-brand_color_4 text-white font-[600]">
-                  Excel
-                </button>
-                <button className="px-3 py-1 rounded bg-brand_color_4 text-white font-[600]">
-                  PDF
-                </button>
+                <CopyToClipboard activeSnippet={'Data'} />
+                <DownloadCSVButton />
+                <DownloadPDFButton />
               </div>
-              <div className="flex items-center gap-2 text-black">
-                <p className="mt-3">Search :</p>
+              <div className="relative md:w-full  max-w-[300px]">
                 <input
                   type="text"
-                  placeholder="search"
-                  className="w-[200px] border-[0.1px] bg-white border-black outline-none text-black rounded py-1 px-2"
+                  placeholder="Search by Username, Campaign, Campaign List"
+                  value={searchTerm}
+                  onChange={e => setSearchTerm(e.target.value)}
+                  className="p-2 pr-8 w-full border border-black rounded-md"
                 />
+                {searchTerm && (
+                  <button
+                    type="button"
+                    onClick={() => setSearchTerm('')}
+                    className="absolute right-2 top-1/2 transform -translate-y-1/2 text-gray-500 bg-white px-1 hover:text-black"
+                  >
+                    ❌
+                  </button>
+                )}
               </div>
             </div>
-            <br />
-            <div className="w-full rounded text-white">
-              {loading ? (
-                <p className="text-center text-black">Loading...</p>
-              ) : error ? (
-                <p className="text-center text-red-500">{error}</p>
-              ) : (
-                <table className="w-full text-center table-auto">
-                  <thead className="bg-gray-800 border-b-2 border-gray-600">
-                    <tr>
-                      <th className="py-3 px-6 text-white font-semibold">
-                        Campaign Id
-                      </th>
-                      <th className="py-3 px-6 text-white font-semibold">
-                        User Name
-                      </th>
-                      <th className="py-3 px-6 text-white font-semibold">
-                        Number Count
-                      </th>
-                      <th className="py-3 px-6 text-white font-semibold">
-                        Campaign
-                      </th>
-                      <th className="py-3 px-6 text-white font-semibold">
-                        Campaign Report
-                      </th>
-                      <th className="py-3 px-6 text-white font-semibold">
-                        Template Status
-                      </th>
-                      <th className="py-3 px-6 text-white font-semibold">
-                        Campaign Submit
-                      </th>
-                    </tr>
-                  </thead>
-                  <tbody className="text-black">
-                    {campaigns.map((campaign) => (
-                      <tr
-                        key={campaign.campaignId}
-                        className="border-b border-gray-600 transition"
-                      >
-                        <td className="py-4 px-6">{campaign.campaignId}</td>
-                        <td className="py-4 px-6">
-                          {campaign.userName || "N/A"}
-                        </td>
-                        <td className="py-4 px-6">{campaign.numberCount}</td>
-                        <td className="py-4 px-6">
-                          {campaign.campaignTitle || "N/A"}
-                        </td>
-                        <td className="py-4 px-6">{campaign.campaignReport}</td>
-                        <td className="py-4 px-6">
-                          Template Status Placeholder
-                        </td>
-                        <td className="py-4 px-6">
-                          {new Date(
-                            campaign.campaignSubmitTime
-                          ).toLocaleString()}
-                        </td>
-                      </tr>
-                    ))}
-                  </tbody>
-                </table>
-              )}
+            <div className="min-w-max overflow-hidden bg-gray-300">
+              <div className={`custom-horizontal-scroll overflow-x-auto  select-text h-full relative ${!isMobile ? (isOpen ? "max-w-[calc(100vw-305px)]" : "max-w-[calc(100vw-60px)]") : "max-w-[calc(100vw-64px)]"}`}>
+                <CustomizeTable
+                  headers={headers}
+                  emptyMessage='No transaction logs available.'
+                  sortConfig={sortConfig}
+                  onSort={handleSort}
+                  renderRow={renderRow}
+                  data={filteredAndSortedLogs}
+                  className="table-auto border-collapse"
+                  theadClassName="px-4 py-2 text-left cursor-pointer select-none whitespace-wrap text-black"
+                  rowClassName='text-black'
+                // className="text-center py-3 text-lg font-semibold"
+                />
+              </div>
             </div>
           </div>
         </div>

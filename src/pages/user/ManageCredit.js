@@ -1,13 +1,13 @@
 /* eslint-disable react-hooks/exhaustive-deps */
 import axios from 'axios';
 import React, { useEffect, useMemo, useState } from "react";
-import { toast } from 'react-toastify'; // Import Toastify
-import 'react-toastify/dist/ReactToastify.css'; // Import Toastify CSS
+import { toast } from 'react-toastify';
+import 'react-toastify/dist/ReactToastify.css';
 import CreditHeader from "../../components/CreditHeader";
 import useIsMobile from '../../hooks/useMobileSize';
 import '../user/whatsapp_offical/commonCSS.css'
-import { LuArrowDown, LuArrowUp } from 'react-icons/lu';
 import { CampaignHeading, CustomizeTable } from '../utils/Index';
+import { getSecureItem } from '../utils/SecureLocalStorage';
 
 function ManageCredit({ isOpen }) {
     const [user, setUser] = useState(null); // User state
@@ -18,6 +18,9 @@ function ManageCredit({ isOpen }) {
     const [sortConfig, setSortConfig] = useState({ key: '', direction: 'asc' });
     const [searchTerm, setSearchTerm] = useState('');
     const isMobile = useIsMobile();
+
+    const userToken = getSecureItem("userToken");
+    
     const recordsPerPage = 5; // You can adjust this as needed
 
     const [formData, setFormData] = useState({
@@ -292,8 +295,6 @@ function ManageCredit({ isOpen }) {
 
         return filtered;
     }, [searchTerm, sortConfig, dummyData]);
-
-    console.log("Filter Dummy Data", filteredAndSortedLogs);
 
     const handleSort = (key) => {
         setSortConfig(prev => ({

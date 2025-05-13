@@ -796,14 +796,14 @@ export const CustomizeTable = ({
     };
 
     return (
-        <table className={`min-w-full text-sm ${className}`}>
+        <table className={`min-w-[100%] text-sm ${className}`}>
             <thead className={`sticky top-0 z-10 ${theadClassName}`}>
                 <tr>
                     {headers.map(({ label, key }) => (
                         <th
                             key={key}
                             onClick={() => onSort(key)}
-                            className="px-4 py-2 text-left cursor-pointer select-none whitespace-nowrap bg-gray-900 text-white"
+                            className="px-2 py-2 text-left cursor-pointer select-none whitespace-wrap w-fit bg-gray-900 text-white"
                         >
                             <div className="flex items-center justify-between gap-3">
                                 {label}

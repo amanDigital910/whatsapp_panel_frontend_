@@ -233,7 +233,7 @@ const TemplateCampaign = () => {
           <div className="w-full px-3 md:px-6 py-6 flex lg:flex-col gap-6">
 
             {/* Left Column */}
-            <div className="lg:w-full w-2/5 flex flex-col gap-6">
+            <div className="lg:w-full w-1/2 flex flex-col gap-6">
               {/* Template Name Input */}
               <CampaignTitle
                 mainTitle={"Template Name"}
@@ -257,18 +257,10 @@ const TemplateCampaign = () => {
                   placeholder="Enter your message"
                 />
               </div>
-              {/* Submit Button */}
-              <div className="d-flex justify-content-end">
-                <button className="btn btn-primary w-24 py-2" onClick={saveTemplate}>
-                  {editingId ? "Update" : "Submit"}
-                </button>
-              </div>
-              {/* Feedback */}
-              {feedback && <p className="text-red-500 mt-2">{feedback}</p>}
             </div>
-            {/* Table Section */}
-            <div className="lg:w-full w-[60%] flex flex-col gap-4">
-              {/* Upload Media Section */}
+
+            {/* Upload Media Section */}
+            <div className="lg:w-full w-[50%] flex flex-col gap-4">
               <div className="bg-white rounded p-4 border border-black flex flex-col gap-6 ">
                 <ImageUploaderGroup
                   inputRefs={inputRefs}
@@ -299,20 +291,35 @@ const TemplateCampaign = () => {
                   />
                 </div>
               </div>
+            </div>
+          </div>
+          <div className="flex items-center mb-4 flex-col">
+            {feedback && <p className="text-red-500 mt-2">{feedback}</p>}
+            <button className="btn btn-primary w-24 py-2" onClick={saveTemplate}>
+              {editingId ? "Update" : "Submit"}
+            </button>
+            {/* Feedback */}
+          </div>
 
-              <div className="w-full max-h-[400px] rounded text-white overflow-auto">
-                <table className="w-full text-center table-auto">
-                  <thead className="bg-gray-800 border-b-2 border-gray-600 whitespace-nowrap">
-                    <tr className='flex justify-around py-2 text-base'>
-                      <th className="mr-0 text-white font-semibold">Id</th>
-                      <th className="mr-0 text-white font-semibold">Template Name</th>
-                      <th className="mr-0 text-white font-semibold">Template Message</th>
-                      <th className="mr-0 text-white font-semibold">Date</th>
-                      <th className="mr-0 text-white font-semibold">Action</th>
-                    </tr>
-                  </thead>
-                  <tbody className="bg-white text-black">
-                    {currentRecords.map((template) => (
+          <div className='px-3 pb-3'>
+            <div className="w-full max-h-[400px] rounded text-white bg-white overflow-auto">
+              <table className="w-full text-center table-auto">
+                <thead className="bg-gray-800 border-b-2 border-gray-600 whitespace-nowrap">
+                  <tr className='flex justify-around py-2 text-base'>
+                    <th className="mr-0 text-white font-semibold">Id</th>
+                    <th className="mr-0 text-white font-semibold">Template Name</th>
+                    <th className="mr-0 text-white font-semibold">Template Message</th>
+                    <th className="mr-0 text-white font-semibold">Date</th>
+                    <th className="mr-0 text-white font-semibold">Action</th>
+                  </tr>
+                </thead>
+                <tbody className=" text-black">
+                  {!currentRecords || currentRecords.length === 0 ?
+                    <p className="text-center py-4 text-red-400 font-bold">
+                      Fail to Load the Data
+                    </p>
+                    :
+                    currentRecords.map((template) => (
                       <tr key={template.id} className="border-b border-gray-600 transition">
                         <td className="py-2 px-2">{template.templateId}</td>
                         <td className="py-2 px-2">{template.template_name}</td>
@@ -327,13 +334,12 @@ const TemplateCampaign = () => {
                         </td>
                       </tr>
                     ))}
-                  </tbody>
-                </table>
-              </div>
+                </tbody>
+              </table>
               {/* Pagination */}
-              <div className="flex justify-end align-items-center gap-4 mt-1">
+              <div className="flex justify-end align-items-center gap-4 border-t border-gray-400 pr-4 py-2 text-black">
                 <button
-                  className="px-4 py-2 border rounded"
+                  className="px-4 py-2 border-2 border-gray-500 rounded"
                   onClick={() => changePage(currentPage - 1)}
                   disabled={currentPage === 1}
                 >
@@ -341,7 +347,7 @@ const TemplateCampaign = () => {
                 </button>
                 <span>{`${(currentPage - 1) * recordsPerPage + 1} - ${Math.min(currentPage * recordsPerPage, templates.length)}`} of {templates.length}</span>
                 <button
-                  className="px-4 py-2 border rounded"
+                  className="px-4 py-2 border-2 border-gray-500 rounded"
                   onClick={() => changePage(currentPage + 1)}
                   disabled={currentPage === totalPages}
                 >
@@ -350,6 +356,7 @@ const TemplateCampaign = () => {
               </div>
             </div>
           </div>
+
         </div>
       </section>
       {/* Toast Container */}

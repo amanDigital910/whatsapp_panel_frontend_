@@ -165,7 +165,7 @@ const App = () => {
                     <Route path="/admin-dashboard" element={<AdminDashboard />} />
                     <Route path='/transitiontable' element={<TransitionCReditUser />} />
                   </Route>
-                  <Route element={<PrivateRoute allowedRoles={[ROLES.ADMIN, ROLES.RESELLER, ROLES.USER]} />}>
+                  <Route element={<PrivateRoute allowedRoles={[ROLES.SUPER_ADMIN, ROLES.ADMIN, ROLES.RESELLER, ROLES.USER]} />}>
                     <Route path="/dashboard" element={<Dashboard />} />
 
                     {/* Wa virtual campaige */}
@@ -173,7 +173,7 @@ const App = () => {
                     <Route path="/virtual-dp" element={<DpVirtualCampaign />} />
                     <Route path="/virtual-poll" element={<VirtualPollCampaign />} />
                     <Route path="/virtual-button" element={<ButtonCampaign />} />
-                    <Route path="/virtual-whatsapp-report" element={<WhatsappReport />} />
+                    <Route path="/virtual-whatsapp-report" element={<WhatsappReport isOpen={isOpen} />} />
                     {/* <Route path="/user/csvvirtual" element={<CsvVirtualCampaign />} /> */}
 
                     {/* wa personal Campaige */}
@@ -182,7 +182,7 @@ const App = () => {
                     {/* <Route path="/personal-personal-csv" element={<PersonalCsv />} /> */}
                     <Route path="/personal-button" element={<PersonalButton />} />
                     {/* <Route path='/personal-Personalbutton' element={<PersonalCSVButton/> } /> */}
-                    <Route path="/personal-whatsapp-report" element={<PersonalCampaign />} />
+                    <Route path="/personal-whatsapp-report" element={<PersonalCampaign isOpen={isOpen} />} />
                     <Route path="/personal-scan-whatsapp" element={<PersonalCampaignScan />} />
                     <Route path="/personal-group-community" element={<PersonalCampaignChannel />} />
                     <Route path="/personal-channel-create-bulk-sms" element={<PersonalGroupChannelCommunity />} />
@@ -191,7 +191,7 @@ const App = () => {
                     <Route path="/international-virtual-quick-csv" element={<InternationalCampaign />} />
                     {/* <Route path="/international-csvcampaign" element={<InternaitionaCsv />} /> */}
                     <Route path="/international-virtual-button" element={<InternaitionaButton />} />
-                    <Route path="/international-virtual-whatsapp-report" element={<InternationalWhatsappReport />} />
+                    <Route path="/international-virtual-whatsapp-report" element={<InternationalWhatsappReport isOpen={isOpen} />} />
 
 
                     {/* Wa Int Personal */}
@@ -199,7 +199,7 @@ const App = () => {
                     {/* <Route path="/international-personal-csvcampaign" element={<InternationalCampaignCsv />} /> */}
                     <Route path="/international-personal-button" element={<InternationalCampaignButton />} />
                     <Route path="/international-personal-poll" element={<InternationalCampaignPoll />} />
-                    <Route path="/international-personal-whatsapp-report" element={<InternationalReport />} />
+                    <Route path="/international-personal-whatsapp-report" element={<InternationalReport isOpen={isOpen} />} />
                     <Route path="/international-personal-scan-whatsapp" element={<InternationalPersonalScan />} />
 
                     {/* Whatsapp Offical Pages Routing */}
@@ -265,7 +265,7 @@ const MainApp = () => (
   <Provider store={store}>
     <Router>
       {/* <AutoLogoutWrapper> */}
-        <App />
+      <App />
       {/* </AutoLogoutWrapper> */}
     </Router>
   </Provider>
