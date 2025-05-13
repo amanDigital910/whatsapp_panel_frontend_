@@ -33,15 +33,11 @@ export const login = (username, password) => async (dispatch) => {
 
     if (response.status === 200) {
       const userData = response?.data?.data;
-      const { user, token, } = userData;
+      const { user, token } = userData;
 
       setSecureItem('userData', JSON.stringify(user));
       setSecureItem('userToken', token);
-
-      // Set a session cookie with the encrypted token
-      setAuthCookies(user, token);
-      dispatch(loginSuccess({ user, token }));
-
+      dispatch(loginSuccess(user));
     }
   } catch (error) {
     let errorMessage = 'An unknown error occurred. Please try again.';
