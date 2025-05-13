@@ -7,7 +7,7 @@ import './style.css';
 import { FaPowerOff } from 'react-icons/fa';
 import { BsPersonCircle } from 'react-icons/bs';
 import { Link, useNavigate } from 'react-router-dom';
-import { useDispatch } from 'react-redux';
+import { useDispatch, useSelector } from 'react-redux';
 import { logout } from '../redux/actions';
 import { getSecureItem } from '../pages/utils/SecureLocalStorage';
 

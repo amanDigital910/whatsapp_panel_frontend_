@@ -10,7 +10,7 @@ import store from './redux/store';
 
 import { PrivateRoute, PublicRoute, ROLES } from './components/ProtectedRoutes';
 import NotFoundPage from './components/NotFoundPage';
-import AutoLogoutWrapper from './components/AutoLogoutWrapper';
+// import AutoLogoutWrapper from './components/AutoLogoutWrapper';
 import PersonalGroupChannelCommunity from './pages/user/wa_personal/PersonalGroupChannel-Community.js';
 // import SideBar from './components/SideBar';
 
@@ -25,7 +25,6 @@ const AdminDashboard = lazy(() => import('./pages/admin/AdminDashboard'));
 const TransitionCReditUser = lazy(() => import('./pages/admin/TransitionCReditUser'))
 
 const LoginScreen = lazy(() => import('./pages/auth/UserLogin'));
-const ChangePassword = lazy(() => import('./pages/auth/ChangePassword.js'));
 
 const VirtualCampaign = lazy(() => import("./pages/user/wa_virtual/VirtualCampaign"));
 // const CsvVirtualCampaign = lazy(() => import("./pages/user/wa_virtual/CSV_Campaign"));
@@ -106,7 +105,6 @@ const App = () => {
   // Disable Side bar in Login Screen
   const location = useLocation();
   const isLoginPage = location.pathname === '/login';
-  const isChangePassword = location.pathname === '/change-password';
 
   // const isLoggedIn = !!localStorage.getItem('userToken'); // or check auth state from Redux
 
@@ -119,7 +117,7 @@ const App = () => {
 
   return (
     <div>
-      <div className="flex h-full w-full flex-wrap select-none  hide-scrollbar">
+      <div className="flex h-full w-full flex-wrap select-none hide-scrollbar">
         {/* Sidebar */}
         {/* 
         // Old Sidebar Code
@@ -127,7 +125,7 @@ const App = () => {
           <SideBar isOpen={isOpen} setIsSidebarOpen={setIsOpen} />
         </div> 
         */}
-        {(!isLoginPage && !isChangePassword) && <CustomSideBar
+        {!isLoginPage && <CustomSideBar
           isOpen={isOpen}
           setIsOpen={setIsOpen}
           activeDropdown={activeDropdown}
@@ -138,12 +136,12 @@ const App = () => {
         <div className="flex-1 flex flex-col ">
 
           {/* Topbar */}
-          {(!isLoginPage && !isChangePassword) && <NavBar
+          {!isLoginPage && <NavBar
             isOpen={isOpen}
             setIsOpen={setIsOpen} />}
 
           {/* Main Content */}
-          <div className={`flex-1 flex flex-col h-full  ${!isLoginPage && !isChangePassword ? ' mt-[70px]' : ''} `}>
+          <div className={`flex-1 flex flex-col h-full  ${!isLoginPage ? ' mt-[70px]' : ''} `}>
             {/* Scrollable content area */}
             <div className="h-[100%] overflow-y-auto">
               <Suspense  >
@@ -158,7 +156,7 @@ const App = () => {
                   {/* Public routes like login */}
                   <Route element={<PublicRoute />}>
                     <Route path="/login" element={<LoginScreen />} />
-                    <Route path="/change-password" element={<ChangePassword />} />
+                    {/* <Route path="/change-password" element={<ChangePassword />} /> */}
                   </Route>
 
                   {/* Protected routes */}
@@ -266,9 +264,9 @@ const App = () => {
 const MainApp = () => (
   <Provider store={store}>
     <Router>
-      <AutoLogoutWrapper>
+      {/* <AutoLogoutWrapper> */}
         <App />
-      </AutoLogoutWrapper>
+      {/* </AutoLogoutWrapper> */}
     </Router>
   </Provider>
 );

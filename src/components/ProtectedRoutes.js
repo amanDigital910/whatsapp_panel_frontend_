@@ -1,3 +1,8 @@
+// PrivateRoute.js
+import { Navigate, Outlet } from 'react-router-dom';
+import { isAuthenticated } from './Cookies';
+import { getSecureItem } from '../pages/utils/SecureLocalStorage';
+
 import { Navigate, Outlet, useLocation } from 'react-router-dom';
 import { getSecureItem } from '../pages/utils/SecureLocalStorage';
 
@@ -6,6 +11,9 @@ export const ROLES = {
   ADMIN: 'admin',
   RESELLER: 'reseller',
   USER: 'user',
+
+export const PrivateRoute = () => {
+  return isAuthenticated() ? <Outlet /> : <Navigate to="/login" />;
 };
 
 export const PrivateRoute = ({ allowedRoles }) => {
