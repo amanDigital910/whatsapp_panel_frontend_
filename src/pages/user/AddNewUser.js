@@ -5,7 +5,7 @@ import 'react-toastify/dist/ReactToastify.css'; // Import Toastify CSS
 import { ToastContainer, toast } from 'react-toastify'; // Import Toastify
 import { FaEye, FaEyeSlash } from "react-icons/fa";
 import { useDispatch, } from "react-redux";
-import { createUser } from "../../redux/actions";
+import { createUser } from "../../redux/actions/authAction";
 import { getSecureItem } from "../utils/SecureLocalStorage";
 
 function AddNewUser() {

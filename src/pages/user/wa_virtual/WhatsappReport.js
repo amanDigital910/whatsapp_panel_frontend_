@@ -3,114 +3,115 @@ import axios from "axios";
 import CreditHeader from "../../../components/CreditHeader";
 import { CampaignHeading, CopyToClipboard, CustomizeTable, DownloadCSVButton, DownloadPDFButton } from "../../utils/Index";
 import useIsMobile from "../../../hooks/useMobileSize";
+import '../whatsapp_offical/commonCSS.css'
 
 const WhatsappReport = ({ isOpen }) => {
   const isMobile = useIsMobile();
   const [campaigns, setCampaigns] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
-    const [searchTerm, setSearchTerm] = useState('');
-    const [sortConfig, setSortConfig] = useState({ key: '', direction: 'asc' });
-    const [dummyData, setDummyData] = useState([
-      {
-        "campaignId": "CMP1001",
-        "userName": "Alice Johnson",
-        "numberCount": 120,
-        "campaignTitle": "Spring Sale",
-        "campaignReport": "Completed",
-        "templateStatus": "Approved",
-        "campaignSubmit": "2025-05-10 14:00"
-      },
-      {
-        "campaignId": "CMP1002",
-        "userName": "Bob Smith",
-        "numberCount": 85,
-        "campaign": "Event Reminder",
-        "campaignReport": "Pending",
-        "templateStatus": "Pending",
-        "campaignSubmit": "2025-05-11 09:30"
-      },
-      {
-        "campaignId": "CMP1003",
-        "userName": "Clara Green",
-        "numberCount": 200,
-        "campaign": "Product Launch",
-        "campaignReport": "Completed",
-        "templateStatus": "Rejected",
-        "campaignSubmit": "2025-05-12 16:45"
-      },
-      {
-        "campaignId": "CMP1004",
-        "userName": "Daniel White",
-        "numberCount": 50,
-        "campaign": "Feedback Request",
-        "campaignReport": "Failed",
-        "templateStatus": "Approved",
-        "campaignSubmit": "2025-05-13 11:15"
-      }])
-  
-    const headers = [
-      { key: "CampaignId", label: 'Campaign ID' },
-      { key: "userName", label: 'User Name' },
-      { key: "numberCount", label: 'Number Count' },
-      { key: "campaignTitle", label: 'Campaign Title' },
-      { key: "campaignReport", label: 'Campaign Report' },
-      { key: "templateStatus", label: 'Template Status' },
-      { key: "campaignSubmit", label: 'Campaign Submit' }
-    ];
-  
-    const renderRow = (log, index) => (
-      <tr key={index} className="text-black border border-gray-700 hover:bg-gray-500 whitespace-wrap">
-        <td className="px-2 py-2 border border-gray-900">{log.campaignId ?? '-'}</td>
-        <td className="px-2 py-2 border border-gray-900 text-blue-600 underline cursor-pointer">
-          {log.userName || 'N/A'}
-        </td>
-        <td className="px-2 py-2 border border-gray-900">
-          {log.numberCount || 'N/A'}
-        </td>
-        <td className="px-2 py-2 border border-gray-900">{log.campaignTitle ?? '-'}</td>
-        <td className="px-2 py-2 border border-gray-900">{log.campaignReport || 'N/A'}</td>
-        <td className="px-2 py-2 border border-gray-900">{log.templateStatus || 'Invalid date'}</td>
-        <td className="px-2 py-2 border border-gray-900">{log.campaignSubmit || 'N/A'}</td>
-      </tr>
-    );
-  
-  
-    const filteredAndSortedLogs = useMemo(() => {
-      const term = searchTerm.toLowerCase().trim();
-  
-      const filtered = dummyData.filter(log => {
-        // Search term filter (matches phone, campaign, status, or read status)
-        const matchesSearch =
-          log.campaignId.includes(term);
-        // log.campaignName.toLowerCase().trim().includes(term) ||
-        // log.status.toLowerCase().trim().includes(term) ||
-        // log.readStatus.toLowerCase().trim().includes(term);
-  
-        // Date filter (matches based on start date and end date)
-        return matchesSearch;
+  const [searchTerm, setSearchTerm] = useState('');
+  const [sortConfig, setSortConfig] = useState({ key: '', direction: 'asc' });
+  const [dummyData, setDummyData] = useState([
+    {
+      "campaignId": "CMP1001",
+      "userName": "Alice Johnson",
+      "numberCount": 120,
+      "campaignTitle": "Spring Sale",
+      "campaignReport": "Completed",
+      "templateStatus": "Approved",
+      "campaignSubmit": "2025-05-10 14:00"
+    },
+    {
+      "campaignId": "CMP1002",
+      "userName": "Bob Smith",
+      "numberCount": 85,
+      "campaign": "Event Reminder",
+      "campaignReport": "Pending",
+      "templateStatus": "Pending",
+      "campaignSubmit": "2025-05-11 09:30"
+    },
+    {
+      "campaignId": "CMP1003",
+      "userName": "Clara Green",
+      "numberCount": 200,
+      "campaign": "Product Launch",
+      "campaignReport": "Completed",
+      "templateStatus": "Rejected",
+      "campaignSubmit": "2025-05-12 16:45"
+    },
+    {
+      "campaignId": "CMP1004",
+      "userName": "Daniel White",
+      "numberCount": 50,
+      "campaign": "Feedback Request",
+      "campaignReport": "Failed",
+      "templateStatus": "Approved",
+      "campaignSubmit": "2025-05-13 11:15"
+    }])
+
+  const headers = [
+    { key: "CampaignId", label: 'Campaign ID' },
+    { key: "userName", label: 'User Name' },
+    { key: "numberCount", label: 'Number Count' },
+    { key: "campaignTitle", label: 'Campaign Title' },
+    { key: "campaignReport", label: 'Campaign Report' },
+    { key: "templateStatus", label: 'Template Status' },
+    { key: "campaignSubmit", label: 'Campaign Submit' }
+  ];
+
+  const renderRow = (log, index) => (
+    <tr key={index} className="text-black border border-gray-700 hover:bg-gray-500 whitespace-wrap">
+      <td className="px-2 py-2 border border-gray-900">{log.campaignId ?? '-'}</td>
+      <td className="px-2 py-2 border border-gray-900 text-blue-600 underline cursor-pointer">
+        {log.userName || 'N/A'}
+      </td>
+      <td className="px-2 py-2 border border-gray-900">
+        {log.numberCount || 'N/A'}
+      </td>
+      <td className="px-2 py-2 border border-gray-900">{log.campaignTitle ?? '-'}</td>
+      <td className="px-2 py-2 border border-gray-900">{log.campaignReport || 'N/A'}</td>
+      <td className="px-2 py-2 border border-gray-900">{log.templateStatus || 'Invalid date'}</td>
+      <td className="px-2 py-2 border border-gray-900">{log.campaignSubmit || 'N/A'}</td>
+    </tr>
+  );
+
+
+  const filteredAndSortedLogs = useMemo(() => {
+    const term = searchTerm.toLowerCase().trim();
+
+    const filtered = dummyData.filter(log => {
+      // Search term filter (matches phone, campaign, status, or read status)
+      const matchesSearch =
+        log.campaignId.includes(term);
+      // log.campaignName.toLowerCase().trim().includes(term) ||
+      // log.status.toLowerCase().trim().includes(term) ||
+      // log.readStatus.toLowerCase().trim().includes(term);
+
+      // Date filter (matches based on start date and end date)
+      return matchesSearch;
+    });
+
+    // Sorting logic
+    if (sortConfig.key) {
+      filtered.sort((a, b) => {
+        const aVal = a[sortConfig.key] || '';
+        const bVal = b[sortConfig.key] || '';
+        if (aVal < bVal) return sortConfig.direction === 'asc' ? -1 : 1;
+        if (aVal > bVal) return sortConfig.direction === 'asc' ? 1 : -1;
+        return 0;
       });
-  
-      // Sorting logic
-      if (sortConfig.key) {
-        filtered.sort((a, b) => {
-          const aVal = a[sortConfig.key] || '';
-          const bVal = b[sortConfig.key] || '';
-          if (aVal < bVal) return sortConfig.direction === 'asc' ? -1 : 1;
-          if (aVal > bVal) return sortConfig.direction === 'asc' ? 1 : -1;
-          return 0;
-        });
-      }
-  
-      return filtered;
-    }, [dummyData, searchTerm, sortConfig]);
-  
-    const handleSort = (key) => {
-      setSortConfig(prev => ({
-        key,
-        direction: prev.key === key && prev.direction === 'asc' ? 'desc' : 'asc'
-      }));
-    };
+    }
+
+    return filtered;
+  }, [dummyData, searchTerm, sortConfig]);
+
+  const handleSort = (key) => {
+    setSortConfig(prev => ({
+      key,
+      direction: prev.key === key && prev.direction === 'asc' ? 'desc' : 'asc'
+    }));
+  };
 
   // Fetch campaigns on component mount
   useEffect(() => {
@@ -132,7 +133,7 @@ const WhatsappReport = ({ isOpen }) => {
     <>
       <section className={`w-[100%] h-full pb-3 bg-gray-200 min-h-[calc(100vh-70px)] ${!isMobile ? isOpen ? "ml-[240px] 60 w-[calc(100vw-246px)]" : "ml-20 w-[calc(100vw-80px)]" : ""} `}>
         <CreditHeader />
-        <div className="w-full mt-8">
+        <div className="w-full mt-8 mb-2">
           <CampaignHeading campaignHeading="Whatsapp Report" />
         </div>
         <div className="px-3 flex flex-col gap-2">
@@ -177,7 +178,7 @@ const WhatsappReport = ({ isOpen }) => {
               </div>
             </div>
             <div className="min-w-max overflow-hidden bg-gray-300">
-              <div className={`custom-horizontal-scroll overflow-x-auto  select-text h-full relative ${!isMobile ? (isOpen ? "max-w-[calc(100vw-305px)]" : "max-w-[calc(100vw-60px)]") : "max-w-[calc(100vw-64px)]"}`}>
+              <div className={`custom-horizontal-scroll overflow-x-auto  select-text h-full relative ${!isMobile ? (isOpen ? "max-w-[calc(100vw-310px)]" : "max-w-[calc(100vw-60px)]") : "max-w-[calc(100vw-64px)]"}`}>
                 <CustomizeTable
                   headers={headers}
                   emptyMessage='No transaction logs available.'

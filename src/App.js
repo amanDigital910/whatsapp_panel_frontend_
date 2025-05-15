@@ -10,7 +10,7 @@ import store from './redux/store';
 
 import { PrivateRoute, PublicRoute, ROLES } from './components/ProtectedRoutes';
 import NotFoundPage from './components/NotFoundPage';
-// import AutoLogoutWrapper from './components/AutoLogoutWrapper';
+import AutoLogoutWrapper from './components/AutoLogoutWrapper';
 import PersonalGroupChannelCommunity from './pages/user/wa_personal/PersonalGroupChannel-Community.js';
 // import SideBar from './components/SideBar';
 
@@ -183,7 +183,7 @@ const App = () => {
                     <Route path="/personal-button" element={<PersonalButton />} />
                     {/* <Route path='/personal-Personalbutton' element={<PersonalCSVButton/> } /> */}
                     <Route path="/personal-whatsapp-report" element={<PersonalCampaign isOpen={isOpen} />} />
-                    <Route path="/personal-scan-whatsapp" element={<PersonalCampaignScan />} />
+                    <Route path="/personal-scan-whatsapp" element={<PersonalCampaignScan isOpen={isOpen} />} />
                     <Route path="/personal-group-community" element={<PersonalCampaignChannel />} />
                     <Route path="/personal-channel-create-bulk-sms" element={<PersonalGroupChannelCommunity />} />
 
@@ -200,7 +200,7 @@ const App = () => {
                     <Route path="/international-personal-button" element={<InternationalCampaignButton />} />
                     <Route path="/international-personal-poll" element={<InternationalCampaignPoll />} />
                     <Route path="/international-personal-whatsapp-report" element={<InternationalReport isOpen={isOpen} />} />
-                    <Route path="/international-personal-scan-whatsapp" element={<InternationalPersonalScan />} />
+                    <Route path="/international-personal-scan-whatsapp" element={<InternationalPersonalScan isOpen={isOpen} />} />
 
                     {/* Whatsapp Offical Pages Routing */}
                     <Route path="/whatsapp-dashboard" element={<WhatsappDashboard />} />
@@ -264,9 +264,9 @@ const App = () => {
 const MainApp = () => (
   <Provider store={store}>
     <Router>
-      {/* <AutoLogoutWrapper> */}
-      <App />
-      {/* </AutoLogoutWrapper> */}
+      <AutoLogoutWrapper>
+        <App />
+      </AutoLogoutWrapper>
     </Router>
   </Provider>
 );

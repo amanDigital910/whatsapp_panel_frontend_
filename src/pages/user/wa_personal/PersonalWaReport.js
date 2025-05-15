@@ -134,7 +134,7 @@ const WhatsappReport = ({ isOpen }) => {
     <>
       <section className={`w-[100%] h-full pb-3 bg-gray-200 min-h-[calc(100vh-70px)] ${!isMobile ? isOpen ? "ml-[240px] 60 w-[calc(100vw-246px)]" : "ml-20 w-[calc(100vw-80px)]" : ""} `}>
         <CreditHeader />
-        <div className="w-full mt-8">
+        <div className="w-full mt-8 mb-2">
           <CampaignHeading campaignHeading="Whatsapp Report" />
         </div>
         <div className="px-3 flex flex-col gap-2">
@@ -179,7 +179,7 @@ const WhatsappReport = ({ isOpen }) => {
               </div>
             </div>
             <div className="min-w-max overflow-hidden bg-gray-300">
-              <div className={`custom-horizontal-scroll overflow-x-auto  select-text h-full relative ${!isMobile ? (isOpen ? "max-w-[calc(100vw-305px)]" : "max-w-[calc(100vw-60px)]") : "max-w-[calc(100vw-64px)]"}`}>
+              <div className={`custom-horizontal-scroll overflow-x-auto  select-text h-full relative ${!isMobile ? (isOpen ? "max-w-[calc(100vw-310px)]" : "max-w-[calc(100vw-60px)]") : "max-w-[calc(100vw-64px)]"}`}>
                 <CustomizeTable
                   headers={headers}
                   emptyMessage='No transaction logs available.'

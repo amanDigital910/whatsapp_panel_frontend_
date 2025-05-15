@@ -61,7 +61,7 @@ function TransitionCReditUser() {
 
     return (
         <>
-            <section className="w-full h-full bg-gray-200 flex justify-center flex-col pb-10">
+            <section className="w-full h-full bg-gray-200 flex flex-col min-h-[calc(100vh-70px)] pb-3">
                 <CreditHeader />
 
 

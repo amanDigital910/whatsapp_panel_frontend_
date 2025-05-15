@@ -1,5 +1,5 @@
 /* eslint-disable default-case */
-import { LOGOUT, LOGIN_REQUEST, LOGIN_SUCCESS, LOGIN_FAILURE, CREATE_USER_REQUEST, CREATE_USER_SUCCESS, CREATE_USER_FAILURE, } from '../actions';
+import { LOGOUT, LOGIN_REQUEST, LOGIN_SUCCESS, LOGIN_FAILURE, CREATE_USER_REQUEST, CREATE_USER_SUCCESS, CREATE_USER_FAILURE, } from '../actions/authAction';
 import { getSecureItem } from '../../pages/utils/SecureLocalStorage';
 
 const stored = JSON.parse(getSecureItem('userData'));

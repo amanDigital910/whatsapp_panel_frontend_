@@ -1,7 +1,7 @@
 /* eslint-disable react-hooks/exhaustive-deps */
 import { useEffect, useRef, useCallback } from 'react';
 import { useDispatch } from 'react-redux';
-import { logout } from '../redux/actions';
+import { logout } from '../redux/actions/authAction';
 import { useNavigate } from 'react-router-dom';
 
 const AutoLogoutWrapper = ({ children }) => {

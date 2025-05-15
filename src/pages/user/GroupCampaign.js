@@ -284,7 +284,7 @@ const GroupCampaign = () => {
             </div>
           </div>
           <div className="flex items-center mb-4 flex-col">
-            {feedback && <p className="text-red-500 mt-2">{feedback}</p>}
+            {feedback && <p className="text-red-500 m-0">{feedback}</p>}
             <button className="btn btn-primary w-24 py-2" onClick={saveTemplate}>
               {editingId ? "Update" : "Submit"}
             </button>
@@ -303,13 +303,9 @@ const GroupCampaign = () => {
                     <th className="px-6 text-white font-semibold">Action</th>
                   </tr>
                 </thead>
-                <tbody className="bg-white text-black">
-                  {!currentRecords || currentRecords.length === 0 ?
-                    <p className="text-center py-4 text-red-400 font-bold">
-                      Fail to Load the Data
-                    </p>
-                    :
-                    currentRecords.map((template) => (
+                {(!currentRecords || currentRecords.length === 0) &&
+                  (<tbody className=" text-black">
+                    {currentRecords.map((template) => (
                       <tr
                         key={template.id}
                         className="border-b border-gray-600 transition"
@@ -335,8 +331,13 @@ const GroupCampaign = () => {
                         </td>
                       </tr>
                     ))}
-                </tbody>
+                  </tbody>
+                  )}
               </table>
+              {(!currentRecords || currentRecords.length === 0) && (
+                <h5 className="text-center py-4 m-0 text-xl tracking-wider text-red-400 font-bold">
+                  Fail to Load the Data
+                </h5>)}
               <div className="flex justify-end align-items-center gap-4 border-t border-gray-400 pr-4 py-2 text-black">
                 <button
                   className="px-4 py-2 border-2 border-gray-500 rounded"

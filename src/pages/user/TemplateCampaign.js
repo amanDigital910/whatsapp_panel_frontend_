@@ -1,21 +1,33 @@
-import React, { useEffect, useRef, useState } from 'react';
+import { useEffect, useMemo, useRef, useState } from 'react';
 import CreditHeader from '../../components/CreditHeader';
 import moment from 'moment';
 import { ToastContainer, toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 import { CampaignHeading, CampaignTitle, PdfUploader, VideoUploader } from '../utils/Index';
 import ImageUploaderGroup from '../utils/ImageUploaderGroup';
+import { useDispatch, useSelector } from 'react-redux';
+import { createTemplate, deleteTemplate, getAllTemplates, updateTemplate } from '../../redux/actions/templateAction';
 
 const TemplateCampaign = () => {
   const [templateName, setTemplateName] = useState("");
   const [templateMsg, setTemplateMsg] = useState("");
   const [feedback, setFeedback] = useState("");
   const [templates, setTemplates] = useState([]);
-  const [currentPage, setCurrentPage] = useState(1); // Track current page
-  const [recordsPerPage] = useState(5); // Set records per page to 5
+  const [currentPage, setCurrentPage] = useState(1);
+  const recordsPerPage = 5;
   const [editingId, setEditingId] = useState(null); // Track which template is being edited
+  const dispatch = useDispatch();
+
+  const { loading, data, } = useSelector((state) => state.template);
+  console.log("Loading Data", data);
 
   const textareaRef = useRef(null);
+
+  const payload = {
+    userId: 1 || editingId,
+    template_name: templateName,
+    template_msg: templateMsg,
+  };
 
   const [uploadedFiles, setUploadedFiles] = useState({
     image1: null,
@@ -46,6 +58,24 @@ const TemplateCampaign = () => {
     video: useRef(null),
   };
 
+  useEffect(() => {
+    // Fetch templates when component mounts
+    dispatch(getAllTemplates());
+    return () => {
+      Object.values(uploadedFiles).forEach(file => {
+        if (file?.preview) {
+          URL.revokeObjectURL(file.preview);
+        }
+      });
+    };
+  }, [dispatch, uploadedFiles]);
+
+  useEffect(() => {
+    if (data && data.ok) {
+      setTemplates(data.templates || []);
+    }
+  }, [data]);
+
   // Handle file uploads for images, PDF, and video.
   const handleFileUpload = (e, type) => {
     const files = e.target.files;
@@ -58,9 +88,7 @@ const TemplateCampaign = () => {
     if (type.startsWith("image")) {
       const validImageTypes = ["image/jpeg", "image/png", "image/gif"];
       if (!validImageTypes.includes(file.type)) {
-        alert(
-          "Invalid file type. Please select a valid image (JPEG, PNG, or GIF)."
-        );
+        alert("Invalid file type. Please select a valid image (JPEG, PNG, or GIF).");
         return;
       }
       const maxSizeInMB = 2;
@@ -108,22 +136,7 @@ const TemplateCampaign = () => {
     textarea.style.height = `${textarea.scrollHeight}px`;
   };
 
-  // Fetch templates from the database
-  const fetchTemplates = async () => {
-    try {
-      const response = await fetch(`${process.env.REACT_APP_API_URL}/msgtemplate/`);
-      if (response.ok) {
-        const data = await response.json();
-        setTemplates(data); // Populate the table with fetched data
-      } else {
-        setFeedback("Failed to fetch templates.");
-      }
-    } catch (error) {
-      setFeedback(`Error: ${error.message}`);
-    }
-  };
-
-  // Add or update template to the database
+  // Add or update template
   const saveTemplate = async () => {
     if (!templateName || !templateMsg) {
       setFeedback("Both fields are required.");
@@ -131,50 +144,54 @@ const TemplateCampaign = () => {
       return;
     }
 
-    const payload = {
-      userId: 1, // Adjust as needed
+    const templateData = {
+      ...payload,
       template_name: templateName,
       template_msg: templateMsg,
     };
 
     try {
       let response;
-      // if (editingId) {
-      //   // Update existing template
-      //   response = await fetch(`${process.env.REACT_APP_API_URL}/msgtemplate/${editingId}`, {
-      //     method: "PUT",
-      //     headers: {
-      //       "Content-Type": "application/json",
-      //     },
-      //     body: JSON.stringify(payload),
-      //   });
-      // } else {
-      //   // Create new template
-      //   response = await fetch(`${process.env.REACT_APP_API_URL}/msgtemplate/`, {
-      //     method: "POST",
-      //     headers: {
-      //       "Content-Type": "application/json",
-      //     },
-      //     body: JSON.stringify(payload),
-      //   });
-      // }
 
-      if (response.ok) {
-        setFeedback(editingId ? "Template updated successfully!" : "Template added successfully!");
-        toast.success(editingId ? "Template updated successfully!" : "Template added successfully!");
-        setTemplateName("");
-        setTemplateMsg("");
-        setEditingId(null); // Reset editing state
-        // fetchTemplates(); // Refresh the table after submission
+      if (editingId) {
+        response = dispatch(updateTemplate(editingId, templateData));
+        if (response?.ok) {
+          toast.success("Template updated successfully!");
+        } else {
+          // If the response is found but not ok
+          const errorMessage = response?.message || "Failed to update template.";
+          setFeedback(errorMessage);
+          toast.error(errorMessage);
+        }
       } else {
-        const errorData = await response.json();
-        setFeedback(`Error: ${errorData.message || "Something went wrong."}`);
-        toast.error(errorData.message || "Something went wrong.");
+        response = dispatch(createTemplate(templateData));
+        if (response?.ok) {
+          toast.success("Template added successfully!");
+        } else if (response) {
+          // If the response is found but not ok
+          const errorMessage = response?.message || "Failed to add template.";
+          setFeedback(errorMessage);
+          toast.error(errorMessage);
+        } else {
+          // If no response object exists, it could mean no data was returned or an issue with the request.
+          const errorMessage = "Server did not respond. Please try again later.";
+          setFeedback(errorMessage);
+          toast.error(errorMessage);
+        }
       }
     } catch (error) {
-      setFeedback(`Error: ${error.message}`);
-      toast.error(`Error: ${error.message}`);
+      // General catch block if there is an unexpected error
+      console.error("Error occurred:", error);  // Log for debugging purposes
+
+      // Show a generic error message
+      const errorMessage = error?.message || "Something went wrong. Please try again later.";
+      setFeedback(errorMessage);
+      toast.error(errorMessage);
     }
+
+    setTemplateName("");
+    setTemplateMsg("");
+    setEditingId(null);
   };
 
   // Edit Template (fetch and populate the form)
@@ -182,45 +199,55 @@ const TemplateCampaign = () => {
     const templateToEdit = templates.find((template) => template.templateId === id);
     setTemplateName(templateToEdit.template_name);
     setTemplateMsg(templateToEdit.template_msg);
-    setEditingId(id); // Set editing state
+    setEditingId(id);
   };
 
-  const deleteTemplate = async (id) => {
-    // try {
-    //   const response = await fetch(`${process.env.REACT_APP_API_URL}/msgtemplate/${id}`, {
-    //     method: "DELETE",
-    //   });
+  const deleteTemplateHandler = async (id) => {
+    try {
+      // Show confirmation before deletion
+      const isConfirmed = window.confirm("Are you sure you want to delete this template?");
+      if (!isConfirmed) return;
 
-    //   if (response.ok) {
-    //     setFeedback("Template deleted successfully!");
-    //     toast.success("Template deleted successfully!");
-    //     fetchTemplates(); // Refresh the templates list after deletion
-    //   } else {
-    //     const errorData = await response.json();
-    //     setFeedback(`Error: ${errorData.message || "Something went wrong."}`);
-    //     toast.error(errorData.message || "Something went wrong.");
-    //   }
-    // } catch (error) {
-    //   setFeedback(`Error: ${error.message}`);
-    //   toast.error(`Error: ${error.message}`);
-    // }
+      // Dispatch delete action
+      const response = dispatch(deleteTemplate(id));
+
+      if (response?.ok) {
+        toast.success("Template deleted successfully!");
+      } else {
+        toast.error(response?.message || "Failed to delete template.");
+      }
+    } catch (error) {
+      console.error("Error deleting template:", error);
+      toast.error("Something went wrong. Please try again later.");
+    }
   };
+
 
   // Pagination Logic
+  const totalPages = useMemo(() => {
+    return Math.ceil(templates.length / recordsPerPage);
+  }, [templates]);
+
+  // Calculate the indices for the current page slice
   const indexOfLastRecord = currentPage * recordsPerPage;
   const indexOfFirstRecord = indexOfLastRecord - recordsPerPage;
   const currentRecords = templates.slice(indexOfFirstRecord, indexOfLastRecord);
 
-  const totalPages = Math.ceil(templates.length / recordsPerPage);
 
+  // Update the currentPage when the page changes
   const changePage = (pageNumber) => {
+    console.log("Current records", currentRecords, pageNumber);
+    if (pageNumber < 1) pageNumber = 1;
+    if (pageNumber > totalPages) pageNumber = totalPages;
     setCurrentPage(pageNumber);
   };
 
-  // Fetch templates on component mount
-  // useEffect(() => {
-  //   fetchTemplates();
-  // }, []);
+  // Ensure templates are properly fetched and loaded
+  useEffect(() => {
+    if (data && data.ok) {
+      setTemplates(data.templates); // Assuming the templates are in the 'templates' field of the response
+    }
+  }, [data]);
 
   return (
     <>
@@ -294,7 +321,7 @@ const TemplateCampaign = () => {
             </div>
           </div>
           <div className="flex items-center mb-4 flex-col">
-            {feedback && <p className="text-red-500 mt-2">{feedback}</p>}
+            {feedback && <p className="text-red-500 m-0">{feedback}</p>}
             <button className="btn btn-primary w-24 py-2" onClick={saveTemplate}>
               {editingId ? "Update" : "Submit"}
             </button>
@@ -313,14 +340,10 @@ const TemplateCampaign = () => {
                     <th className="mr-0 text-white font-semibold">Action</th>
                   </tr>
                 </thead>
-                <tbody className=" text-black">
-                  {!currentRecords || currentRecords.length === 0 ?
-                    <p className="text-center py-4 text-red-400 font-bold">
-                      Fail to Load the Data
-                    </p>
-                    :
-                    currentRecords.map((template) => (
-                      <tr key={template.id} className="border-b border-gray-600 transition">
+                {(!currentRecords || currentRecords.length === 0 || loading) &&
+                  (<tbody className=" text-black">
+                    {currentRecords.map((template) => (
+                      <tr key={template.templateId} className="border-b border-gray-600 transition">
                         <td className="py-2 px-2">{template.templateId}</td>
                         <td className="py-2 px-2">{template.template_name}</td>
                         <td className="py-2 px-2">{template.template_msg}</td>
@@ -329,13 +352,17 @@ const TemplateCampaign = () => {
                         </td>
                         <td className="py-2 px-2">
                           <button onClick={() => editTemplate(template.templateId)} className='me-2'>Edit</button>
-                          <button onClick={() => deleteTemplate(template.templateId)}>Delete</button>
-
+                          <button onClick={() => deleteTemplateHandler(template.templateId)}>Delete</button>
                         </td>
                       </tr>
                     ))}
-                </tbody>
+                  </tbody>
+                  )}
               </table>
+              {(!currentRecords || currentRecords.length === 0) && (
+                <h5 className="text-center py-4 m-0 text-xl tracking-wider text-red-400 font-bold">
+                  Fail to Load the Data
+                </h5>)}
               {/* Pagination */}
               <div className="flex justify-end align-items-center gap-4 border-t border-gray-400 pr-4 py-2 text-black">
                 <button

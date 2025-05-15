@@ -70,7 +70,7 @@ const UserDashboard = () => {
       cardName: "WA Channel Create & Send Bulk Message Campaign",
       cardCredit: 0,
       bg: "#25D366",
-      redirectUrl: "/personal-group-community",
+      redirectUrl: "/personal-channel-create-bulk-sms",
       charName: 'WPG'
     },
     {
@@ -78,15 +78,15 @@ const UserDashboard = () => {
       cardName: "WA Personal Poll Campaign",
       cardCredit: 0,
       bg: "#25D366",
-      redirectUrl: "/personal-channel-create-bulk-sms",
+      redirectUrl: "/personal-poll",
       charName: 'WPCC'
     },
     {
       id: 10,
       cardName: "WA International Virtual Quick / CSV Campaign",
       cardCredit: 0,
-      bg: "#25D366",
-      redirectUrl: "/personal-poll",
+      bg: "#7b1111",
+      redirectUrl: "/international-virtual-quick-csv",
       charName: 'WPP'
     },
     {
@@ -101,7 +101,7 @@ const UserDashboard = () => {
       id: 12,
       cardName: "WA International Personal Quick / CSV Campaign",
       cardCredit: 0,
-      bg: "#7b1111",
+      bg: "#52117b",
       redirectUrl: "/international-virtual-button",
       charName: 'WIVB'
     },
@@ -109,7 +109,7 @@ const UserDashboard = () => {
       id: 13,
       cardName: "WA International Personal Button Campaign",
       cardCredit: 0,
-      bg: "#7b1111",
+      bg: "#52117b",
       redirectUrl: "/international-personal-button",
       charName: 'WIPB'
     },
@@ -117,7 +117,7 @@ const UserDashboard = () => {
       id: 14,
       cardName: "WA International Personal Poll Campaign",
       cardCredit: 0,
-      bg: "#7b1111",
+      bg: "#52117b",
       redirectUrl: "/international-personal-poll",
       charName: 'WIPP'
     },

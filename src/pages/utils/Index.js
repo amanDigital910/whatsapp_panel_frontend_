@@ -14,7 +14,7 @@ const RequireMark = () => {
 export const CampaignHeading = ({ campaignHeading }) => {
     return (
         <div className="px-3">
-            <div className="w-full py-2 mb-2 bg-white rounded-lg">
+            <div className="w-full py-2 bg-white rounded-lg">
                 <h1 className="text-2xl ss:text-xl md:text-xl text-start pl-4 md:pl-0 md:flex justify-center text-black font-semibold py-0 m-0">
                     {campaignHeading}
                 </h1>
@@ -221,6 +221,11 @@ export const CSVButton = () => {
     const [, setCsvPreview] = useState([]);
     const csvInputRef = useRef(null);
 
+    // Reset the file input after removal
+    const resetFileInput = () => {
+        csvInputRef.current.value = ""; // Resets the input field
+    };
+
     const parseCSVPreview = (file) => {
         const reader = new FileReader();
         reader.onload = (e) => {
@@ -236,6 +241,7 @@ export const CSVButton = () => {
         if (type === "csv") {
             const file = e.target.files[0];
             if (file) {
+                console.log("Uploading CSV:", file);
                 setUploadedFile(file);
                 parseCSVPreview(file);
             }
@@ -246,6 +252,8 @@ export const CSVButton = () => {
         if (type === "csv") {
             setUploadedFile(null);
             setCsvPreview([]);
+            console.log("Removing CSV:", uploadedFile);
+            resetFileInput(); // Reset input field when file is removed
         }
     };
 
@@ -263,21 +271,23 @@ export const CSVButton = () => {
                 <button className="bg-brand_colors font-medium text-[1rem] text-white text-base  py-2 px-3 w-fit md:w-full  whitespace-nowrap md:rounded-t-md md:rounded-br-none md:rounded-bl-none rounded-l-md">
                     Upload CSV
                 </button>
-                <span className="w-full relative flex flex-row justify-start md:justify-center text-[1rem] py-2 bg-gray-400 text-gray-700 font-medium text-base overflow-hidden custom-rounded whitespace-nowrap md:rounded-r-md md:rounded-br-none md:rounded-bl-none rounded-tl-none rounded-tr-none">
+                <span className="w-full relative flex flex-row justify-start md:justify-center text-[1rem] py-2 bg-[#00000013] text-gray-700 font-medium text-base overflow-hidden custom-rounded whitespace-nowrap md:rounded-r-md md:rounded-br-none md:rounded-bl-none rounded-tl-none rounded-tr-none">
                     <p className=" pl-3  flex m-0 py-0">Ex: Name, Number (Vikram, 91xxxxxx57)</p>
                     {/* <p className="py-0 m-0 absolute top-0 right-0 h-full bg-gray-400">&nbsp;</p> */}
                 </span>
             </button>
 
             {uploadedFile && (
-                <div className="w-full max-h-80 overflow-y-hidden border border-gray-200 bg-white rounded px-3 py-2">
-                    <div className="flex justify-between items-center">
-                        <span className="text-gray-700 font-medium flex gap-2 items-center truncate max-w-[80%]">
+                <div className="w-full max-h-80  overflow-y-hidden border border-gray-200 truncate bg-white rounded  py-2">
+                    <div className="flex relative justify-between items-center">
+                        <div className='flex items-center px-3  gap-2'>
                             <FaFileCsv />
-                            {uploadedFile.name}
-                        </span>
+                            <span className="text-gray-700 font-medium flex gap-2 items-center w-[90%]">
+                                {uploadedFile.name}
+                            </span>
+                        </div>
                         <MdDelete
-                            className="text-red-500 text-xl cursor-pointer"
+                            className="absolute end-0 pr-2 w-8 bg-white text-red-500 text-xl cursor-pointer"
                             onClick={() => onRemove("csv")}
                         />
                     </div>
@@ -324,7 +334,7 @@ export const GroupDropDown = ({ selectedGroup, setSelectedGroup, groups }) => {
             value={selectedGroup}
             onChange={(e) => setSelectedGroup(e.target.value)}
         >
-            <option value="">Select Your Group</option>
+            <option value="" disabled>Select Your Group</option>
             {groups.map((group) => (
                 <option key={group.groupId} value={group.groupId}>
                     {group.group_name}
@@ -342,7 +352,7 @@ export const CountryDropDown = ({ selectedCountry, setSelectedCountry, countries
             value={selectedCountry}
             onChange={(e) => setSelectedCountry(e.target.value)}
         >
-            <option value="">Select Country</option>
+            <option value="" disabled>Select Country</option>
             {countries.map((country, index) => (
                 <option key={index} value={country.dialCode}>
                     {country.name} (+{country.dialCode})
@@ -409,7 +419,7 @@ export const WhatsappTextNumber = ({ setWhatsAppNumbers, whatsAppNumbers, statsN
             <div className="h-full flex flex-grow">
                 <textarea
                     className="w-full h-full px-3 py-2 rounded-md bg-white text-black border border-black form-control placeholder-gray-500"
-                    placeholder="Enter WhatsApp Numbers (one per line)"
+                    placeholder="Enter WhatsApp Numbers (without +91)"
                     required
                     style={{
                         minHeight: '400px',
@@ -496,7 +506,7 @@ export const TemplateDropdown = ({ selectedTemplate, setSelectedTemplate, msgTem
                 }
             }}
         >
-            <option value="">Select Your Template</option>
+            <option value="" disabled>Select Your Template</option>
             {msgTemplates.map((template) => (
                 <option key={template.templateId} value={template.templateId}>
                     {template.template_name}
@@ -556,6 +566,11 @@ export const PollCampaign = ({ question, setQuestion, inputs, handleInputChange,
 
 // upload documents like Photos upto 2mb, Video and Pdf upto 15Mb.
 export const ImagesUploader = ({ type, index, inputRef, uploadedFile, onFileUpload, onRemove, caption, onCaptionChange }) => {
+
+    const removeRestBtn = (inputRef) => {
+        inputRef.current.value = "";
+        onRemove(type);
+    };
     return (
         <div className="flex flex-col gap-2">
             <div className="flex items-center gap-2">
@@ -592,7 +607,7 @@ export const ImagesUploader = ({ type, index, inputRef, uploadedFile, onFileUplo
                     />
                     <MdDelete
                         className="text-red-500 absolute top-2 right-2 text-xl z-10 cursor-pointer"
-                        onClick={() => onRemove(type)}
+                        onClick={() => removeRestBtn(inputRef)}
                     />
                 </div>
             )}
@@ -601,6 +616,12 @@ export const ImagesUploader = ({ type, index, inputRef, uploadedFile, onFileUplo
 };
 
 export const PdfUploader = ({ inputRef, uploadedFile, onFileUpload, onRemove, caption, onCaptionChange }) => {
+
+    const removeRestBtn = (inputRef) => {
+        inputRef.current.value = "";
+        onRemove("pdf");
+    };
+
 
     useEffect(() => {
         let url;
@@ -640,7 +661,7 @@ export const PdfUploader = ({ inputRef, uploadedFile, onFileUpload, onRemove, ca
                     <embed src={URL.createObjectURL(uploadedFile)} type="application/pdf" className="text-[150px] h-full text-red-400" />
                     <MdDelete
                         className="text-red-500 absolute top-2 right-2 text-xl cursor-pointer"
-                        onClick={() => onRemove("pdf")}
+                        onClick={() => removeRestBtn(inputRef)}
                     />
                 </div>
             )}
@@ -741,37 +762,45 @@ export const DelayButtonDetails = ({ delayBetweenMessages, setDelayBetweenMessag
     )
 }
 
-export const VideoUploader = ({ inputRef, uploadedFile, onFileUpload, onRemove, caption, onCaptionChange }) => (
-    <div className="flex flex-col gap-1">
-        <h6 className="font-semibold  m-0">Video (Max 15MB):</h6>
-        <div className="flex items-center md:flex-col">
-            <button
-                className="bg-[#23a31af5] w-fit md:w-full text-white py-2 px-6 whitespace-nowrap md:rounded-t-md md:rounded-br-none md:rounded-bl-none rounded-l-md "
-                onClick={() => inputRef.current.click()}
-            >
-                Upload Video
-            </button>
-            <input type="file" accept="video/mp4, video/x-matroska, video/webm, video/x-msvideo"
-                ref={inputRef} className="hidden" onChange={(e) => onFileUpload(e, "video")} />
-            <input
-                type="text"
-                className="w-full border border-gray-300 py-2 px-3 rounded-lg custom-rounded placeholder-gray-500"
-                placeholder="Enter caption for Video"
-                value={caption}
-                onChange={(e) => onCaptionChange(e.target.value)}
-            />
-        </div>
-        {uploadedFile && (
-            <div className="relative w-full h-[250px] border border-gray-200 rounded overflow-hidden">
-                <video src={uploadedFile.preview} className="w-full h-full object-contain" controls />
-                <MdDelete
-                    className="text-red-500 absolute top-2 right-2 text-xl cursor-pointer"
-                    onClick={() => onRemove("video")}
+export const VideoUploader = ({ inputRef, uploadedFile, onFileUpload, onRemove, caption, onCaptionChange }) => {
+
+    const removeRestBtn = (inputRef) => {
+        inputRef.current.value = "";
+        onRemove("video");
+    };
+
+    return (
+        <div className="flex flex-col gap-1">
+            <h6 className="font-semibold  m-0">Video (Max 15MB):</h6>
+            <div className="flex items-center md:flex-col">
+                <button
+                    className="bg-[#23a31af5] w-fit md:w-full text-white py-2 px-6 whitespace-nowrap md:rounded-t-md md:rounded-br-none md:rounded-bl-none rounded-l-md "
+                    onClick={() => inputRef.current.click()}
+                >
+                    Upload Video
+                </button>
+                <input type="file" accept="video/mp4, video/x-matroska, video/webm, video/x-msvideo"
+                    ref={inputRef} className="hidden" onChange={(e) => onFileUpload(e, "video")} />
+                <input
+                    type="text"
+                    className="w-full border border-gray-300 py-2 px-3 rounded-lg custom-rounded placeholder-gray-500"
+                    placeholder="Enter caption for Video"
+                    value={caption}
+                    onChange={(e) => onCaptionChange(e.target.value)}
                 />
             </div>
-        )}
-    </div>
-);
+            {uploadedFile && (
+                <div className="relative w-full h-[250px] border border-gray-200 rounded overflow-hidden">
+                    <video src={uploadedFile.preview} className="w-full h-full object-contain" controls />
+                    <MdDelete
+                        className="text-red-500 absolute top-2 right-2 text-xl cursor-pointer"
+                        onClick={() => removeRestBtn(inputRef)}
+                    />
+                </div>
+            )}
+        </div>
+    );
+};
 
 export const CustomizeTable = ({
     headers = [],
@@ -845,7 +874,7 @@ export const CopyToClipboard = ({ activeSnippet }) => {
 
     // Copy to Clipboard Button
     const copyToClipboard = () => {
-        const textToCopy = activeSnippet.code.join('\n');
+        const textToCopy = Array.isArray(activeSnippet) ? activeSnippet.map(item => JSON.stringify(item)).join('\n') : activeSnippet.code.join('\n');
         navigator.clipboard.writeText(textToCopy).then(() => {
             // alert(`Copied ${activeSnippet.language} code to clipboard!`);
             toast.success(`Copied ${activeSnippet.language} code to clipboard!`)

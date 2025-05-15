@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useDispatch, useSelector } from 'react-redux';
-import { login } from '../../redux/actions';
+import { login } from '../../redux/actions/authAction';
 import socialmedia from '../../assets/whatsApp_Panel_Login_Background_5.jpg';
 import { FaEye, FaEyeSlash } from 'react-icons/fa';
 import usernameSvgLogo from '../../assets/icons/username-svg-logo.svg';
@@ -62,17 +62,12 @@ const UserLogin = () => {
       // Navigate based on user role
       const userRole = user?.role;
 
-      const roleMap = {
-        super_admin: { message: 'Welcome Admin!', path: '/admin-dashboard' },
-        reseller: { message: 'Welcome Reseller!', path: '/admin-dashboard' },
-        user: { message: 'Welcome User!', path: '/dashboard' },
-      };
-      
-      const roleData = roleMap[userRole];
-      
-      if (roleData) {
-        toast.success(roleData.message);
-        navigate(roleData.path);
+      if (userRole === 'super_admin' || userRole === 'reseller') {
+        toast.success('Welcome Admin!');
+        navigate('/admin-dashboard');
+      } else if (userRole === 'user') {
+        toast.success('Welcome User!');
+        navigate('/dashboard');
       } else {
         navigate('/login');
       }      

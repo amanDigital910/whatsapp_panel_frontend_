@@ -200,7 +200,7 @@ const InternationalAPIManage = ({ isOpen }) => {
             WAINT API
           </p>
           <div className='py-3 px-3 border-t border-white w-full select-text'>
-            <div className='flex flex-col px-3 py-3 bg-[#1c4d0d] gap-4'>
+            <div className='flex flex-col px-3 py-3 bg-green-700 gap-4'>
               {/* <div style="background-color:#ff9102;padding: 10px; font-weight: bold;"> Response </div> */}
               <p className='text-white font-bold text-xl m-0 p-0'>Response</p>
               <div className='text-white font-bold text-xl m-0 p-0 break-words'>
@@ -224,7 +224,7 @@ const InternationalAPIManage = ({ isOpen }) => {
             </div>
             <div className=" flex flex-col h-fit mt-3 ">
               <p className="w-full whitespace-nowrap text-white font-semibold 
-            text-xl m-0 flex flex-col px-3 py-3 bg-[#1c4d0d] gap-4 text-center">
+            text-xl m-0 flex flex-col px-3 py-3 bg-green-700 gap-4 text-center">
                 Send Message
               </p>
 
@@ -249,7 +249,7 @@ const InternationalAPIManage = ({ isOpen }) => {
             </div>
             <div className=" flex flex-col h-fit mt-3 ">
               <p className="w-full whitespace-nowrap text-white font-semibold 
-            text-xl m-0 flex flex-col px-3 py-3 bg-[#1c4d0d] gap-4 text-center">
+            text-xl m-0 flex flex-col px-3 py-3 bg-green-700 gap-4 text-center">
                 Send Message With Button for Client Reply
               </p>
               <table className="min-w-full text-white text-sm">

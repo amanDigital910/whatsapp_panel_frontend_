@@ -32,10 +32,10 @@ export const login = (username, password) => async (dispatch) => {
     });
 
     if (response.status === 200) {
-    const userData = response?.data?.data;
-    const { user, token } = userData;
-
-      localStorage.setItem('newUserData', response?.data)
+      const userData = response?.data?.data;
+      const { user, token } = userData;
+      
+      localStorage.setItem('newUserData', JSON.stringify(token))
       setSecureItem('userData', JSON.stringify(user));
       setSecureItem('userToken', token);
       dispatch(loginSuccess(user));
