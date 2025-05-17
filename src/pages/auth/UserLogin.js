@@ -33,14 +33,20 @@ const UserLogin = () => {
     }
 
     setErrorValid("");
+    setLocalLoading(true);
 
     // Dispatch and wait for login to complete
-    const result = dispatch(login(username, password));
+    try {
+      const result = dispatch(login(username, password));
 
-    // If login failed, exit early
-    if (result?.error) {
-      return;
-
+      // If login failed, exit early
+      if (result?.error) {
+        return;
+      }
+    } catch (err) {
+      toast.error("Unexpected error during login.");
+    } finally {
+      setLocalLoading(false);
     }
 
   };
@@ -70,18 +76,14 @@ const UserLogin = () => {
         navigate('/dashboard');
       } else {
         navigate('/login');
-      }      
+      }
     }
   }, [isAuthenticated, navigate, user]);
 
   useEffect(() => {
     if (error) {
-      setLocalLoading(true); // Set local loading to true on error
-      const timer = setTimeout(() => {
-        setLocalLoading(false); // Stop loading after 3 seconds
-      }, 3000);
-
-      return () => clearTimeout(timer); // Cleanup timeout on unmount
+      const timer = setTimeout(() => setLocalLoading(false), 3000);
+      return () => clearTimeout(timer);
     }
   }, [error]);
 
@@ -170,7 +172,7 @@ const UserLogin = () => {
               type="submit"
               disabled={localLoading}
             >
-              {localLoading ? 'Logging in...' : 'Login'}
+              {loading || localLoading ? 'Logging in...' : 'Login'}
             </button>
           </div>
         </form>

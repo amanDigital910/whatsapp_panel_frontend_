@@ -116,7 +116,7 @@ function TransitionCReditUser() {
                                                         <td className="px-4 py-2 border">{log.credit_type}</td>
                                                         <td className="px-4 py-2 border">{log.credit}</td>
                                                         <td className="px-4 py-2 border">
-                                                            {new Date(log.transaction_date).toLocaleString()}
+                                                            {new Date(log.transaction_date).toLocaleDateString('en-GB')}
                                                         </td>
                                                         <td className="px-4 py-2 border">{log.name}</td>
                                                     </tr>

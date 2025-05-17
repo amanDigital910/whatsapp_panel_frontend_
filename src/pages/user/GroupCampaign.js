@@ -1,12 +1,14 @@
+/* eslint-disable no-use-before-define */
 import moment from "moment";
-import React, { useEffect, useRef, useState } from "react";
+import React, { useEffect, useMemo, useRef, useState } from "react";
 import { ToastContainer, toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 import CreditHeader from "../../components/CreditHeader";
-import { CampaignHeading, CampaignTitle, PdfUploader, VideoUploader } from "../utils/Index";
+import { CampaignHeading, CampaignTitle, CopyToClipboard, CustomizeTable, DownloadCSVButton, DownloadPDFButton, PdfUploader, VideoUploader } from "../utils/Index";
 import ImageUploaderGroup from "../utils/ImageUploaderGroup";
+import useIsMobile from "../../hooks/useMobileSize";
 
-const GroupCampaign = () => {
+const GroupCampaign = ({ isOpen }) => {
   const [groupName, setGroupName] = useState("");
   const [groupNub, setGroupNum] = useState("");
   const [feedback, setFeedback] = useState("");
@@ -14,6 +16,14 @@ const GroupCampaign = () => {
   const [currentPage, setCurrentPage] = useState(1);
   const [recordsPerPage] = useState(5);
   const [editingId, setEditingId] = useState(null);
+  const isMobile = useIsMobile();
+  const [usersList, setUsersList] = useState([]); // List of users fetched from the API
+
+  const [sortConfig, setSortConfig] = useState({ key: '', direction: 'asc' });
+  const [searchTerm, setSearchTerm] = useState('');
+
+  const [filteredUsers, setFilteredUsers] = useState([]);
+  const [searchQuery, setSearchQuery] = useState("");
 
   const textareaRef = useRef(null);
   const [uploadedFiles, setUploadedFiles] = useState({
@@ -43,6 +53,112 @@ const GroupCampaign = () => {
     image4: useRef(null),
     pdf: useRef(null),
     video: useRef(null),
+  };
+
+  const dummyData = [
+    {
+      id: 1,
+      groupName: "john_doe",
+      balanceType: "Savings",
+      groupNumber: 150075,
+      groupDate: "2025-04-28",
+    },
+    {
+      id: 2,
+      groupName: "jane_smith",
+      balanceType: "Checking",
+      groupNumber: 23480,
+      groupDate: "2025-05-01",
+    },
+    {
+      id: 3,
+      groupName: "michael_lee",
+      balanceType: "Savings",
+      groupNumber: 98760,
+      groupDate: "2025-04-15",
+    },
+    {
+      id: 4,
+      groupName: "emily_watson",
+      balanceType: "Investment",
+      groupNumber: 1500000,
+      groupDate: "2025-03-30",
+    },
+    {
+      id: 5,
+      groupName: "david_clark",
+      balanceType: "Checking",
+      groupNumber: 51235,
+      groupDate: "2025-05-05",
+    },
+  ];
+
+  const headers = [
+    { key: 'id', label: 'Id' },
+    { key: 'groupName', label: 'Group Name' },
+    { key: 'groupNumber', label: 'Group Number' },
+    { key: 'groupDate', label: 'Date' },
+    { key: 'action', label: 'Action' }
+  ];
+
+  const renderRow = (log, index) => (
+    <tr key={index} className="text-black border border-gray-700 hover:bg-gray-500 whitespace-nowrap">
+      <td className="px-2 py-2 border border-gray-900">{log.id}</td>
+      <td className="px-2 py-2 border border-gray-900">{log.groupName}</td>
+      <td className="px-2 py-2 border border-gray-900">{log.groupNumber || '-'}</td>
+      <td className="px-2 py-2 border border-gray-900 ">{log.groupDate}</td>
+      <td className="px-2 py-2 border border-gray-900">  {new Date(log.groupDate).toLocaleDateString('en-GB')}</td>
+    </tr>
+  );
+
+  const handleSearch = (e) => {
+    const query = setSearchTerm(e.target.value.toLowerCase());
+    setSearchQuery(query);
+
+    if (query.trim() === "") {
+      setFilteredUsers(usersList);
+    } else {
+      const filtered = usersList.filter(user =>
+        user.groupName.toLowerCase().includes(query)
+      );
+      setFilteredUsers(filtered);
+    }
+  };
+
+  const filteredAndSortedLogs = useMemo(() => {
+    const term = searchTerm.toLowerCase().trim();
+
+    const filtered = dummyData.filter(log => {
+      // Search term filter (matches phone, campaign, status, or read status)
+      const matchesSearch =
+        log.groupName.includes(term);
+      // log.campaignName.toLowerCase().trim().includes(term) ||
+      // log.status.toLowerCase().trim().includes(term) ||
+      // log.readStatus.toLowerCase().trim().includes(term);
+
+      // Date filter (matches based on start date and end date)
+      return matchesSearch;
+    });
+
+    // Sorting logic
+    if (sortConfig.key) {
+      filtered.sort((a, b) => {
+        const aVal = a[sortConfig.key] || '';
+        const bVal = b[sortConfig.key] || '';
+        if (aVal < bVal) return sortConfig.direction === 'asc' ? -1 : 1;
+        if (aVal > bVal) return sortConfig.direction === 'asc' ? 1 : -1;
+        return 0;
+      });
+    }
+
+    return filtered;
+  }, [searchTerm, sortConfig]);
+
+  const handleSort = (key) => {
+    setSortConfig(prev => ({
+      key,
+      direction: prev.key === key && prev.direction === 'asc' ? 'desc' : 'asc'
+    }));
   };
 
   // Handle file uploads for images, PDF, and video.
@@ -201,9 +317,6 @@ const GroupCampaign = () => {
     // }
   };
 
-  const indexOfLastRecord = currentPage * recordsPerPage;
-  const indexOfFirstRecord = indexOfLastRecord - recordsPerPage;
-  const currentRecords = group.slice(indexOfFirstRecord, indexOfLastRecord);
 
   const totalPages = Math.ceil(group.length / recordsPerPage);
 
@@ -291,76 +404,45 @@ const GroupCampaign = () => {
             {/* Feedback */}
           </div>
 
-          <div className='px-3 mb-3'>
-            <div className="w-full max-h-[400px] rounded text-white bg-white overflow-auto">
-              <table className="w-full text-center table-auto">
-                <thead className="bg-gray-800 border-b-2 border-gray-600 whitespace-nowrap">
-                  <tr className='flex justify-around py-2 text-base'>
-                    <th className="px-6 text-white font-semibold">Id</th>
-                    <th className="px-6 text-white font-semibold">Group Name</th>
-                    <th className="px-6 text-white font-semibold">Group Number</th>
-                    <th className="px-6 text-white font-semibold">Date</th>
-                    <th className="px-6 text-white font-semibold">Action</th>
-                  </tr>
-                </thead>
-                {(!currentRecords || currentRecords.length === 0) &&
-                  (<tbody className=" text-black">
-                    {currentRecords.map((template) => (
-                      <tr
-                        key={template.id}
-                        className="border-b border-gray-600 transition"
-                      >
-                        <td className="py-2 px-2">{template.groupId}</td>
-                        <td className="py-2 px-2">{template.group_name}</td>
-                        <td className="py-2 px-2">{template.group_number}</td>
-                        <td className="py-2 px-2">
-                          {moment(template.createdAt).format("DD-MMM-YYYY")}
-                        </td>
-                        <td className="py-2 px-2">
-                          <button
-                            onClick={() => editTemplate(template.groupId)}
-                            className="me-2"
-                          >
-                            Edit
-                          </button>
-                          <button
-                            onClick={() => deleteTemplate(template.groupId)}
-                          >
-                            Delete
-                          </button>
-                        </td>
-                      </tr>
-                    ))}
-                  </tbody>
-                  )}
-              </table>
-              {(!currentRecords || currentRecords.length === 0) && (
-                <h5 className="text-center py-4 m-0 text-xl tracking-wider text-red-400 font-bold">
-                  Fail to Load the Data
-                </h5>)}
-              <div className="flex justify-end align-items-center gap-4 border-t border-gray-400 pr-4 py-2 text-black">
-                <button
-                  className="px-4 py-2 border-2 border-gray-500 rounded"
-                  onClick={() => changePage(currentPage - 1)}
-                  disabled={currentPage === 1}
-                >
-                  &lt;
-                </button>
-                <span>
-                  {`${(currentPage - 1) * recordsPerPage + 1} - ${Math.min(
-                    currentPage * recordsPerPage,
-                    group.length
-                  )}`}{" "}
-                  of {group.length}
-                </span>
-                <button
-                  className="px-4 py-2 border-2 border-gray-500 rounded"
-                  onClick={() => changePage(currentPage + 1)}
-                  disabled={currentPage === totalPages}
-                >
-                  &gt;
-                </button>
+          <div className="bg-white p-3 m-3">
+            <div className="flex  md:justify-start justify-between gap-3 md:flex-col py-3 ">
+              <div className="flex gap-3  ">
+                <CopyToClipboard activeSnippet={filteredAndSortedLogs} />
+                <DownloadCSVButton headers={headers} dataLogs={dummyData} />
+                <DownloadPDFButton />
               </div>
+              <div className="relative md:w-full  max-w-[300px]">
+                <input
+                  type="text"
+                  placeholder="Search..."
+                  value={searchTerm}
+                  onChange={e => setSearchTerm(e.target.value)}
+                  className="p-2 pr-8 w-full border border-black rounded-md"
+                />
+                {searchTerm && (
+                  <button
+                    type="button"
+                    onClick={() => setSearchTerm('')}
+                    className="absolute right-2 top-1/2 transform -translate-y-1/2 text-gray-500 bg-white px-1 hover:text-black"
+                  >
+                    ❌
+                  </button>
+                )}
+              </div>
+            </div>
+            <div className={` w-full bg-gray-300 flex-shrink-0 overflow-auto custom-horizontal-scroll select-text h-full ${!isMobile ? (isOpen ? "max-w-[calc(100vw-50px)]" : "max-w-[calc(100vw-65px)]") : "max-w-[calc(100vw-64px)]"}`}>
+              <CustomizeTable
+                headers={headers}
+                emptyMessage='No transaction logs available.'
+                sortConfig={sortConfig}
+                onSort={handleSort}
+                renderRow={renderRow}
+                data={filteredAndSortedLogs}
+                className="table-auto border-collapse"
+                theadClassName="px-4 py-2 text-left cursor-pointer select-none whitespace-nowrap"
+                rowClassName=''
+              // className="text-center py-3 text-lg font-semibold"
+              />
             </div>
           </div>
         </div>

@@ -1,14 +1,16 @@
+/* eslint-disable no-use-before-define */
 import { useEffect, useMemo, useRef, useState } from 'react';
 import CreditHeader from '../../components/CreditHeader';
 import moment from 'moment';
 import { ToastContainer, toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
-import { CampaignHeading, CampaignTitle, PdfUploader, VideoUploader } from '../utils/Index';
+import { CampaignHeading, CampaignTitle, CopyToClipboard, CustomizeTable, DownloadCSVButton, DownloadPDFButton, PdfUploader, VideoUploader } from '../utils/Index';
 import ImageUploaderGroup from '../utils/ImageUploaderGroup';
 import { useDispatch, useSelector } from 'react-redux';
 import { createTemplate, deleteTemplate, getAllTemplates, updateTemplate } from '../../redux/actions/templateAction';
+import useIsMobile from '../../hooks/useMobileSize';
 
-const TemplateCampaign = () => {
+const TemplateCampaign = ({ isOpen }) => {
   const [templateName, setTemplateName] = useState("");
   const [templateMsg, setTemplateMsg] = useState("");
   const [feedback, setFeedback] = useState("");
@@ -17,17 +19,164 @@ const TemplateCampaign = () => {
   const recordsPerPage = 5;
   const [editingId, setEditingId] = useState(null); // Track which template is being edited
   const dispatch = useDispatch();
+  const isMobile = useIsMobile();
+  const [usersList, setUsersList] = useState([]); // List of users fetched from the API
 
-  const { loading, data, } = useSelector((state) => state.template);
-  console.log("Loading Data", data);
+  const [sortConfig, setSortConfig] = useState({ key: '', direction: 'asc' });
+  const [searchTerm, setSearchTerm] = useState('');
+
+  const [filteredUsers, setFilteredUsers] = useState([]);
+  const [searchQuery, setSearchQuery] = useState("");
+
+  const { loading, templatesData } = useSelector((state) => state.template);
 
   const textareaRef = useRef(null);
-
+  // const payload = {
+  //   userId: editingId || 1,
+  //   name: templateName,
+  //   text: templateMsg,
+  // }
   const payload = {
-    userId: 1 || editingId,
-    template_name: templateName,
-    template_msg: templateMsg,
+    "name": "welcome_to UV Digital",
+    "category": "MARKETING",
+    "language": "en",
+    "components": [
+      {
+        "type": "HEADER1",
+        "format": "TEXT1",
+        "text": "Welcome to Our Service! Whats Bulk🎉"
+      },
+      {
+        "type": "BODY",
+        "text": "Hello Vikram, thank you for joining us! We're excited to have you on board."
+      },
+      {
+        "type": "BUTTONS",
+        "buttons": [
+          {
+            "type": "QUICK_REPLY",
+            "text": "Get Started Now"
+          },
+          {
+            "type": "URL",
+            "text": "Visit Website",
+            "url": "https://example.com"
+          },
+          {
+            "type": "Number",
+            "text": "Call Now",
+            "url": "234234234534"
+          }
+        ]
+      }
+    ]
+  }
+
+  const dummyData = [
+    {
+      id: 1,
+      groupName: "john_doe",
+      balanceType: "Savings",
+      groupNumber: 150075,
+      groupDate: "2025-04-28",
+    },
+    {
+      id: 2,
+      groupName: "jane_smith",
+      balanceType: "Checking",
+      groupNumber: 23480,
+      groupDate: "2025-05-01",
+    },
+    {
+      id: 3,
+      groupName: "michael_lee",
+      balanceType: "Savings",
+      groupNumber: 98760,
+      groupDate: "2025-04-15",
+    },
+    {
+      id: 4,
+      groupName: "emily_watson",
+      balanceType: "Investment",
+      groupNumber: 1500000,
+      groupDate: "2025-03-30",
+    },
+    {
+      id: 5,
+      groupName: "david_clark",
+      balanceType: "Checking",
+      groupNumber: 51235,
+      groupDate: "2025-05-05",
+    },
+  ];
+
+  const headers = [
+    { key: 'id', label: 'Id' },
+    { key: 'templateName', label: 'Template Name' },
+    { key: 'templateNumber', label: 'Template Number' },
+    { key: 'templateDate', label: 'Date' },
+    { key: 'action', label: 'Action' }
+  ];
+
+  const renderRow = (log, index) => (
+    <tr key={index} className="text-black border border-gray-700 hover:bg-gray-500 whitespace-nowrap">
+      <td className="px-2 py-2 border border-gray-900">{log.id}</td>
+      <td className="px-2 py-2 border border-gray-900">{log.templateName}</td>
+      <td className="px-2 py-2 border border-gray-900">{log.templateNumber || '-'}</td>
+      <td className="px-2 py-2 border border-gray-900">  {new Date(log.templateDate).toLocaleDateString('en-GB')}</td>
+    </tr>
+  );
+
+  const handleSearch = (e) => {
+    const query = setSearchTerm(e.target.value.toLowerCase());
+    setSearchQuery(query);
+
+    if (query.trim() === "") {
+      setFilteredUsers(usersList);
+    } else {
+      const filtered = usersList.filter(user =>
+        user.groupName.toLowerCase().includes(query)
+      );
+      setFilteredUsers(filtered);
+    }
   };
+
+  const filteredAndSortedLogs = useMemo(() => {
+    const term = searchTerm.toLowerCase().trim();
+
+    const filtered = dummyData.filter(log => {
+      // Search term filter (matches phone, campaign, status, or read status)
+      const matchesSearch =
+        log.groupName.includes(term);
+      // log.campaignName.toLowerCase().trim().includes(term) ||
+      // log.status.toLowerCase().trim().includes(term) ||
+      // log.readStatus.toLowerCase().trim().includes(term);
+
+      // Date filter (matches based on start date and end date)
+      return matchesSearch;
+    });
+
+    // Sorting logic
+    if (sortConfig.key) {
+      filtered.sort((a, b) => {
+        const aVal = a[sortConfig.key] || '';
+        const bVal = b[sortConfig.key] || '';
+        if (aVal < bVal) return sortConfig.direction === 'asc' ? -1 : 1;
+        if (aVal > bVal) return sortConfig.direction === 'asc' ? 1 : -1;
+        return 0;
+      });
+    }
+
+    return filtered;
+  }, [searchTerm, sortConfig]);
+
+  const handleSort = (key) => {
+    setSortConfig(prev => ({
+      key,
+      direction: prev.key === key && prev.direction === 'asc' ? 'desc' : 'asc'
+    }));
+  };
+
 
   const [uploadedFiles, setUploadedFiles] = useState({
     image1: null,
@@ -59,8 +208,10 @@ const TemplateCampaign = () => {
   };
 
   useEffect(() => {
-    // Fetch templates when component mounts
     dispatch(getAllTemplates());
+  }, [dispatch]);
+
+  useEffect(() => {
     return () => {
       Object.values(uploadedFiles).forEach(file => {
         if (file?.preview) {
@@ -68,13 +219,13 @@ const TemplateCampaign = () => {
         }
       });
     };
-  }, [dispatch, uploadedFiles]);
+  }, [uploadedFiles]);
 
   useEffect(() => {
-    if (data && data.ok) {
-      setTemplates(data.templates || []);
+    if (templatesData && templatesData.statusText) {
+      setTemplates(templatesData.templates || []);
     }
-  }, [data]);
+  }, [templatesData]);
 
   // Handle file uploads for images, PDF, and video.
   const handleFileUpload = (e, type) => {
@@ -144,17 +295,11 @@ const TemplateCampaign = () => {
       return;
     }
 
-    const templateData = {
-      ...payload,
-      template_name: templateName,
-      template_msg: templateMsg,
-    };
-
     try {
       let response;
 
       if (editingId) {
-        response = dispatch(updateTemplate(editingId, templateData));
+        response = dispatch(updateTemplate(editingId, payload));
         if (response?.ok) {
           toast.success("Template updated successfully!");
         } else {
@@ -164,7 +309,7 @@ const TemplateCampaign = () => {
           toast.error(errorMessage);
         }
       } else {
-        response = dispatch(createTemplate(templateData));
+        response = dispatch(createTemplate(payload));
         if (response?.ok) {
           toast.success("Template added successfully!");
         } else if (response) {
@@ -244,10 +389,10 @@ const TemplateCampaign = () => {
 
   // Ensure templates are properly fetched and loaded
   useEffect(() => {
-    if (data && data.ok) {
-      setTemplates(data.templates); // Assuming the templates are in the 'templates' field of the response
+    if (templatesData && templatesData.ok) {
+      setTemplates(templatesData); // Assuming the templates are in the 'templates' field of the response      
     }
-  }, [data]);
+  }, [templatesData]);
 
   return (
     <>
@@ -327,63 +472,47 @@ const TemplateCampaign = () => {
             </button>
             {/* Feedback */}
           </div>
-
-          <div className='px-3 pb-3'>
-            <div className="w-full max-h-[400px] rounded text-white bg-white overflow-auto">
-              <table className="w-full text-center table-auto">
-                <thead className="bg-gray-800 border-b-2 border-gray-600 whitespace-nowrap">
-                  <tr className='flex justify-around py-2 text-base'>
-                    <th className="mr-0 text-white font-semibold">Id</th>
-                    <th className="mr-0 text-white font-semibold">Template Name</th>
-                    <th className="mr-0 text-white font-semibold">Template Message</th>
-                    <th className="mr-0 text-white font-semibold">Date</th>
-                    <th className="mr-0 text-white font-semibold">Action</th>
-                  </tr>
-                </thead>
-                {(!currentRecords || currentRecords.length === 0 || loading) &&
-                  (<tbody className=" text-black">
-                    {currentRecords.map((template) => (
-                      <tr key={template.templateId} className="border-b border-gray-600 transition">
-                        <td className="py-2 px-2">{template.templateId}</td>
-                        <td className="py-2 px-2">{template.template_name}</td>
-                        <td className="py-2 px-2">{template.template_msg}</td>
-                        <td className="py-2 px-2">
-                          {moment(template.createAt).format('DD-MMM-YYYY')}
-                        </td>
-                        <td className="py-2 px-2">
-                          <button onClick={() => editTemplate(template.templateId)} className='me-2'>Edit</button>
-                          <button onClick={() => deleteTemplateHandler(template.templateId)}>Delete</button>
-                        </td>
-                      </tr>
-                    ))}
-                  </tbody>
-                  )}
-              </table>
-              {(!currentRecords || currentRecords.length === 0) && (
-                <h5 className="text-center py-4 m-0 text-xl tracking-wider text-red-400 font-bold">
-                  Fail to Load the Data
-                </h5>)}
-              {/* Pagination */}
-              <div className="flex justify-end align-items-center gap-4 border-t border-gray-400 pr-4 py-2 text-black">
-                <button
-                  className="px-4 py-2 border-2 border-gray-500 rounded"
-                  onClick={() => changePage(currentPage - 1)}
-                  disabled={currentPage === 1}
-                >
-                  &lt;
-                </button>
-                <span>{`${(currentPage - 1) * recordsPerPage + 1} - ${Math.min(currentPage * recordsPerPage, templates.length)}`} of {templates.length}</span>
-                <button
-                  className="px-4 py-2 border-2 border-gray-500 rounded"
-                  onClick={() => changePage(currentPage + 1)}
-                  disabled={currentPage === totalPages}
-                >
-                  &gt;
-                </button>
+          <div className="bg-white p-3 m-3">
+            <div className="flex  md:justify-start justify-between gap-3 md:flex-col py-3 ">
+              <div className="flex gap-3  ">
+                <CopyToClipboard activeSnippet={filteredAndSortedLogs} />
+                <DownloadCSVButton headers={headers} dataLogs={dummyData} />
+                <DownloadPDFButton />
+              </div>
+              <div className="relative md:w-full  max-w-[300px]">
+                <input
+                  type="text"
+                  placeholder="Search..."
+                  value={searchTerm}
+                  onChange={e => setSearchTerm(e.target.value)}
+                  className="p-2 pr-8 w-full border border-black rounded-md"
+                />
+                {searchTerm && (
+                  <button
+                    type="button"
+                    onClick={() => setSearchTerm('')}
+                    className="absolute right-2 top-1/2 transform -translate-y-1/2 text-gray-500 bg-white px-1 hover:text-black"
+                  >
+                    ❌
+                  </button>
+                )}
               </div>
             </div>
+            <div className={` w-full bg-gray-300 flex-shrink-0 overflow-auto custom-horizontal-scroll select-text h-full ${!isMobile ? (isOpen ? "max-w-[calc(100vw-50px)]" : "max-w-[calc(100vw-65px)]") : "max-w-[calc(100vw-64px)]"}`}>
+              <CustomizeTable
+                headers={headers}
+                emptyMessage='No transaction logs available.'
+                sortConfig={sortConfig}
+                onSort={handleSort}
+                renderRow={renderRow}
+                data={filteredAndSortedLogs}
+                className="table-auto border-collapse"
+                theadClassName="px-4 py-2 text-left cursor-pointer select-none whitespace-nowrap"
+                rowClassName=''
+              // className="text-center py-3 text-lg font-semibold"
+              />
+            </div>
           </div>
-
         </div>
       </section>
       {/* Toast Container */}

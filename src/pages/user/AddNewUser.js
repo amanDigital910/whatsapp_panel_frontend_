@@ -30,6 +30,26 @@ function AddNewUser() {
         "International Virtual",
     ];
 
+
+    const roleKeyMap = {
+        "Virtual": "virtual",
+        "Personal": "personal",
+        "International Personal": "internationalPersonal",
+        "International Virtual": "internationalVirtual"
+    };
+
+    const generatePermissions = (selectedRoles) => {
+        const permissions = {};
+
+        Object.keys(roleKeyMap).forEach((role) => {
+            const key = roleKeyMap[role];
+            permissions[key] = selectedRoles.includes(role);
+        });
+
+        return permissions;
+    };
+
+
     // Get logged-in user data from localStorage
     useEffect(() => {
         const storedData = getSecureItem("userData");
@@ -63,40 +83,35 @@ function AddNewUser() {
         e.preventDefault();
 
         if (formData.password !== formData.confirmPassword) {
-            return toast.error("Passwords do not match!");
+            return toast.error("Your passwords don't match. Please try again.");
         }
 
-        if (!formData.password.length || formData.password.length <= 6 || formData.selectedRoles.length === 0) {
-            return toast.error("Password and User Permissions are required!");
+        if (formData.username === "" || !formData.password.length || formData.password.length <= 6 || formData.selectedRoles.length === 0 || formData.userRole === "") {
+            return toast.error("All fields are required. Please complete the form!");
         }
 
         const payload = {
             username: formData.username,
             password: formData.password,
             role: formData.userRole,
-            email: "example11@gmail.com",
-            permission: formData.selectedRoles,
-            // isActive: true,
-            // parentuser_id: user?.userid,
-            // firstName: "Amansingh",
-            // lastName: "Chauhan",
-            // mobileNumber: "9234234234",
+            permissions: generatePermissions(formData.selectedRoles),
         };
-        try {
-            // Dispatch Redux action to create the user
-            await dispatch(createUser(payload)); // Wait until it's done
 
-            setFormData({
-                userid: "",
-                username: "",
-                password: "",
-                confirmPassword: "",
-                userRole: "",
-                selectedRoles: [],
-            });
+        try {
+            const response = await dispatch(createUser(payload));
+
+            if ([200, 201].includes(response.status)) {
+                setFormData({
+                    userid: "",
+                    username: "",
+                    password: "",
+                    confirmPassword: "",
+                    userRole: "",
+                    selectedRoles: [],
+                });
+            }
         } catch (error) {
-            // No need for toast here since it's handled in the action
-            console.error("Error dispatching createUser:", error);
+            toast.error(error);
         }
     };
     // try {
@@ -287,7 +302,7 @@ function AddNewUser() {
             </section >
 
             {/* Toast Container to Display Toasts */}
-            < ToastContainer />
+            < ToastContainer autoClose="5000" />
         </>
     );
 }

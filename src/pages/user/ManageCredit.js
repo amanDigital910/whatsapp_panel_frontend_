@@ -6,7 +6,7 @@ import 'react-toastify/dist/ReactToastify.css';
 import CreditHeader from "../../components/CreditHeader";
 import useIsMobile from '../../hooks/useMobileSize';
 import '../user/whatsapp_offical/commonCSS.css'
-import { CampaignHeading, CustomizeTable } from '../utils/Index';
+import { CampaignHeading, CopyToClipboard, CustomizeTable, DownloadCSVButton, DownloadPDFButton } from '../utils/Index';
 import { getSecureItem } from '../utils/SecureLocalStorage';
 
 function ManageCredit({ isOpen }) {
@@ -20,7 +20,7 @@ function ManageCredit({ isOpen }) {
     const isMobile = useIsMobile();
 
     const userToken = getSecureItem("userToken");
-    
+
     const recordsPerPage = 5; // You can adjust this as needed
 
     const [formData, setFormData] = useState({
@@ -261,7 +261,7 @@ function ManageCredit({ isOpen }) {
             <td className="px-4 py-2 border border-gray-700">{item.balanceType}</td>
             <td className="px-4 py-2 border border-gray-700">${item.balance.toFixed(2)}</td>
             <td className="px-4 py-2 border border-gray-700">{item.creditType}</td>
-            <td className="px-4 py-2 border border-gray-700">{item.creditDate}</td>
+            <td className="px-4 py-2 border border-gray-700">{new Date(item.creditDate).toLocaleDateString('en-GB')}</td>
         </tr>
     );
 
@@ -379,19 +379,29 @@ function ManageCredit({ isOpen }) {
                             </form>
 
                             {/* Buttons Section */}
-                            <div className="d-flex justify-content-between align-items-center py-3 border-b border-[#383387] smm:flex-col w-full gap-4">
-                                <div className="d-flex align-items-center gap-3">
-                                    <button className="btn btn-outline-primary">Copy</button>
-                                    <button className="btn btn-outline-success">Excel</button>
-                                    <button className="btn btn-outline-danger">PDF</button>
+                            <div className="flex  md:justify-start justify-between gap-3 md:flex-col pt-3">
+                                <div className="flex gap-3  ">
+                                    <CopyToClipboard activeSnippet={filteredAndSortedLogs} />
+                                    <DownloadCSVButton headers={headers} dataLogs={dummyData} />
+                                    <DownloadPDFButton />
                                 </div>
-
-                                <div className="d-flex align-items-center sm:w-full">
-                                    {/* <label className="me-2 mb-0">Search:</label> */}
+                                <div className="relative md:w-full  max-w-[300px]">
                                     <input
-                                        type="text" placeholder='Search...'
+                                        type="text"
+                                        placeholder="Search..."
+                                        value={searchTerm}
                                         onChange={e => setSearchTerm(e.target.value)}
-                                        className="form-control d-inline-block border-black border" />
+                                        className="p-2 pr-8 w-full border border-black rounded-md"
+                                    />
+                                    {searchTerm && (
+                                        <button
+                                            type="button"
+                                            onClick={() => setSearchTerm('')}
+                                            className="absolute right-2 top-1/2 transform -translate-y-1/2 text-gray-500 bg-white px-1 hover:text-black"
+                                        >
+                                            ❌
+                                        </button>
+                                    )}
                                 </div>
                             </div>
 

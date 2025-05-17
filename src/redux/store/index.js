@@ -1,7 +1,7 @@
 // redux/store.js
 import { configureStore } from '@reduxjs/toolkit';
 import { createUserReducer, loginReducer } from '../reducer/authReducer';
-import templateReducer  from '../reducer/templateReduce';
+import { templateReducer } from '../reducer/templateReducer';
 import { categoryCreateReducer } from '../reducer/categoryReducerTypes';
 
 // Create the store with Redux Toolkit's configureStore method

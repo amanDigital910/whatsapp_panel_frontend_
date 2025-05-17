@@ -240,15 +240,18 @@ const App = () => {
 
 
                     <Route path="/group" element={<GroupCampaign />} />
-                    <Route path="/template" element={<TemplateCampaign />} />
+                    <Route path="/template" element={<TemplateCampaign isOpen={isOpen} />} />
 
                     <Route path='/manage-user' element={<ManageUser isOpen={isOpen} />} />
                     <Route path='/membership-validity' element={<MembershipValidTill />} />
                     <Route path='/manage-credit' element={<ManageCredit isOpen={isOpen} />} />
-                    <Route path='/add-new-user' element={<AddNewUser />} />
                     <Route path='/profile' element={<ProfilePage />} />
                     <Route path='/unauthorized' element={<NotFoundPage />} />
                     <Route path='*' element={<NotFoundPage />} />
+
+                  </Route>
+                  <Route element={<PrivateRoute allowedRoles={[ROLES.SUPER_ADMIN, ROLES.ADMIN, ROLES.RESELLER]} />}>
+                    <Route path='/add-new-user' element={<AddNewUser />} />
                   </Route>
                 </Routes>
               </Suspense>

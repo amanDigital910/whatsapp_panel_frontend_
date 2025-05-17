@@ -33,6 +33,7 @@ function ManageUser({ isOpen }) {
     const headers = [
         { key: 'id', label: 'S.No.' },
         { key: 'userName', label: 'Username' },
+        { key: 'resellerUserName', label: 'Reseller UserName' },
         { key: 'userType', label: 'User Type' },
         { key: 'date', label: 'Date' },
         { key: 'action', label: 'Action' }
@@ -141,8 +142,8 @@ function ManageUser({ isOpen }) {
             </td>
             <td className="px-2 py-2 border border-gray-900">{log.credit || '-'}</td>
             <td className="px-2 py-2 border border-gray-900 ">{log.name}</td>
-            <td className="px-2 py-2 border border-gray-900 max-w-[200px] truncate">
-                {new Date(log.transaction_date).toLocaleString()}
+            <td className="px-2 py-2 border border-gray-900 ">
+                {new Date(log.transaction_date).toLocaleDateString('en-GB')}
             </td>
         </tr>
     );

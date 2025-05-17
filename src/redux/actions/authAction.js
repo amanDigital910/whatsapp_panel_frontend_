@@ -1,5 +1,6 @@
 import axios from "axios";
 import { getSecureItem, removeSecureItem, setSecureItem } from "../../pages/utils/SecureLocalStorage";
+import { toast } from "react-toastify";
 
 
 // Action Types
@@ -34,8 +35,10 @@ export const login = (username, password) => async (dispatch) => {
     if (response.status === 200) {
       const userData = response?.data?.data;
       const { user, token } = userData;
-      
-      localStorage.setItem('newUserData', JSON.stringify(token))
+      console.log("Users Login", user);
+
+      localStorage.setItem('newUserToken', token)
+      localStorage.setItem('newUserData', JSON.stringify(userData))
       setSecureItem('userData', JSON.stringify(user));
       setSecureItem('userToken', token);
       dispatch(loginSuccess(user));
@@ -99,7 +102,6 @@ export const logout = () => async (dispatch) => {
 // Create New User
 export const createUser = (userData) => async (dispatch) => {
   dispatch({ type: CREATE_USER_REQUEST });
-
   try {
     const response = await axios.post(
       `${process.env.REACT_APP_API_URL}/api/auth/CreateUser`,
@@ -110,16 +112,20 @@ export const createUser = (userData) => async (dispatch) => {
           Authorization: `Bearer ${getSecureItem("userToken")}`,
         },
       }
-    );
+    ).catch((err) => {
+      if (err.response.status) {
+        toast.error(`${err?.response?.data?.message}`);
+      }
+    });
 
     if ([200, 201].includes(response.status)) {
       dispatch({ type: CREATE_USER_SUCCESS, payload: response.data });
+      toast.success("User successfully created!");
     }
   } catch (error) {
     dispatch({
       type: CREATE_USER_FAILURE,
-      payload: error?.response?.data?.message || "Something went wrong",
+      payload: error || "Something went wrong",
     });
-    console.log("Something went wrong. Try again.", error);
   }
 };

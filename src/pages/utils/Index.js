@@ -832,9 +832,9 @@ export const CustomizeTable = ({
                         <th
                             key={key}
                             onClick={() => onSort(key)}
-                            className="px-2 py-2 text-left cursor-pointer select-none whitespace-wrap w-fit bg-gray-900 text-white"
+                            className="px-2 py-2 text-left cursor-pointer select-none whitespace-wrap w-fit bg-gray-900 text-white border border-white"
                         >
-                            <div className="flex items-center justify-between gap-3">
+                            <div className="flex items-center justify-around gap-3 ">
                                 {label}
                                 <div className="w-8">{renderSortIcon(key)}</div>
                             </div>
