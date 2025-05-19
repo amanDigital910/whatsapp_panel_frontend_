@@ -17,15 +17,11 @@ import ProfileImgBG from '../assets/profile_img_logo_bg.jpg';
 import useIsMobile from '../hooks/useMobileSize';
 import './style.css'
 
-import { useSelector } from 'react-redux';
-
 import { getSecureItem } from '../pages/utils/SecureLocalStorage';
 
 const SideBar = ({ isOpen, toggleDropdown, activeDropdown }) => {
 
     const location = useLocation();
-    const userRole = useSelector((state) => state?.userLogin.user?.role);
-    console.log(userRole);
 
     const isMobile = useIsMobile();
 
@@ -64,8 +60,8 @@ const SideBar = ({ isOpen, toggleDropdown, activeDropdown }) => {
             icon: whatsappIcon,
             dropdown: [
                 { label: "Quick Campaign", to: "/virtual-quick-csv" },
-                { label: "DP Campaign", to: "/virtual-dp" },
                 { label: "Button Campaign", to: "/virtual-button" },
+                { label: "DP Campaign", to: "/virtual-dp" },
                 // { label: "CSV Campaign", to: "/user/csvvirtual" },
                 { label: "WhatsApp Report", to: "/virtual-whatsapp-report" }
             ]
@@ -294,7 +290,7 @@ const SideBar = ({ isOpen, toggleDropdown, activeDropdown }) => {
                                                                                     <li key={nestedIndex} className='mt-1 space-y-1 duration-300 ease-in-out p-0'>
                                                                                         <Link
                                                                                             to={nestedItem.to}
-                                                                                            className={`py-2  pl-14 m-0 flex items-center justify-between text-white no-underline hover:underline ${location.pathname === nestedItem.to
+                                                                                            className={`py-2  pl-14 m-0 flex items-center justify-between text-white no-underline hover:underline underline-offset-4 ${location.pathname === nestedItem.to
                                                                                                 ? 'bg-green-500 font-bold'
                                                                                                 : ''
                                                                                                 }`}

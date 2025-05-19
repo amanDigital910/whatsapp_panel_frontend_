@@ -23,8 +23,8 @@ const Dashboard = () => {
   return (
     <div className="w-full bg-gray-200">
       <TitleName titleName="Whatsapp Dashboard" />
-      <div className="py-3 px-2 bg-white flex flex-col gap-3">
-        <div className="flex gap-3 lg:flex-col">
+      <div className="py-3 bg-white flex flex-col gap-3">
+        <div className="flex gap-3 lg:flex-col px-2">
           <div className="w-[50%] lg:w-full border border-black rounded-md shadow-xl">
             <span className="bg-[#383387] py-3 flex justify-around text-white text-lg">
               <p className="m-0">Total Submission</p>
@@ -60,9 +60,9 @@ const Dashboard = () => {
           </div>
         </div>
 
-        <div className="flex lg:flex-col gap-3 w-full">
+        <div className="flex lg:flex-col gap-3 w-full pb-3 shadow-xl px-2">
           {/* Performance Report with Bar Chart */}
-          <div className="lg:w-full w-[50%] border border-black rounded-md shadow-xl">
+          <div className="lg:w-full w-[50%] border border-black rounded-md min-h-max shadow-xl">
             <span className="py-2 flex justify-center text-black border-b border-black text-lg rounded-t-md">
               <p className="m-0">Performance Report</p>
             </span>
@@ -70,13 +70,13 @@ const Dashboard = () => {
           </div>
 
           {/* Code Example Panel */}
-          <div className="lg:w-full w-[50%] h-full border border-black rounded-md shadow-xl">
+          <div className="lg:w-full w-[50%] h-full border border-black rounded-md ">
             <div className="bg-white rounded-lg">
               <div className="border-b border-black py-2 px-3 flex gap-4 overflow-x-auto text-[1.1rem]">
                 {CodeSnippet.map(snippet => (
                   <button
                     key={snippet.language}
-                    className={`font-semibold whitespace-nowrap ${activeTab === snippet.language
+                    className={`font-semibold whitespace-nowrap h-full ${activeTab === snippet.language
                       ? 'border-b-2 border-black text-black'
                       : 'text-gray-500'
                       }`}
@@ -87,7 +87,7 @@ const Dashboard = () => {
                 ))}
               </div>
 
-              <div className="relative overflow-x-auto rounded-b-lg bg-gray-300 h-[400px] flex flex-wrap custom-horizontal-scroll">
+              <div className="relative overflow-x-auto rounded-b-lg bg-gray-300 min-h-max h-[430px] shadow-xl flex flex-wrap custom-horizontal-scroll">
                 {/* Copy Button */}
                 <button
                   onClick={copyToClipboard}

@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useDispatch, useSelector } from 'react-redux';
-import { login } from '../../redux/actions';
+import { login } from '../../redux/actions/authAction';
 import socialmedia from '../../assets/whatsApp_Panel_Login_Background_5.jpg';
 import { FaEye, FaEyeSlash } from 'react-icons/fa';
 import usernameSvgLogo from '../../assets/icons/username-svg-logo.svg';
@@ -33,14 +33,20 @@ const UserLogin = () => {
     }
 
     setErrorValid("");
+    setLocalLoading(true);
 
     // Dispatch and wait for login to complete
-    const result = dispatch(login(username, password));
+    try {
+      const result = dispatch(login(username, password));
 
-    // If login failed, exit early
-    if (result?.error) {
-      return;
-
+      // If login failed, exit early
+      if (result?.error) {
+        return;
+      }
+    } catch (err) {
+      toast.error("Unexpected error during login.");
+    } finally {
+      setLocalLoading(false);
     }
 
   };
@@ -62,31 +68,22 @@ const UserLogin = () => {
       // Navigate based on user role
       const userRole = user?.role;
 
-      const roleMap = {
-        super_admin: { message: 'Welcome Admin!', path: '/admin-dashboard' },
-        reseller: { message: 'Welcome Reseller!', path: '/admin-dashboard' },
-        user: { message: 'Welcome User!', path: '/dashboard' },
-      };
-      
-      const roleData = roleMap[userRole];
-      
-      if (roleData) {
-        toast.success(roleData.message);
-        navigate(roleData.path);
+      if (userRole === 'super_admin' || userRole === 'reseller') {
+        toast.success('Welcome Admin!');
+        navigate('/admin-dashboard');
+      } else if (userRole === 'user') {
+        toast.success('Welcome User!');
+        navigate('/dashboard');
       } else {
         navigate('/login');
-      }      
+      }
     }
   }, [isAuthenticated, navigate, user]);
 
   useEffect(() => {
     if (error) {
-      setLocalLoading(true); // Set local loading to true on error
-      const timer = setTimeout(() => {
-        setLocalLoading(false); // Stop loading after 3 seconds
-      }, 3000);
-
-      return () => clearTimeout(timer); // Cleanup timeout on unmount
+      const timer = setTimeout(() => setLocalLoading(false), 3000);
+      return () => clearTimeout(timer);
     }
   }, [error]);
 
@@ -175,7 +172,7 @@ const UserLogin = () => {
               type="submit"
               disabled={localLoading}
             >
-              {localLoading ? 'Logging in...' : 'Login'}
+              {loading || localLoading ? 'Logging in...' : 'Login'}
             </button>
           </div>
         </form>

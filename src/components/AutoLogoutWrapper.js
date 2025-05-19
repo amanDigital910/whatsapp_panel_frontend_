@@ -1,7 +1,7 @@
 /* eslint-disable react-hooks/exhaustive-deps */
 import { useEffect, useRef, useCallback } from 'react';
 import { useDispatch } from 'react-redux';
-import { logout } from '../redux/actions';
+import { logout } from '../redux/actions/authAction';
 import { useNavigate } from 'react-router-dom';
 
 const AutoLogoutWrapper = ({ children }) => {
@@ -17,27 +17,28 @@ const AutoLogoutWrapper = ({ children }) => {
   }, [dispatch, navigate]);
 
   const resetTimer = useCallback(() => {
-    // Clear the existing timer
-    clearTimeout(timerRef.current);
-    // Set a new timer
-    timerRef.current = setTimeout(handleLogout, timeoutDuration);
-  }, [handleLogout, timeoutDuration]);
+    if (timerRef.current) clearTimeout(timerRef.current);
+
+    // Set new timeout
+    timerRef.current = setTimeout(() => {
+      handleLogout();
+    }, timeoutDuration);
+  }, [handleLogout]);
 
   useEffect(() => {
     resetTimer();
-    // Define the events to listen for
-    const events = ['mousemove', 'click', 'keydown', 'scroll'];
-    // Add event listeners to reset the timer
-    for (const event of events) {
-      window.addEventListener(event, resetTimer);
-    }
 
-    // Cleanup function to remove event listeners and clear the timer
+    const events = ['mousemove', 'mousedown', 'click', 'scroll', 'keydown', 'touchstart'];
+    events.forEach(event => {
+      window.addEventListener(event, resetTimer);
+    });
+
     return () => {
+      // Cleanup on unmount
       for (const event of events) {
         window.removeEventListener(event, resetTimer);
-      }
-      clearTimeout(timerRef.current);
+      };
+      if (timerRef.current) clearTimeout(timerRef.current);
     };
   }, [resetTimer]);
 

@@ -4,8 +4,6 @@ import { CategoryScale, Chart as ChartJS, defaults, Legend, LinearScale, LineEle
 import { Bar, Doughnut } from "react-chartjs-2";
 import '../commonCSS.css'
 import sourceData from "./sourceData.json";
-import DatePicker from "react-datepicker";
-import 'react-datepicker/dist/react-datepicker.css'; 
 
 defaults.maintainAspectRatio = false;
 defaults.responsive = true;
@@ -89,16 +87,16 @@ export const DashboardBarChart = () => {
   });
 
   const chartData = {
-    labels: filteredData.map((item) => item.date),
+    labels: data.map((item) => item.date),
     datasets: [
       {
         label: "Failure",
-        data: filteredData.map((item) => item.failure),
+        data: data.map((item) => item.failure),
         backgroundColor: "rgba(53, 162, 235, 1)",
       },
       {
         label: "Success",
-        data: filteredData.map((item) => item.success),
+        data: data.map((item) => item.success),
         backgroundColor: "rgba(53, 162, 35, 1)",
       },
     ],
@@ -125,8 +123,8 @@ export const DashboardBarChart = () => {
 
 
   return (
-    <div className="border rounded shadow-md lg:w-full overflow-auto h-[400px] overflow-y-auto custom-horizontal-scroll">
-      <div className="flex gap-4 w-full justify-center pt-3">
+    <div className="border rounded shadow-md lg:w-full overflow-auto h-[430px] overflow-y-auto custom-horizontal-scroll">
+      {/*<div className="flex gap-4 w-full justify-center">
         <DatePicker
           className='w-60 px-2 border-2 border-black '
           selectsRange={true}
@@ -137,7 +135,7 @@ export const DashboardBarChart = () => {
           }}
           isClearable={true}
         />
-      </div>
+      </div>*/}
       <Bar data={chartData} options={options} />
     </div>
   );

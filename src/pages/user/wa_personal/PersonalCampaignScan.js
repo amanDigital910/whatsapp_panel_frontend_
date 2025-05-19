@@ -1,14 +1,155 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useMemo } from "react";
 import axios from "axios";
 import { IoScanCircle } from "react-icons/io5";
 import { RxCross1 } from "react-icons/rx";
 import CreditHeader from "../../../components/CreditHeader";
+import { CampaignHeading, CampaignTitle, CopyToClipboard, CustomizeTable, DownloadCSVButton, DownloadPDFButton } from "../../utils/Index";
+import useIsMobile from "../../../hooks/useMobileSize";
 
-const PersonalCampaignScan = () => {
+const PersonalCampaignScan = ({ isOpen }) => {
   const [model, setModel] = useState(false);
   const [qrCode, setQrCode] = useState("");
   const [instanceData, setInstanceData] = useState(null);
   const [isLoading, setIsLoading] = useState(true);
+  const [sortConfig, setSortConfig] = useState({ key: '', direction: 'asc' });
+  const [searchTerm, setSearchTerm] = useState('');
+  const isMobile = useIsMobile();
+
+  const headers = [
+    { key: 'id', label: 'Id' },
+    { key: 'whatsAppName', label: 'WhatsApp Name' },
+    { key: 'mobile', label: 'Mobile' },
+    { key: 'status', label: 'Status' },
+    { key: 'action', label: 'Action' }
+  ];
+
+  const dummyData = [
+    {
+      id: 1,
+      whatsAppName: "john_doe",
+      mobile: "+91 9876543210",
+      status: "Active",
+      action: "Edit",
+    },
+    {
+      id: 2,
+      whatsAppName: "jane_smith",
+      mobile: "+91 8765432109",
+      status: "Inactive",
+      action: "Deactivate",
+    },
+    {
+      id: 3,
+      whatsAppName: "mark_taylor",
+      mobile: "+91 7654321098",
+      status: "Active",
+      action: "Edit",
+    },
+    {
+      id: 4,
+      whatsAppName: "emily_jones",
+      mobile: "+91 6543210987",
+      status: "Pending",
+      action: "Approve",
+    },
+    {
+      id: 5,
+      whatsAppName: "alex_brown",
+      mobile: "+91 5432109876",
+      status: "Active",
+      action: "Edit",
+    },
+    {
+      id: 6,
+      whatsAppName: "lucy_williams",
+      mobile: "+91 4321098765",
+      status: "Suspended",
+      action: "Activate",
+    },
+    {
+      id: 7,
+      whatsAppName: "sarah_davis",
+      mobile: "+91 3210987654",
+      status: "Active",
+      action: "Edit",
+    },
+    {
+      id: 8,
+      whatsAppName: "david_clark",
+      mobile: "+91 2109876543",
+      status: "Inactive",
+      action: "Deactivate",
+    },
+    {
+      id: 9,
+      whatsAppName: "olivia_martin",
+      mobile: "+91 1098765432",
+      status: "Pending",
+      action: "Approve",
+    },
+    {
+      id: 10,
+      whatsAppName: "chris_lee",
+      mobile: "+91 0987654321",
+      status: "Active",
+      action: "Edit",
+    }
+  ];
+
+
+  const renderRow = (item) => (
+    <tr key={item.id} className="text-black border border-gray-700 hover:bg-gray-500">
+      <td className="px-4 py-2 border border-gray-700">{item.id}</td>
+      <td className="px-4 py-2 border border-gray-700">{item.whatsAppName}</td>
+      <td className="px-4 py-2 border border-gray-700">{item.mobile}</td>
+      <td className="px-4 py-2 border border-gray-700">{item.status}</td>
+      <td className="px-4 py-2 border border-gray-700">{item.action}</td>
+      {/* <td className="px-4 py-2 border border-gray-700">{item.creditDate}</td> */}
+    </tr>
+  );
+
+  // Memoized filtered and sorted data
+  const filteredAndSortedLogs = useMemo(() => {
+    const term = searchTerm.toLowerCase().trim();
+
+    // Filtering based on the search term
+    const filtered = dummyData.filter(data => {
+      const userMatch = data.whatsAppName.toLowerCase().includes(term);
+      return userMatch;
+    });
+
+    // Sorting logic based on the sortConfig
+    if (sortConfig.key) {
+      return [...filtered].sort((a, b) => {
+        const aVal = a[sortConfig.key];
+        const bVal = b[sortConfig.key];
+
+        // Handle sorting based on string and number types
+        if (typeof aVal === 'string' && typeof bVal === 'string') {
+          return sortConfig.direction === 'asc'
+            ? aVal.localeCompare(bVal)
+            : bVal.localeCompare(aVal);
+        }
+
+        if (typeof aVal === 'number' && typeof bVal === 'number') {
+          return sortConfig.direction === 'asc' ? aVal - bVal : bVal - aVal;
+        }
+
+        return 0;
+      });
+    }
+
+    return filtered;
+  }, [dummyData, searchTerm, sortConfig]);
+
+  // Handle sorting logic
+  const handleSort = (key) => {
+    setSortConfig(prev => ({
+      key,
+      direction: prev.key === key && prev.direction === 'asc' ? 'desc' : 'asc'
+    }));
+  };
+
 
   useEffect(() => {
     axios
@@ -72,25 +213,25 @@ const PersonalCampaignScan = () => {
     }
   };
 
+  console.log("Filter data", filteredAndSortedLogs);
+
   return (
     <>
       <section className="w-full bg-gray-200  flex justify-center flex-col pb-10">
         <CreditHeader />
-        <div className="w-full px-4">
-          <div className="w-full flex justify-between bg-white mt-5 py-3 px-3">
-            <h1
-              className="text-2xl text-black font-semibold pl-4"
-              style={{ fontSize: "32px" }}
-            >
-              Scan Whatsapp
-            </h1>
+        <div className="w-full mt-8 px-4">
+          <div className="w-full h-full flex m-0 justify-between items-center bg-white rounded-md pr-4 py-2">
+            <CampaignHeading campaignHeading={"Scan Whatsapp"} />
             <button
               onClick={handleAddChannel}
-              className="text-white flex justify-center items-center gap-2 px-4 py-1 rounded bg-brand_colors"
+              className="text-white flex px-4 py-2 h-full rounded bg-brand_colors "
             >
-              <IoScanCircle /> Add Channel
+              <span className="flex h-fit gap-2 justify-center items-center">
+                <IoScanCircle /> Scan Whatsapp
+              </span>
             </button>
           </div>
+
 
           {/* Modal displaying the API QR Code */}
           {model && (
@@ -124,30 +265,38 @@ const PersonalCampaignScan = () => {
           )}
 
           {/* Table with Instance Data */}
-          <div className="w-full bg-white rounded mt-5 py-3 px-3">
+          <div className="w-full bg-white rounded mt-2 py-3 px-3">
             <div className="w-full flex justify-between items-center">
               <div className="flex items-center gap-3">
-                <button className="px-3 py-1 rounded bg-brand_color_4 text-white font-[600]">
-                  Copy
-                </button>
-                <button className="px-3 py-1 rounded bg-brand_color_4 text-white font-[600]">
-                  Excel
-                </button>
-                <button className="px-3 py-1 rounded bg-brand_color_4 text-white font-[600]">
-                  PDF
-                </button>
+                                <CopyToClipboard headers={headers} dataLogs={dummyData}/>
+                <DownloadCSVButton />
+                <DownloadPDFButton />
               </div>
-              <div className="flex items-center gap-2 text-black">
-                <p className="mb-0">Search :</p>
+              <div className="d-flex align-items-center sm:w-full">
                 <input
-                  type="text"
-                  placeholder="search"
-                  className="w-[200px] border-[0.1px] bg-white border-black outline-none text-black py-1 px-2"
-                />
+                  type="text" placeholder='Search...'
+                  onChange={e => setSearchTerm(e.target.value)}
+                  className="form-control d-inline-block border-black border" />
               </div>
             </div>
             <br />
-            <div className="w-full max-h-[400px] rounded text-white">
+            <div className={`min-w-max`}>
+              <div className={`w-full bg-gray-300 flex-shrink-0 overflow-auto custom-horizontal-scroll select-text h-full ${!isMobile ? (isOpen ? "max-w-[calc(100vw-50px)]" : "max-w-[calc(100vw-65px)]") : "max-w-[calc(100vw-64px)]"}`}>
+                <CustomizeTable
+                  headers={headers}
+                  emptyMessage='No transaction logs available.'
+                  sortConfig={sortConfig}
+                  onSort={handleSort}
+                  renderRow={renderRow}
+                  data={filteredAndSortedLogs}
+                  className="table-auto border-collapse"
+                  theadClassName="px-4 py-2 text-left cursor-pointer select-none whitespace-nowrap"
+                  rowClassName=''
+                // className="text-center py-3 text-lg font-semibold"
+                />
+              </div>
+            </div>
+            {/* <div className="w-full max-h-[400px] rounded text-white">
               <table className="w-full text-center table-auto">
                 <thead className="bg-gray-800 border-b-2 border-gray-600">
                   <tr>
@@ -203,7 +352,7 @@ const PersonalCampaignScan = () => {
                   )}
                 </tbody>
               </table>
-            </div>
+            </div> */}
           </div>
 
           {/* Additional duplicate modal (if needed) */}

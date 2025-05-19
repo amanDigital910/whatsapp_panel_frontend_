@@ -61,7 +61,7 @@ function TransitionCReditUser() {
 
     return (
         <>
-            <section className="w-full h-full bg-gray-200 flex justify-center flex-col pb-10">
+            <section className="w-full h-full bg-gray-200 flex flex-col min-h-[calc(100vh-70px)] pb-3">
                 <CreditHeader />
 
 
@@ -116,7 +116,7 @@ function TransitionCReditUser() {
                                                         <td className="px-4 py-2 border">{log.credit_type}</td>
                                                         <td className="px-4 py-2 border">{log.credit}</td>
                                                         <td className="px-4 py-2 border">
-                                                            {new Date(log.transaction_date).toLocaleString()}
+                                                            {new Date(log.transaction_date).toLocaleDateString('en-GB')}
                                                         </td>
                                                         <td className="px-4 py-2 border">{log.name}</td>
                                                     </tr>
