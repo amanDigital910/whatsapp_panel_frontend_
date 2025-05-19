@@ -834,7 +834,7 @@ export const CustomizeTable = ({
                             onClick={() => onSort(key)}
                             className="px-2 py-2 text-left cursor-pointer select-none whitespace-wrap w-fit bg-gray-900 text-white border border-white"
                         >
-                            <div className="flex items-center justify-around gap-3 ">
+                            <div className="flex items-center justify-between gap-3 ">
                                 {label}
                                 <div className="w-8">{renderSortIcon(key)}</div>
                             </div>
@@ -870,29 +870,46 @@ export const SendNowButton = ({ handleSendCampaign }) => {
     )
 }
 
-export const CopyToClipboard = ({ activeSnippet }) => {
+export const CopyToClipboard = ({ headers = [], data = [] }) => {
+    const copyFilteredJSON = () => {
+        if (!Array.isArray(headers) || !headers.length || !Array.isArray(data) || !data.length) {
+            toast.error("Missing headers or data");
+            return;
+        }
 
-    // Copy to Clipboard Button
-    const copyToClipboard = () => {
-        const textToCopy = Array.isArray(activeSnippet) ? activeSnippet.map(item => JSON.stringify(item)).join('\n') : activeSnippet.code.join('\n');
-        navigator.clipboard.writeText(textToCopy).then(() => {
-            // alert(`Copied ${activeSnippet.language} code to clipboard!`);
-            toast.success(`Copied ${activeSnippet.language} code to clipboard!`)
-        }).catch(err => {
-            console.error('Failed to copy:', err);
+        const allowedKeys = headers.slice(0, -1).map(h => h.key);
+
+        const filteredData = data.map(row => {
+            const filteredRow = {};
+            allowedKeys.forEach(key => {
+                filteredRow[key] = row[key] ?? ''; // Default to empty string if missing
+            });
+            return filteredRow;
         });
+
+        const jsonText = JSON.stringify(filteredData, null, 2);
+
+        navigator.clipboard.writeText(jsonText)
+            .then(() => toast.success("JSON copied to clipboard!"))
+            .catch(err => {
+                console.error("Failed to copy:", err);
+                toast.error("Copy failed.");
+            });
     };
+
     return (
-        <button className='px-3 py-1 text-base font-medium border-2 border-[#0d6efd] text-[#0d6efd] rounded-md hover:text-white
-         hover:bg-[#0d6efd]' onClick={copyToClipboard}>
+        <button
+            onClick={copyFilteredJSON}
+            className="px-3 py-1 text-base font-medium border-2 border-[#0d6efd] text-[#0d6efd] rounded-md hover:text-white hover:bg-[#0d6efd]"
+        >
             Copy
         </button>
-    )
-}
+    );
+};
 
 export const DownloadCSVButton = ({ headers, dataLogs }) => {
     const convertToCSV = (rows) => {
-        const csvHeaders = headers.map(h => h.label).join(',');
+        const csvHeaders = headers.slice(0, -1).map(h => h.label).join(',');
 
         const csvRows = rows.map(row =>
             headers.map(h => {
@@ -923,21 +940,75 @@ export const DownloadCSVButton = ({ headers, dataLogs }) => {
 
     return (
         <button
-            className='px-3 py-1 text-base font-medium border-2 border-[#dc3545] text-[#dc3545] rounded-md hover:text-white hover:bg-[#dc3545]'
+            className='px-3 py-1 h-10 text-base font-medium border-2 border-[#dc3545] text-[#dc3545] rounded-md hover:text-white hover:bg-[#dc3545]'
             onClick={downloadCSV}
         >
             CSV
         </button>
     );
 };
-export const DownloadPDFButton = () => {
-    const downloadPDF = () => {
 
-    }
+
+export const DownloadPDFButton = ({ headers, dataLogs }) => {
+    const getFlattenedRow = (row) => {
+        return headers.map(({ key }) => {
+            if (key === 'submitted_failed') {
+                return `Submitted: ${row.submitted || '-'} | Failed: ${row.failed || '-'}`;
+            }
+            return row[key] ?? '-';
+        });
+    };
+
+    const downloadPDF = () => {
+        const htmlContent = `
+      <html>
+        <head>
+          <title>Download PDF</title>
+          <style>
+            table { width: 100%; border-collapse: collapse; font-family: monospace; font-size: 11px; }
+            th, td { border: 1px solid #ccc; padding: 2px; text-align: left; white-space: wrap; }
+            th { background-color: #f2f2f2; }
+            h2 { font-family: Arial, sans-serif; }
+            @media print {
+              button { display: none; }
+            }
+          </style>
+        </head>
+        <body>
+          <h2>Exported Logs</h2>
+          <table>
+            <thead>
+              <tr>${headers.slice(0, -1).map(h => `<th>${h.label}</th>`).join('')}</tr>
+            </thead>
+            <tbody>
+              ${dataLogs.map(log => `
+                <tr>
+                  ${getFlattenedRow(log).slice(0, -1)?.map(val => `<td>${val}</td>`).join('')}
+                </tr>
+              `).join('')}
+            </tbody>
+          </table>
+          <script>
+            window.onload = function() {
+              window.print();
+              setTimeout(() => window.close(), 1000);
+            };
+          </script>
+        </body>
+      </html>
+    `;
+
+        const blob = new Blob([htmlContent], { type: 'text/html' });
+        const url = URL.createObjectURL(blob);
+        window.open(url, '_blank');
+    };
 
     return (
-        <button className='px-3 py-1 text-base font-medium border-2 border-[#198754] text-[#198754] rounded-md hover:text-white hover:bg-[#198754]' onClick={downloadPDF}>
+        <button
+            className="px-3 py-1 h-10 text-base font-medium border-2 border-[#198754] text-[#198754] rounded-md hover:text-white hover:bg-[#198754]"
+            onClick={downloadPDF}
+        >
             PDF
         </button>
-    )
-}
+    );
+};

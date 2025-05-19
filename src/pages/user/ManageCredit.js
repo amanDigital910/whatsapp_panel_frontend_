@@ -381,7 +381,7 @@ function ManageCredit({ isOpen }) {
                             {/* Buttons Section */}
                             <div className="flex  md:justify-start justify-between gap-3 md:flex-col pt-3">
                                 <div className="flex gap-3  ">
-                                    <CopyToClipboard activeSnippet={filteredAndSortedLogs} />
+                                    <CopyToClipboard headers={headers} dataLogs={dummyData} />
                                     <DownloadCSVButton headers={headers} dataLogs={dummyData} />
                                     <DownloadPDFButton />
                                 </div>

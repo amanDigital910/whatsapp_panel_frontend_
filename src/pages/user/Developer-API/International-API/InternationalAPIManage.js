@@ -153,7 +153,7 @@ const InternationalAPIManage = ({ isOpen }) => {
         <div className="px-3 py-3 bg-white flex gap-3 flex-col rounded-md">
           <div className="flex  md:justify-start justify-between gap-3 md:flex-col ">
             <div className="flex gap-3  ">
-              <CopyToClipboard activeSnippet={activeSnippet} />
+              <CopyToClipboard headers={headers} dataLogs={data} />
               <DownloadCSVButton headers={headers} dataLogs={data} />
               <DownloadPDFButton />
             </div>

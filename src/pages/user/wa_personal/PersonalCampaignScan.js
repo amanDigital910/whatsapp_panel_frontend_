@@ -268,7 +268,7 @@ const PersonalCampaignScan = ({ isOpen }) => {
           <div className="w-full bg-white rounded mt-2 py-3 px-3">
             <div className="w-full flex justify-between items-center">
               <div className="flex items-center gap-3">
-                <CopyToClipboard activeSnippet={filteredAndSortedLogs} />
+                                <CopyToClipboard headers={headers} dataLogs={dummyData}/>
                 <DownloadCSVButton />
                 <DownloadPDFButton />
               </div>

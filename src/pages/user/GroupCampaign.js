@@ -407,7 +407,7 @@ const GroupCampaign = ({ isOpen }) => {
           <div className="bg-white p-3 m-3">
             <div className="flex  md:justify-start justify-between gap-3 md:flex-col py-3 ">
               <div className="flex gap-3  ">
-                <CopyToClipboard activeSnippet={filteredAndSortedLogs} />
+                <CopyToClipboard headers={headers} dataLogs={dummyData} />
                 <DownloadCSVButton headers={headers} dataLogs={dummyData} />
                 <DownloadPDFButton />
               </div>

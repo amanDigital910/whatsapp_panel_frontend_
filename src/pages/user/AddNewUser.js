@@ -153,6 +153,7 @@ function AddNewUser() {
             selectRole: "Select a Role",
             super_admin: ["admin", "reseller", "user"],
             admin: ["reseller", "user"],
+            reseller: ["user"],
             user: ["user"],
         };
 
