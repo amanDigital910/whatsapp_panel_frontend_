@@ -1,25 +1,27 @@
 import React, { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useDispatch, useSelector } from 'react-redux';
-import { login } from '../../redux/actions';
+import { login } from '../../redux/actions/authAction';
 import socialmedia from '../../assets/whatsApp_Panel_Login_Background_5.jpg';
 import { FaEye, FaEyeSlash } from 'react-icons/fa';
 import usernameSvgLogo from '../../assets/icons/username-svg-logo.svg';
 import passwordSvgLogo from '../../assets/icons/password-svg-logo.svg';
 import './style.css';
 import { toast } from 'react-toastify';
+import { getSecureItem } from '../utils/SecureLocalStorage';
 
 const UserLogin = () => {
-  const { loading = false, error = null, isAuthenticated = false, user = null, requirePasswordChange } = useSelector((state) => state.userLogin) || {};
+  const { loading = false, error = null, isAuthenticated = false } = useSelector((state) => state.userLogin) || {};
+  const userRole = JSON.parse(getSecureItem("userData"));
+
+  const dispatch = useDispatch();
+  const navigate = useNavigate();
 
   const [localLoading, setLocalLoading] = useState(loading);
   const [username, setUsername] = useState('');
   const [password, setPassword] = useState('');
   const [showPassword, setShowPassword] = useState(false);
-  const dispatch = useDispatch();
-  const navigate = useNavigate();
   const [errorValid, setErrorValid] = useState("");
-  console.log("requirePasswordChange ", requirePasswordChange);
 
   const handleLogin = async (e) => {
     e.preventDefault();
@@ -38,42 +40,37 @@ const UserLogin = () => {
     // Dispatch and wait for login to complete
     const result = dispatch(login(username, password));
 
-    // If login failed, exit early
-    if (result?.error) {
-      return;
-
+      // If login failed, exit early
+      if (result?.error) {
+        return;
+      }
+    } catch (err) {
+      toast.error("Unexpected error during login.");
+    } finally {
+      setLocalLoading(false);
     }
 
   };
 
-
-  // const handleLogin = async (e) => {
-  //   e.preventDefault();
-  //   if (!username || !password) {
-  //     setErrorValid("Please enter both username and password.");
-  //     return;
-  //   } else if (username || password) {
-  //     setErrorValid("")
-  //   }
-  //   dispatch(login(username, password)); // Dispatch login action
-  // };
-
   useEffect(() => {
     if (isAuthenticated) {
       // Navigate based on user role
-      const userRole = user?.role;
-      if (userRole === "super_admin" || userRole === 'admin') {
+      const usersRole = userRole?.role;
+
+      if (usersRole === 'super_admin' || usersRole === 'admin') {
         toast.success('Welcome Admin!');
         navigate('/admin-dashboard');
-      } else if (userRole === "user" || userRole === "reseller") {
+      } else if (usersRole === 'reseller') {
+        toast.success('Welcome Reseller!');
+        navigate('/dashboard');
+      } else if (usersRole === 'user') {
         toast.success('Welcome User!');
         navigate('/dashboard');
       } else {
-        navigate('/login')
+        navigate('/login');
       }
-
     }
-  }, [isAuthenticated, navigate, user]);
+  }, [isAuthenticated, navigate, userRole]);
 
   useEffect(() => {
     if (error) {
