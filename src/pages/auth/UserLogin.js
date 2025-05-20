@@ -8,16 +8,19 @@ import usernameSvgLogo from '../../assets/icons/username-svg-logo.svg';
 import passwordSvgLogo from '../../assets/icons/password-svg-logo.svg';
 import './style.css';
 import { toast } from 'react-toastify';
+import { getSecureItem } from '../utils/SecureLocalStorage';
 
 const UserLogin = () => {
-  const { loading = false, error = null, isAuthenticated = false, user = null, } = useSelector((state) => state.userLogin) || {};
+  const { loading = false, error = null, isAuthenticated = false } = useSelector((state) => state.userLogin) || {};
+  const userRole = JSON.parse(getSecureItem("userData"));
+
+  const dispatch = useDispatch();
+  const navigate = useNavigate();
 
   const [localLoading, setLocalLoading] = useState(loading);
   const [username, setUsername] = useState('');
   const [password, setPassword] = useState('');
   const [showPassword, setShowPassword] = useState(false);
-  const dispatch = useDispatch();
-  const navigate = useNavigate();
   const [errorValid, setErrorValid] = useState("");
 
   const handleLogin = async (e) => {
@@ -51,34 +54,25 @@ const UserLogin = () => {
 
   };
 
-
-  // const handleLogin = async (e) => {
-  //   e.preventDefault();
-  //   if (!username || !password) {
-  //     setErrorValid("Please enter both username and password.");
-  //     return;
-  //   } else if (username || password) {
-  //     setErrorValid("")
-  //   }
-  //   dispatch(login(username, password)); // Dispatch login action
-  // };
-
   useEffect(() => {
     if (isAuthenticated) {
       // Navigate based on user role
-      const userRole = user?.role;
+      const usersRole = userRole?.role;
 
-      if (userRole === 'super_admin' || userRole === 'reseller') {
+      if (usersRole === 'super_admin' || usersRole === 'admin') {
         toast.success('Welcome Admin!');
         navigate('/admin-dashboard');
-      } else if (userRole === 'user') {
+      } else if (usersRole === 'reseller') {
+        toast.success('Welcome Reseller!');
+        navigate('/dashboard');
+      } else if (usersRole === 'user') {
         toast.success('Welcome User!');
         navigate('/dashboard');
       } else {
         navigate('/login');
       }
     }
-  }, [isAuthenticated, navigate, user]);
+  }, [isAuthenticated, navigate, userRole]);
 
   useEffect(() => {
     if (error) {
