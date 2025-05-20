@@ -40,14 +40,10 @@ const UserLogin = () => {
     // Dispatch and wait for login to complete
     const result = dispatch(login(username, password));
 
-      // If login failed, exit early
-      if (result?.error) {
-        return;
-      }
-    } catch (err) {
-      toast.error("Unexpected error during login.");
-    } finally {
-      setLocalLoading(false);
+    // If login failed, exit early
+    if (result?.error) {
+      return;
+
     }
 
   };
