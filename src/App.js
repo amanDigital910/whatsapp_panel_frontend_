@@ -1,3 +1,4 @@
+/* eslint-disable react/jsx-no-undef */
 import React, { lazy, Suspense, useState } from 'react';
 import { BrowserRouter as Router, Routes, Route, Navigate, useLocation } from 'react-router-dom';
 import 'bootstrap/dist/css/bootstrap.min.css';
@@ -82,10 +83,10 @@ const UserResponseReport = lazy(() => import("./pages/user/whatsapp_offical/repo
 const ExportReport = lazy(() => import("./pages/user/whatsapp_offical/reports/ExportsReport.js"));
 
 // Developer API Pages
-const PersonalDeveloperAPI = lazy(() => import("./pages/user/developer-api/personal-api/PersonalAPIManage.js"));
-const PersonalDeveloperReport = lazy(() => import("./pages/user/developer-api/personal-api/PersonalReport.js"));
-const InternationalDeveloperAPI = lazy(() => import("./pages/user/developer-api/international-api/InternationalAPIManage.js"));
-const InternationalDeveloperReport = lazy(() => import("./pages/user/developer-api/international-api/InternationalReport.js"));
+const PersonalDeveloperAPI = lazy(() => import("./pages/user/developer_api/personal_api/PersonalAPIManage.js"));
+const PersonalDeveloperReport = lazy(() => import("./pages/user/developer_api/personal_api/PersonalReport.js"));
+const InternationalDeveloperAPI = lazy(() => import("./pages/user/developer_api/international_api/InternationalAPIManage.js"));
+const InternationalDeveloperReport = lazy(() => import("./pages/user/developer_api/international_api/InternationalReport.js"));
 
 const GroupCampaign = lazy(() => import("./pages/user/GroupCampaign"));
 const TemplateCampaign = lazy(() => import("./pages/user/TemplateCampaign"));
