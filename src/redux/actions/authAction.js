@@ -50,7 +50,7 @@ export const login = (username, password) => async (dispatch) => {
 
       // Save to localStorage and secure storage
       localStorage.setItem('newUserToken', token);
-      localStorage.setItem('newUserData', JSON.stringify(response.data.data));
+      // localStorage.setItem('newUserData', JSON.stringify(response.data.data));
       setSecureItem('userData', JSON.stringify(user));
       setSecureItem('userToken', token);
 
