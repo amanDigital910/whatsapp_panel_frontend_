@@ -356,45 +356,12 @@ const GroupCampaign = ({ isOpen }) => {
                     setGroupNum(e.target.value);
                     handleInput();
                   }}
-                  className="p-2 rounded w-[100%] h-full min-h-[400px] bg-white text-black border-black border-[0.1px]"
+                  className="p-2 rounded w-[100%] h-full min-h-[600px] bg-white text-black border-black border-[0.1px]"
                   placeholder="Enter your message"
                 />
               </div>
             </div>
 
-            <div className="lg:w-full w-[50%] flex flex-col gap-4">
-              {/* Upload Media Section */}
-              <div className="bg-white rounded p-4 border border-black flex flex-col gap-6 ">
-                <ImageUploaderGroup
-                  inputRefs={inputRefs}
-                  uploadedFiles={uploadedFiles}
-                  handleFileUpload={handleFileUpload}
-                  removeFile={removeFile}
-                  mediaCaptions={mediaCaptions}
-                  setMediaCaptions={setMediaCaptions}
-                />
-
-                <div className="grid grid-cols-1 gap-6">
-                  <PdfUploader
-                    inputRef={inputRefs.pdf}
-                    uploadedFile={uploadedFiles.pdf}
-                    onFileUpload={handleFileUpload}
-                    onRemove={removeFile}
-                    caption={mediaCaptions.pdf || ""}
-                    onCaptionChange={(val) => setMediaCaptions((prev) => ({ ...prev, pdf: val }))}
-                  />
-
-                  <VideoUploader
-                    inputRef={inputRefs.video}
-                    uploadedFile={uploadedFiles.video}
-                    onFileUpload={handleFileUpload}
-                    onRemove={removeFile}
-                    caption={mediaCaptions.video || ""}
-                    onCaptionChange={(val) => setMediaCaptions((prev) => ({ ...prev, video: val }))}
-                  />
-                </div>
-              </div>
-            </div>
           </div>
           <div className="flex items-center mb-4 flex-col">
             {feedback && <p className="text-red-500 m-0">{feedback}</p>}
@@ -407,9 +374,9 @@ const GroupCampaign = ({ isOpen }) => {
           <div className="bg-white p-3 m-3">
             <div className="flex  md:justify-start justify-between gap-3 md:flex-col py-3 ">
               <div className="flex gap-3  ">
-                <CopyToClipboard headers={headers} dataLogs={dummyData} />
+                <CopyToClipboard headers={headers} data={dummyData} />
                 <DownloadCSVButton headers={headers} dataLogs={dummyData} />
-                <DownloadPDFButton />
+                <DownloadPDFButton headers={headers} dataLogs={dummyData}  />
               </div>
               <div className="relative md:w-full  max-w-[300px]">
                 <input
@@ -447,7 +414,7 @@ const GroupCampaign = ({ isOpen }) => {
           </div>
         </div>
       </section >
-      <ToastContainer />
+      <ToastContainer autoClose="1000" />
     </>
   );
 };

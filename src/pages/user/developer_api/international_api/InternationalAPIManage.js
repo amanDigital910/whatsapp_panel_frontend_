@@ -155,7 +155,7 @@ const InternationalAPIManage = ({ isOpen }) => {
             <div className="flex gap-3  ">
               <CopyToClipboard headers={headers} dataLogs={data} />
               <DownloadCSVButton headers={headers} dataLogs={data} />
-              <DownloadPDFButton />
+              <DownloadPDFButton headers={headers} dataLogs={data} />
             </div>
             <div className="relative md:w-full  max-w-[300px]">
               <input

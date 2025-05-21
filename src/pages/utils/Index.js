@@ -870,36 +870,63 @@ export const SendNowButton = ({ handleSendCampaign }) => {
     )
 }
 
-export const CopyToClipboard = ({ headers = [], data = [] }) => {
-    const copyFilteredJSON = () => {
-        if (!Array.isArray(headers) || !headers.length || !Array.isArray(data) || !data.length) {
+export const CopyToClipboard = ({ headers, data }) => {
+    const copyToClipboard = () => {
+        if (!Array.isArray(headers) || headers.length === 0 || !Array.isArray(data) || data.length === 0) {
             toast.error("Missing headers or data");
             return;
         }
 
-        const allowedKeys = headers.slice(0, -1).map(h => h.key);
+        const allowedKeys = headers.map(({ key }) => key);
 
-        const filteredData = data.map(row => {
-            const filteredRow = {};
-            allowedKeys.forEach(key => {
-                filteredRow[key] = row[key] ?? ''; // Default to empty string if missing
-            });
-            return filteredRow;
-        });
+        const filteredData = data.map(row =>
+            Object.fromEntries(
+                allowedKeys.map(key => [key, row[key] ?? ""])
+            )
+        );
 
-        const jsonText = JSON.stringify(filteredData, null, 2);
+        const jsonString = JSON.stringify(filteredData, null, 2);
 
-        navigator.clipboard.writeText(jsonText)
-            .then(() => toast.success("JSON copied to clipboard!"))
-            .catch(err => {
-                console.error("Failed to copy:", err);
+        // Try native clipboard first
+        if (navigator.clipboard && window.isSecureContext) {
+            navigator.clipboard.writeText(jsonString)
+                .then(() => toast.success("Selected fields copied to clipboard!"))
+                .catch(() => {
+                    fallbackCopy(jsonString);
+                });
+        } else {
+            fallbackCopy(jsonString);
+        }
+    };
+
+    // Fallback using a temporary textarea
+    const fallbackCopy = (text) => {
+        const textarea = document.createElement("textarea");
+        textarea.value = text;
+        textarea.style.position = "fixed"; // prevent scrolling to bottom
+        textarea.style.opacity = "0";
+        document.body.appendChild(textarea);
+        textarea.focus();
+        textarea.select();
+
+        try {
+            const successful = document.execCommand("copy");
+            if (successful) {
+                toast.success("Selected fields copied to clipboard!")
+            } else {
                 toast.error("Copy failed.");
-            });
+            }
+        } catch (err) {
+            console.error("Fallback copy failed:", err);
+            toast.error("Copy failed.");
+        }
+
+        document.body.removeChild(textarea);
     };
 
     return (
         <button
-            onClick={copyFilteredJSON}
+            onClick={copyToClipboard}
             className="px-3 py-1 text-base font-medium border-2 border-[#0d6efd] text-[#0d6efd] rounded-md hover:text-white hover:bg-[#0d6efd]"
         >
             Copy

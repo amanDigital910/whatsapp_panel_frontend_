@@ -147,12 +147,10 @@ function ManageUser({ isOpen }) {
     useEffect(() => {
         dispatch(getAllUsers());
         // console.log("Set Filtered User", filteredUsers);
-    }, [dispatch, users?.data?.length]);
+    }, [dispatch]);
 
     useEffect(() => {
-        if (users?.data?.length) {
-            setFilteredUsers(users.data);
-        }
+        setFilteredUsers(users?.data || []);
     }, [users]);
 
     const headers = [
@@ -261,9 +259,6 @@ function ManageUser({ isOpen }) {
             </td>
         </tr>
     );
-
-    console.log("All Customers Records", currentRecords, '\n', filteredAndSortedLogs);
-
 
     return (
         <>
@@ -443,7 +438,7 @@ function ManageUser({ isOpen }) {
             )}
 
             {/* Toast Container to Display Toasts */}
-            <ToastContainer />
+            <ToastContainer autoClose="1000" />
         </>
     );
 }

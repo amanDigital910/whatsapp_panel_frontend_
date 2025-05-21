@@ -11,66 +11,6 @@ import {
 import { getSecureItem } from '../../pages/utils/SecureLocalStorage';
 
 const authToken = getSecureItem('userToken');
-const payload = {
-    "metadata": {
-        "whatsappComponents": []
-    },
-    "_id": "newID123",
-    "name": "welcome UV Digital Solution",
-    "category": "MARKETING",
-    "language": "en",
-    "components": [
-        {
-            "example": {
-                "header_text": [],
-                "body_text": [],
-                "header_handle": [],
-                "header_url": []
-            },
-            "type": "HEADER",
-            "format": "TEXT",
-            "text": "Welcome to Our Service! Digital Marketing 🎉",
-            "_id": "682464f7c9d00c3230dea0323fe",
-            "buttons": []
-        },
-        {
-            "example": {
-                "header_text": [],
-                "body_text": [],
-                "header_handle": [],
-                "header_url": []
-            },
-            "type": "BODY",
-            "text": "Hello Vikram , thank you for joining us! We're excited to have you on board.",
-            "_id": "682464f7c9d00c3230dea0fef",
-            "buttons": []
-        },
-        {
-            "example": {
-                "header_text": [],
-                "body_text": [],
-                "header_handle": [],
-                "header_url": []
-            },
-            "type": "BUTTONS",
-            "buttons": [
-                {
-                    "type": "QUICK_REPLY",
-                    "text": "Get Started Now",
-                    "example": [],
-                    "_id": "682464f7c9d00c3230dea101"
-                },
-                {
-                    "type": "URL",
-                    "text": "Visit Website This",
-                    "url": "https://uvdigitalsolution.com",
-                    "example": [],
-                    "_id": "682464f7c9d00c3230dea102"
-                }
-            ]
-        }
-    ]
-}
 
 // Headers Config
 const headers = {
@@ -82,14 +22,15 @@ const headers = {
 // Create Template
 export const createTemplate = (templateData) => async (dispatch) => {
     dispatch(createTemplateStart());
+    console.log("Re Created Template", templateData);
     try {
         const response = await axios.post(
             `${process.env.REACT_APP_API_URL}/api/templates`,
-            payload,
+            templateData,
             { headers },
         );
         console.log("Created Template", response);
-        dispatch(createTemplateSuccess(payload));
+        dispatch(createTemplateSuccess(response));
     } catch (error) {
         dispatch(createTemplateFailure(error.response?.data?.message || error.message));
     }
@@ -101,7 +42,6 @@ export const getAllTemplates = () => async (dispatch) => {
     try {
         const response = await axios.get(`${process.env.REACT_APP_API_URL}/api/templates`, { headers });
         dispatch(getTemplatesSuccess(response.data.data));
-        console.log("Template Fetched", response.data.data);
     } catch (error) {
         dispatch(getTemplatesFailure(error.response?.data?.message || error.message));
     }

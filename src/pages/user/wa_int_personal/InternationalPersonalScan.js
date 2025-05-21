@@ -264,9 +264,9 @@ const PersonalCampaignScan = ({ isOpen }) => {
           <div className="w-full bg-white rounded mt-2 py-3 px-3">
             <div className="w-full flex sm:flex-col gap-3 justify-between items-center">
               <div className="flex items-center gap-3">
-                <CopyToClipboard headers={headers} dataLogs={dummyData} />
+                <CopyToClipboard headers={headers} data={dummyData} />
                 <DownloadCSVButton dataLogs={dummyData} headers={headers} />
-                <DownloadPDFButton /> 
+                <DownloadPDFButton headers={headers} dataLogs={dummyData} /> 
               </div>
               <div className="d-flex align-items-center sm:w-full">
                 {/* <label className="me-2 mb-0">Search:</label> */}

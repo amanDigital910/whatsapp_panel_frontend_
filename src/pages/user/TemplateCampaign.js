@@ -1,7 +1,7 @@
+/* eslint-disable react-hooks/exhaustive-deps */
 /* eslint-disable no-use-before-define */
 import { useEffect, useMemo, useRef, useState } from 'react';
 import CreditHeader from '../../components/CreditHeader';
-import moment from 'moment';
 import { ToastContainer, toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 import { CampaignHeading, CampaignTitle, CopyToClipboard, CustomizeTable, DownloadCSVButton, DownloadPDFButton, PdfUploader, VideoUploader } from '../utils/Index';
@@ -20,13 +20,19 @@ const TemplateCampaign = ({ isOpen }) => {
   const [editingId, setEditingId] = useState(null); // Track which template is being edited
   const dispatch = useDispatch();
   const isMobile = useIsMobile();
-  const [usersList, setUsersList] = useState([]); // List of users fetched from the API
+
+  const [filteredUsers, setFilteredUsers] = useState([]);
+  const [isModalOpen, setIsModalOpen] = useState(false);
+  const [showDeleteModal, setShowDeleteModal] = useState(false);
+  const [selectedUser, setSelectedUser] = useState(null);
+  const [formData, setFormData] = useState({
+    _id: "",
+    name: "",
+    templateMessage: "",
+  });
 
   const [sortConfig, setSortConfig] = useState({ key: '', direction: 'asc' });
   const [searchTerm, setSearchTerm] = useState('');
-
-  const [filteredUsers, setFilteredUsers] = useState([]);
-  const [searchQuery, setSearchQuery] = useState("");
 
   const { loading, templatesData } = useSelector((state) => state.template);
 
@@ -37,35 +43,30 @@ const TemplateCampaign = ({ isOpen }) => {
   //   text: templateMsg,
   // }
   const payload = {
-    "name": "welcome_to UV Digital",
+    "name": "welcome_message by aman",
     "category": "MARKETING",
     "language": "en",
     "components": [
       {
-        "type": "HEADER1",
-        "format": "TEXT1",
-        "text": "Welcome to Our Service! Whats Bulk🎉"
+        "type": "HEADER",
+        "format": "TEXT",
+        "text": "Welcome to Our Service! UV Digital Marketing"
       },
       {
         "type": "BODY",
-        "text": "Hello Vikram, thank you for joining us! We're excited to have you on board."
+        "text": "Hello Vikram Rajput, thank you for joining us! We're excited to have you on board."
       },
       {
         "type": "BUTTONS",
         "buttons": [
           {
             "type": "QUICK_REPLY",
-            "text": "Get Started Now"
+            "text": "Get Started"
           },
           {
             "type": "URL",
             "text": "Visit Website",
             "url": "https://example.com"
-          },
-          {
-            "type": "Number",
-            "text": "Call Now",
-            "url": "234234234534"
           }
         ]
       }
@@ -75,79 +76,147 @@ const TemplateCampaign = ({ isOpen }) => {
   const dummyData = [
     {
       id: 1,
-      groupName: "john_doe",
+      templateName: "john_doe",
       balanceType: "Savings",
-      groupNumber: 150075,
-      groupDate: "2025-04-28",
+      templateNumber: 150075,
+      templateDate: "2025-04-28",
     },
     {
       id: 2,
-      groupName: "jane_smith",
+      templateName: "jane_smith",
       balanceType: "Checking",
-      groupNumber: 23480,
-      groupDate: "2025-05-01",
+      templateNumber: 23480,
+      templateDate: "2025-05-01",
     },
     {
       id: 3,
-      groupName: "michael_lee",
+      templateName: "michael_lee",
       balanceType: "Savings",
-      groupNumber: 98760,
-      groupDate: "2025-04-15",
+      templateNumber: 98760,
+      templateDate: "2025-04-15",
     },
     {
       id: 4,
-      groupName: "emily_watson",
+      templateName: "emily_watson",
       balanceType: "Investment",
-      groupNumber: 1500000,
-      groupDate: "2025-03-30",
+      templateNumber: 1500000,
+      templateDate: "2025-03-30",
     },
     {
       id: 5,
-      groupName: "david_clark",
-      balanceType: "Checking",
-      groupNumber: 51235,
-      groupDate: "2025-05-05",
+      templateName: "david_clark",
+      templateNumber: 51235,
+      templateDate: "2025-05-05",
     },
   ];
 
+
+  const handleSubmit = (e) => {
+    e.preventDefault();
+
+    const payload = {
+      name: formData.username,
+      templateMsg: formData.templateName,      
+    };
+
+    if (formData._id) {
+      dispatch(updateTemplate(formData._id, payload));
+    }
+
+    setIsModalOpen(false);
+    setFormData({
+      _id: "",
+      name: "",
+      templateMessage: ""
+    });
+  };
+
+
+  // Close form modal
+  const closeModal = () => {
+    setIsModalOpen(false);
+    setFormData({}); // Reset formData if needed
+  };
+
+  // Delete confirmation handlers
+  const handleDeleteClick = (user) => {
+    setSelectedUser(user);
+    setShowDeleteModal(true);
+  };
+
+  const handleCancelDelete = () => {
+    setShowDeleteModal(false);
+    setSelectedUser(null);
+  };
+
+  const handleConfirmDelete = (userId) => {
+    dispatch(deleteTemplate(userId)); // redux action
+    setShowDeleteModal(false);
+    setSelectedUser(null);
+  };
+
+
+  useEffect(() => {
+    dispatch(getAllTemplates());
+    // console.log("Set Filtered User", filteredUsers);
+  }, [dispatch, templatesData?.data?.length]);
+
+  useEffect(() => {
+    if (templatesData?.data?.length) {
+      setFilteredUsers(templatesData.data);
+    }
+  }, [templatesData]);
+
+
   const headers = [
-    { key: 'id', label: 'Id' },
-    { key: 'templateName', label: 'Template Name' },
-    { key: 'templateNumber', label: 'Template Number' },
+    { key: '_id', label: 'Id' },
+    { key: 'name', label: 'Template Name' },
+    { key: 'templateMessage', label: 'Template Message' },
     { key: 'templateDate', label: 'Date' },
     { key: 'action', label: 'Action' }
   ];
 
   const renderRow = (log, index) => (
-    <tr key={index} className="text-black border border-gray-700 hover:bg-gray-500 whitespace-nowrap">
-      <td className="px-2 py-2 border border-gray-900">{log.id}</td>
-      <td className="px-2 py-2 border border-gray-900">{log.templateName}</td>
-      <td className="px-2 py-2 border border-gray-900">{log.templateNumber || '-'}</td>
-      <td className="px-2 py-2 border border-gray-900">  {new Date(log.templateDate).toLocaleDateString('en-GB')}</td>
+    <tr key={index} className="text-black border border-gray-700 hover:bg-gray-500 whitespace-wrap h-full">
+      <td className="px-2 py-2 border border-gray-900">{log?._id}</td>
+      <td className="px-2 py-2 border border-gray-900">{log?.name}</td>
+      <td className="px-2 py-2 border border-gray-900">{log?.components[1].text || '-'}</td>
+      <td className="px-2 py-2 border border-gray-900">  {new Date(log.updatedAt).toLocaleDateString('en-GB')}</td>
+      <td className="px-2 py-2 border border-gray-900 flex justify-center h-full">
+        <div className="flex items-center justify-center gap-2 max-h-full">
+          <button
+            className="bg-[#ffc107] rounded-md py-1 px-2 text-bas font-medium me-2"
+            onClick={() => {
+              // setFormData({
+              //   _id: log._id,
+              //   username: log.username,
+              //   role: log.role,
+              //   permissions: extractSelectedRoles(log.permissions || {}),
+              // });
+              setIsModalOpen(true);
+            }}
+          >
+            Edit
+          </button>
+
+          <button
+            className="bg-[#ff0000] rounded-md py-1 px-2 text-bas font-medium text-white"
+            onClick={() => handleDeleteClick(log)} // Pass the whole user
+          >
+            Delete
+          </button>
+        </div>
+      </td>
     </tr>
   );
-
-  const handleSearch = (e) => {
-    const query = setSearchTerm(e.target.value.toLowerCase());
-    setSearchQuery(query);
-
-    if (query.trim() === "") {
-      setFilteredUsers(usersList);
-    } else {
-      const filtered = usersList.filter(user =>
-        user.groupName.toLowerCase().includes(query)
-      );
-      setFilteredUsers(filtered);
-    }
-  };
 
   const filteredAndSortedLogs = useMemo(() => {
     const term = searchTerm.toLowerCase().trim();
 
-    const filtered = dummyData.filter(log => {
+    const filtered = templatesData.filter(log => {
       // Search term filter (matches phone, campaign, status, or read status)
       const matchesSearch =
-        log.groupName.includes(term);
+        log.name.includes(term);
       // log.campaignName.toLowerCase().trim().includes(term) ||
       // log.status.toLowerCase().trim().includes(term) ||
       // log.readStatus.toLowerCase().trim().includes(term);
@@ -168,7 +237,7 @@ const TemplateCampaign = ({ isOpen }) => {
     }
 
     return filtered;
-  }, [searchTerm, sortConfig]);
+  }, [dummyData, searchTerm, sortConfig]);
 
   const handleSort = (key) => {
     setSortConfig(prev => ({
@@ -475,9 +544,9 @@ const TemplateCampaign = ({ isOpen }) => {
           <div className="bg-white p-3 m-3">
             <div className="flex  md:justify-start justify-between gap-3 md:flex-col py-3 ">
               <div className="flex gap-3  ">
-                <CopyToClipboard headers={headers} dataLogs={dummyData} />
+                <CopyToClipboard headers={headers} data={dummyData} />
                 <DownloadCSVButton headers={headers} dataLogs={dummyData} />
-                <DownloadPDFButton />
+                <DownloadPDFButton headers={headers} dataLogs={dummyData} />
               </div>
               <div className="relative md:w-full  max-w-[300px]">
                 <input
@@ -515,8 +584,29 @@ const TemplateCampaign = ({ isOpen }) => {
           </div>
         </div>
       </section>
+
+      {/* Delete Confirmation Modal */}
+      {showDeleteModal && selectedUser && (
+        <div className="modal fade show d-block" tabIndex="-1" role="dialog" style={{ backgroundColor: 'rgba(0,0,0,0.5)' }}>
+          <div className="modal-dialog modal-dialog-centered" role="document">
+            <div className="modal-content">
+              <div className="modal-header">
+                <h5 className="modal-title">Confirm Delete</h5>
+                <button type="button" className="btn-close" onClick={handleCancelDelete} aria-label="Close"></button>
+              </div>
+              <div className="modal-body m-0">
+                <p className="m-0">Are you sure you want to delete user <strong>{templatesData.name}</strong>?</p>
+              </div>
+              <div className="modal-footer">
+                <button className="btn btn-secondary" onClick={handleCancelDelete}>No</button>
+                <button className="px-3 py-2 rounded-md text-white bg-[#ff0000] " onClick={() => handleConfirmDelete(templatesData._id)}>Yes, Delete</button>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
       {/* Toast Container */}
-      <ToastContainer />
+      <ToastContainer autoClose="1000" />
     </>
   );
 };
