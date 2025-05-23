@@ -414,7 +414,7 @@ const GroupCampaign = ({ isOpen }) => {
           </div>
         </div>
       </section >
-      <ToastContainer autoClose="1000" />
+      <ToastContainer autoClose="3000" />
     </>
   );
 };

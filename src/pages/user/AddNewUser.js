@@ -5,14 +5,18 @@ import 'react-toastify/dist/ReactToastify.css'; // Import Toastify CSS
 import { ToastContainer, toast } from 'react-toastify'; // Import Toastify
 import { FaEye, FaEyeSlash } from "react-icons/fa";
 import { useDispatch, } from "react-redux";
-import { createUser } from "../../redux/actions/authAction";
+import { createUser, getAllUsers } from "../../redux/actions/authAction";
 import { getSecureItem } from "../utils/SecureLocalStorage";
+import { useNavigate } from "react-router-dom";
 
 function AddNewUser() {
     const [user, setUser] = useState(null);
     const [showPassword, setShowPassword] = useState(false);
     const [showConfirmPassword, setShowConfirmPassword] = useState(false);
+    const [isSubmitting, setIsSubmitting] = useState(false);
+
     const dispatch = useDispatch();
+    const navigate = useNavigate();
 
     const [formData, setFormData] = useState({
         userid: "",
@@ -30,77 +34,74 @@ function AddNewUser() {
         "International Virtual",
     ];
 
-
     const roleKeyMap = {
-        "Virtual": "virtual",
-        "Personal": "personal",
+        Virtual: "virtual",
+        Personal: "personal",
         "International Personal": "internationalPersonal",
-        "International Virtual": "internationalVirtual"
+        "International Virtual": "internationalVirtual",
     };
 
+    // Generate permission object based on selected roles
     const generatePermissions = (selectedRoles) => {
-        const permissions = {};
-
-        Object.keys(roleKeyMap).forEach((role) => {
-            const key = roleKeyMap[role];
-            permissions[key] = selectedRoles.includes(role);
-        });
-
-        return permissions;
+        return Object.keys(roleKeyMap).reduce((acc, role) => {
+            acc[roleKeyMap[role]] = selectedRoles.includes(role);
+            return acc;
+        }, {});
     };
 
-
-    // Get logged-in user data from localStorage
+    // Load user data from secure storage
     useEffect(() => {
         const storedData = getSecureItem("userData");
         if (storedData) {
             const parsed = JSON.parse(storedData);
-            setUser(parsed?.user || parsed); // Fallback if `user` key isn't nested
+            setUser(parsed?.user || parsed);
         }
     }, []);
 
+    // Handle input change
     const handleChange = (e) => {
-        const { name, value, checked } = e.target;
-
-        if (name === "selectedRoles") {
-            const updatedRoles = checked
-                ? [...formData.selectedRoles, value]
-                : formData.selectedRoles.filter((role) => role !== value);
-            setFormData((prev) => ({ ...prev, selectedRoles: updatedRoles }));
-        } else {
-            setFormData((prev) => ({ ...prev, [name]: value }));
-        }
+        const { name, value } = e.target;
+        setFormData((prev) => ({ ...prev, [name]: value }));
     };
 
+    // Handle role checkbox toggles
     const handleCheckboxChange = (role) => {
-        const updated = formData.selectedRoles.includes(role)
-            ? formData.selectedRoles.filter((r) => r !== role)
-            : [...formData.selectedRoles, role];
-        setFormData((prev) => ({ ...prev, selectedRoles: updated }));
+        setFormData((prev) => ({
+            ...prev,
+            selectedRoles: prev.selectedRoles.includes(role)
+                ? prev.selectedRoles.filter((r) => r !== role)
+                : [...prev.selectedRoles, role],
+        }));
     };
 
+    // Handle form submission
     const handleSubmit = async (e) => {
         e.preventDefault();
+        if (isSubmitting) return;
 
-        if (formData.password !== formData.confirmPassword) {
-            return toast.error("Your passwords don't match. Please try again.");
-        }
+        const { username, password, confirmPassword, userRole, selectedRoles } = formData;
 
-        if (formData.username === "" || !formData.password.length || formData.password.length <= 6 || formData.selectedRoles.length === 0 || formData.userRole === "") {
-            return toast.error("All fields are required. Please complete the form!");
-        }
+        // Form validation
+        if (!username.trim()) return toast.error("Username is required.");
+        if (!password || password.length < 6) return toast.error("Password must be at least 6 characters.");
+        if (password !== confirmPassword) return toast.error("Passwords do not match.");
+        if (!userRole) return toast.error("Please select a user role.");
+        if (selectedRoles.length === 0) return toast.error("At least one permission role must be selected.");
 
         const payload = {
-            username: formData.username,
-            password: formData.password,
-            role: formData.userRole,
-            permissions: generatePermissions(formData.selectedRoles),
+            username,
+            password,
+            role: userRole,
+            permissions: generatePermissions(selectedRoles),
         };
 
         try {
-            const response = await dispatch(createUser(payload));
+            setIsSubmitting(true);
+            const response = dispatch(createUser(payload));
+            console.log("Response data", dispatch(createUser(payload)));
 
-            if ([200, 201].includes(response.status)) {
+            if (response) {
+                toast.success("User created successfully.");
                 setFormData({
                     userid: "",
                     username: "",
@@ -109,9 +110,13 @@ function AddNewUser() {
                     userRole: "",
                     selectedRoles: [],
                 });
+                navigate("/manage-user");
+                dispatch(getAllUsers());
             }
         } catch (error) {
-            toast.error(error);
+            toast.error(error?.message || "An unexpected error occurred.");
+        } finally {
+            setIsSubmitting(false);
         }
     };
     // try {

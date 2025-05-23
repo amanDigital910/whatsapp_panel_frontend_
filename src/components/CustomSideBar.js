@@ -102,6 +102,11 @@ const SideBar = ({ isOpen, toggleDropdown, activeDropdown }) => {
             ]
         },
         {
+            label: "Credit History",
+            to: "/credit-history",
+            icon: home
+        },
+        {
             label: "Whatsapp Official",
             icon: whatsappOfficialIcon,
             dropdown: [
@@ -143,6 +148,26 @@ const SideBar = ({ isOpen, toggleDropdown, activeDropdown }) => {
             ]
         },
         {
+            label: "Template",
+            to: "/template",
+            icon: templateIcon
+        },
+        {
+            label: "Group",
+            to: "/group",
+            icon: groupIcon
+        },
+        {
+            label: "Manage Credits",
+            to: "/manage-credit",
+            icon: creditCardIcon
+        },
+        {
+            label: "Manage User",
+            to: "/manage-user",
+            icon: UserIcon
+        },
+        {
             label: "Developer API",
             icon: DeveloperAPI,
             dropdown: [
@@ -164,30 +189,10 @@ const SideBar = ({ isOpen, toggleDropdown, activeDropdown }) => {
                 }
             ]
         },
-        {
-            label: "Template",
-            to: "/template",
-            icon: templateIcon
-        },
-        {
-            label: "Group",
-            to: "/group",
-            icon: groupIcon
-        },
-        {
-            label: "Manage Credits",
-            to: "/manage-credit",
-            icon: creditCardIcon
-        },
-        {
-            label: "Manage User",
-            to: "/manage-user",
-            icon: UserIcon
-        },
     ];
 
     const userRole = JSON.parse(getSecureItem("userData"));
-    
+
     const filteredSidebarMenu = sidebarMenu.filter(item => {
         if (userRole?.role === "admin" || userRole?.role === "super_admin") return true;
         return item.label !== "Admin Dashboard" && item.label !== "Transaction Logs";

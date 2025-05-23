@@ -95,6 +95,7 @@ const ManageUser = lazy(() => import("./pages/user/ManageUser"));
 const ManageCredit = lazy(() => import("./pages/user/ManageCredit"));
 const AddNewUser = lazy(() => import("./pages/user/AddNewUser"));
 const ProfilePage = lazy(() => import("./pages/user/ProfilePage.js"));
+const CreditHistory = lazy(() => import("./pages/user/CreditHistory.js"))
 
 const App = () => {
   const [isOpen, setIsOpen] = useState(true);
@@ -243,6 +244,7 @@ const App = () => {
                     <Route path="/group" element={<GroupCampaign />} />
                     <Route path="/template" element={<TemplateCampaign isOpen={isOpen} />} />
 
+                    <Route path='/credit-history' element={<CreditHistory isOpen={isOpen} />} />
                     <Route path='/manage-user' element={<ManageUser isOpen={isOpen} />} />
                     <Route path='/membership-validity' element={<MembershipValidTill />} />
                     <Route path='/manage-credit' element={<ManageCredit isOpen={isOpen} />} />
@@ -260,7 +262,7 @@ const App = () => {
           </div>
         </div>
       </div>
-      <ToastContainer autoClose="1000" />
+      <ToastContainer autoClose="3000" />
     </div >
   );
 };

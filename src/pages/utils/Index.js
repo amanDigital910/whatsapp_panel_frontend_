@@ -549,17 +549,6 @@ export const PollCampaign = ({ question, setQuestion, inputs, handleInputChange,
                     </button>
                 </div>
             </div>
-            {/* Button Detail and Delay Between Messages Section */}
-            {/*<div className="w-full flex mt-3">
-                <button
-                    className="w-full rounded text-center py-2 bg-brand_colors h-[40px] text-white font-[500] flex items-center justify-center"
-                    value={buttonDetail}
-                    onChange={(e) => setButtonDetail(e.target.value)}
-                    placeholder="Enter Button Detail"
-                >
-                    Button Detail
-                </button>
-            </div>*/}
         </div>
     )
 }
@@ -791,7 +780,7 @@ export const VideoUploader = ({ inputRef, uploadedFile, onFileUpload, onRemove, 
             </div>
             {uploadedFile && (
                 <div className="relative w-full h-[250px] border border-gray-200 rounded overflow-hidden">
-                    <video src={uploadedFile.preview} className="w-full h-full object-contain" controls />
+                    <video src={uploadedFile?.preview} className="w-full h-full object-contain" controls />
                     <MdDelete
                         className="text-red-500 absolute top-2 right-2 text-xl cursor-pointer"
                         onClick={() => removeRestBtn(inputRef)}

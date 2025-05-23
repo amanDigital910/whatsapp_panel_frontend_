@@ -8,6 +8,9 @@ import useIsMobile from '../../hooks/useMobileSize';
 import '../user/whatsapp_offical/commonCSS.css'
 import { CampaignHeading, CopyToClipboard, CustomizeTable, DownloadCSVButton, DownloadPDFButton } from '../utils/Index';
 import { getSecureItem } from '../utils/SecureLocalStorage';
+import { getAllUsers } from '../../redux/actions/authAction';
+import { useDispatch } from 'react-redux';
+import { useSelector } from 'react-redux';
 
 function ManageCredit({ isOpen }) {
     const [user, setUser] = useState(null); // User state
@@ -17,21 +20,51 @@ function ManageCredit({ isOpen }) {
     const [currentPage, setCurrentPage] = useState(1);
     const [sortConfig, setSortConfig] = useState({ key: '', direction: 'asc' });
     const [searchTerm, setSearchTerm] = useState('');
-    const isMobile = useIsMobile();
+    const { loading, users, error } = useSelector((state) => state.userCreate);
 
-    const userToken = getSecureItem("userToken");
+    const isMobile = useIsMobile();
+    const dispatch = useDispatch();
+    const storedData = JSON.parse(getSecureItem("userData"));
+    const [inputValue, setInputValue] = useState('');
+    const [isDropdownOpen, setIsDropdownOpen] = useState(false);
+    const handleInputChange = (e) => {
+        const value = e.target.value;
+        setInputValue(value);
+        setFormData((prev) => ({ ...prev, toUserId: value })); // Update formData with input value
+        setIsDropdownOpen(value.length > 0); // Open dropdown if input is not empty
+    };
+    const handleOptionClick = (username, userId) => {
+        setInputValue(username);
+        setFormData((prev) => ({ ...prev, toUserId: userId }));
+        // setIsDropdownOpen(false); // Close dropdown
+    };
+    const filteredUsers = users?.data?.filter(user =>
+        user.username.toLowerCase().includes(inputValue.toLowerCase())
+    );
+
+    console.log("User Token Data", user);
+
+    const groupedOptions = {
+        Virtual: ['Quick Campaign', 'DP Campaign', 'Button Campaign'],
+        Personal: ['Quick Campaign', 'POLL Campaign', 'Professional Campaign'],
+        International: ['International Personal Campaign', 'International Virtual Campaign'],
+    };
 
     const recordsPerPage = 5; // You can adjust this as needed
 
+    console.log("Stored Data", storedData?.id);
+
+
     const [formData, setFormData] = useState({
-        sendUser: "",
-        selectedCategory: "",
-        balance: "",
+        toUserId: "",
         creditDebit: "",
-    }); // Form data state
+        creditAmount: "",
+        selectedCampaign: "",
+    });
+
+    console.log("FormData", formData);
 
     const headers = [
-        // UserName Balance Type Balance Credit Type Credit Date
         { key: 'id', label: 'ID' },
         { key: 'userName', label: 'UserName' },
         { key: 'balanceType', label: 'Balance Type' },
@@ -83,13 +116,18 @@ function ManageCredit({ isOpen }) {
         },
     ];
 
+    useEffect(() => {
+        dispatch(getAllUsers())
+    }, [dispatch])
+
+    console.log("Data found", users?.data);
 
     // Simulating user data fetching from localStorage
     useEffect(() => {
-        const storedData = localStorage.getItem("userData");
+
         if (storedData) {
             const parsedData = (storedData);
-            setUser(parsedData?.user);
+            setUser(parsedData?.username);
             // Fetch all necessary data
             // fetchUsers(parsedData.user.userid);
             // fetchTransactionLogs(parsedData.user.userid);
@@ -183,22 +221,22 @@ function ManageCredit({ isOpen }) {
             let payload, response;
 
             // Prepare the payload based on Credit or Debit
-            if (formData.creditDebit === "Credit") {
+            if (formData?.creditDebit === "Credit") {
                 payload = {
-                    fromUserId: user.userid,
-                    toUserId: parseInt(formData.sendUser),
-                    categoryId: parseInt(formData.selectedCategory),
-                    creditAmount: parseInt(formData.balance),
+                    toUserId: formData?.toUserId,
+                    creditDebit: formData?.creditDebit,
+                    creditAmount: parseInt(formData?.creditAmount),
+                    selectedCampaign: formData?.selectedCampaign,
                 };
 
                 // Call the Credit API
                 response = await axios.post(`${process.env.REACT_APP_API_URL}/transfer/credit`, payload);
             } else {
                 payload = {
-                    fromUserId: parseInt(formData.sendUser),
-                    toUserId: user.userid,
-                    categoryId: parseInt(formData.selectedCategory),
-                    creditAmount: parseInt(formData.balance),
+                    toUserId: formData?.toUserId,
+                    creditDebit: formData?.creditDebit,
+                    creditAmount: parseInt(formData?.creditAmount),
+                    selectedCampaign: formData?.selectedCampaign,
                 };
 
                 // Call the Debit API
@@ -218,10 +256,10 @@ function ManageCredit({ isOpen }) {
 
                 // Clear the form
                 setFormData({
-                    sendUser: "",
-                    selectedCategory: "",
-                    balance: "",
+                    toUserId: "",
                     creditDebit: "",
+                    creditAmount: "",
+                    selectedCampaign: "",
                 });
             } else {
                 throw new Error("Unexpected response from server.");
@@ -310,46 +348,54 @@ function ManageCredit({ isOpen }) {
                 <div className="w-full mt-8">
                     <CampaignHeading campaignHeading="Manage Credits" />
                     <div className="w-full px-3 pt-3 ">
-                        <div className='bg-white px-3 py-3'>
+                        <div className='bg-white px-3 py-3 mb-3'>
                             {/* Filters Section */}
                             <form onSubmit={handleSubmit}>
-                                <div className="me-0 flex md:flex-col gap-3 pb-3 border-b border-[#383387]">
-                                    {/* Left Section */}
-                                    <div className="flex sm:flex-col w-full gap-3 align-items-center ">
-                                        <div className="grow w-full">
-                                            <select
-                                                name="sendUser"
-                                                value={formData.sendUser}
-                                                onChange={handleChange}
-                                                className="form-select border border-black w-full"
-                                            >
-                                                <option value="">Select User</option>
-                                                {usersList.map((user) => (
-                                                    <option key={user.userid} value={user.userid}>
-                                                        {user.userName}
-                                                    </option>
-                                                ))}
-                                            </select>
+                                <div className="flex flex-col gap-3 pb-3 border-b border-[#383387]">
+                                    <div className="flex gap-3 md:flex-col">
+                                        <div className="relative grow w-full">
+                                            <input
+                                                type="text"
+                                                name="toUserId"
+                                                value={inputValue}
+                                                onChange={handleInputChange}
+                                                placeholder="Select Username"
+                                                className="border border-black w-full p-1.5 pl-3 rounded"
+                                                onFocus={() => setIsDropdownOpen(true)} // Open dropdown on focus
+                                                onBlur={() => setIsDropdownOpen(false)} // Close dropdown on blur
+                                            />
+                                            {isDropdownOpen && filteredUsers.length > 0 && (
+                                                <ul className="absolute z-50 w-full bg-white border border-gray-300 rounded shadow-lg max-h-60 overflow-auto">
+                                                    {filteredUsers.map((user) => (
+                                                        <li
+                                                            key={user._id}
+                                                            onClick={() => handleOptionClick(user.username, user._id)}
+                                                            className="p-2 hover:bg-gray-200 cursor-pointer"
+                                                        >
+                                                            {user.username}
+                                                        </li>
+                                                    ))}
+                                                </ul>
+                                            )}
                                         </div>
                                         <div className="grow w-full">
                                             <select
-                                                name="selectedCategory"
-                                                value={formData.selectedCategory}
+                                                name="selectedCampaign"
+                                                value={formData?.selectedCampaign}
                                                 onChange={handleChange}
-                                                className="form-select border border-black w-full"
-                                            >
-                                                <option value="">Select Category</option>
-                                                {categories.map((category) => (
-                                                    <option key={category.id} value={category.id}>
-                                                        {category.name}
-                                                    </option>
+                                                className="form-select border border-black w-full">
+                                                <option value="" disabled>Select Campaign</option>
+                                                {Object.entries(groupedOptions).map(([groupLabel, options]) => (
+                                                    <optgroup key={groupLabel} label={groupLabel}>
+                                                        {options.map((option) => (
+                                                            <option key={option} value={option}>
+                                                                {option}
+                                                            </option>
+                                                        ))}
+                                                    </optgroup>
                                                 ))}
                                             </select>
                                         </div>
-                                    </div>
-
-                                    {/* Right Section */}
-                                    <div className="flex sm:flex-col w-full gap-3 align-items-center">
                                         <div className="grow w-full">
                                             <select
                                                 name="creditDebit"
@@ -357,6 +403,7 @@ function ManageCredit({ isOpen }) {
                                                 onChange={handleChange}
                                                 className="form-select border border-black w-full"
                                             >
+                                                <option value="" disabled>Select</option>
                                                 <option value="Credit">Credit</option>
                                                 <option value="Debit">Debit</option>
                                             </select>
@@ -364,14 +411,14 @@ function ManageCredit({ isOpen }) {
                                         <div className="grow w-full">
                                             <input
                                                 type="text"
-                                                name="balance"
-                                                value={formData.balance}
+                                                name="creditAmount"
+                                                value={formData?.creditAmount}
                                                 onChange={handleChange}
                                                 className="form-control border border-black w-full"
                                                 placeholder="Balance"
                                             />
                                         </div>
-                                        <div className="grow w-fit ">
+                                        <div className="grow w-fit">
                                             <button type="submit" className="btn text-white bg-black w-100 px-4">Submit</button>
                                         </div>
                                     </div>
@@ -465,7 +512,7 @@ function ManageCredit({ isOpen }) {
                                 </div>
                             </div>
                             {/* Pagination Controls */}
-                            <div className="d-flex justify-content-end align-items-center gap-3 mt-3">
+                            <div className="d-flex justify-content-end align-items-center gap-3">
                                 <button className="btn btn-dark" onClick={handlePrevious} disabled={currentPage === 1}>
                                     &lt;
                                 </button>

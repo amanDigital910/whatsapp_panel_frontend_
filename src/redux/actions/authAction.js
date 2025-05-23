@@ -24,6 +24,14 @@ export const DELETE_USER_REQUEST = "DELETE_USER_REQUEST";
 export const DELETE_USER_SUCCESS = "DELETE_USER_SUCCESS";
 export const DELETE_USER_FAILURE = "DELETE_USER_FAILURE";
 
+export const CHANGE_USER_PASSWORD_REQUEST = 'CHANGE_USER_PASSWORD_REQUEST';
+export const CHANGE_USER_PASSWORD_SUCCESS = 'CHANGE_USER_PASSWORD_SUCCESS';
+export const CHANGE_USER_PASSWORD_FAILURE = 'CHANGE_USER_PASSWORD_FAILURE';
+
+export const UPLOAD_PROFILE_PICTURE_REQUEST = 'UPLOAD_PROFILE_PICTURE_REQUEST';
+export const UPLOAD_PROFILE_PICTURE_SUCCESS = 'UPLOAD_PROFILE_PICTURE_SUCCESS';
+export const UPLOAD_PROFILE_PICTURE_FAILURE = 'UPLOAD_PROFILE_PICTURE_FAILURE';
+
 // Dynamic headers with latest token
 const getAuthHeaders = () => ({
   'Content-Type': 'application/json',
@@ -47,7 +55,8 @@ export const login = (username, password) => async (dispatch) => {
 
     if (response?.status === 200) {
       const { user, token } = response.data.data;
-
+      console.log("Sae the Data",response);
+      
       // Save to localStorage and secure storage
       localStorage.setItem('newUserToken', token);
       // localStorage.setItem('newUserData', JSON.stringify(response.data.data));
@@ -174,6 +183,59 @@ export const deleteUser = (userId) => async (dispatch) => {
     dispatch({
       type: DELETE_USER_FAILURE,
       payload: error?.response?.data?.message || "Failed to delete user",
+    });
+  }
+};
+
+export const changeUserPassword = (userId, payload) => async (dispatch) => {
+  dispatch({ type: CHANGE_USER_PASSWORD_REQUEST });
+
+  try {
+    const response = await axios.post(
+      `${process.env.REACT_APP_API_URL}/api/auth/admin/change-user-password/${userId}`,
+      { payload },
+      { headers: getAuthHeaders() }
+    );
+
+    console.log("Users Data",response);
+    
+
+    if (response?.status === 200) {
+      dispatch({ type: CHANGE_USER_PASSWORD_SUCCESS, payload: response.data.message });
+      toast.success(response.data.message || 'Password changed successfully');
+    }
+  } catch (error) {
+    const errorMessage = error?.response?.data?.message || 'Failed to change user password';
+    toast.error(errorMessage);
+    dispatch({ type: CHANGE_USER_PASSWORD_FAILURE, payload: errorMessage });
+  }
+};
+
+export const uploadProfilePicture = (file) => async (dispatch) => {
+  dispatch({ type: UPLOAD_PROFILE_PICTURE_REQUEST });
+
+  try {
+    const token = getSecureItem('userToken');
+    const formData = new FormData();
+    formData.append('profilePicture', file);
+    console.log(formData);
+    
+
+    const response = await axios.put(`${process.env.REACT_APP_API_URL}/api/auth/profile-picture`, formData, {
+      headers: {
+        'Authorization': `Bearer ${token}`,
+        'Content-Type': 'multipart/form-data',
+      },
+    });
+
+    dispatch({
+      type: UPLOAD_PROFILE_PICTURE_SUCCESS,
+      payload: response.data?.data?.profilePicture, // contains the image path
+    });
+  } catch (error) {
+    dispatch({
+      type: UPLOAD_PROFILE_PICTURE_FAILURE,
+      payload: error.response?.data?.message || 'Failed to upload profile picture',
     });
   }
 };

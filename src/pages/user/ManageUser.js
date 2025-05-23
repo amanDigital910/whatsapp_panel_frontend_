@@ -19,8 +19,8 @@ function ManageUser({ isOpen }) {
     const [filteredUsers, setFilteredUsers] = useState([]);
     // const [searchQuery, setSearchQuery] = useState('');
     const [currentPage, setCurrentPage] = useState(1);
-    const recordsPerPage = 5;
-    const [sortConfig, setSortConfig] = useState({ key: '', direction: 'desc' });
+    const recordsPerPage = 20;
+    const [sortConfig, setSortConfig] = useState({ key: '_id', direction: 'desc' });
     const [searchTerm, setSearchTerm] = useState('');
     const storedData = JSON.parse(getSecureItem("userData"));
 
@@ -65,6 +65,7 @@ function ManageUser({ isOpen }) {
 
         if (formData._id) {
             dispatch(updateUser(formData._id, payload));
+            dispatch(getAllUsers());
         }
 
         setIsModalOpen(false);
@@ -141,6 +142,7 @@ function ManageUser({ isOpen }) {
         dispatch(deleteUser(userId)); // redux action
         setShowDeleteModal(false);
         setSelectedUser(null);
+        dispatch(getAllUsers());
     };
 
 
@@ -227,11 +229,11 @@ function ManageUser({ isOpen }) {
 
     const renderRow = (log, index) => (
         <tr key={index} className="text-black border border-gray-700 hover:bg-gray-500 whitespace-nowrap ">
-            <td className="px-2 py-2 border text-[1rem] border-gray-900">{log?._id || '-'}</td>
+            <td className="px-2 py-2 border text-[1rem] border-gray-900 w-20">{log?._id.slice(-5) || '-'}</td>
             <td className="px-2 py-2 border text-[1rem] border-gray-900">{log?.username || '-'}</td>
             <td className="px-2 py-2 border text-[1rem] border-gray-900">{log?.role || '-'}</td>
             <td className="px-2 py-2 border text-[1rem] border-gray-900">{log?.firstName || '-'}</td>
-            <td className="px-2 py-2 border text-[1rem] border-gray-900">{new Date(log?.createdAt).toLocaleDateString('en-GB')}</td>
+            <td className="px-2 py-2 border text-[1rem] border-gray-900">{new Date(log?.updatedAt).toLocaleDateString('en-GB')}</td>
 
             <td className="px-2 py-2 border border-gray-900 flex justify-center">
                 <button
@@ -438,7 +440,7 @@ function ManageUser({ isOpen }) {
             )}
 
             {/* Toast Container to Display Toasts */}
-            <ToastContainer autoClose="1000" />
+            <ToastContainer autoClose="3000" />
         </>
     );
 }
