@@ -9,7 +9,7 @@ import ImageUploaderGroup from '../utils/ImageUploaderGroup';
 import { useDispatch, useSelector } from 'react-redux';
 import { createTemplate, deleteTemplate, getAllTemplates, updateTemplate } from '../../redux/actions/templateAction';
 import useIsMobile from '../../hooks/useMobileSize';
-import { getSecureItem } from '../utils/SecureLocalStorage';
+import '../user/whatsapp_offical/commonCSS.css'
 
 const TemplateCampaign = ({ isOpen }) => {
   const { loading, error, templatesData } = useSelector((state) => state.template);
@@ -83,7 +83,7 @@ const TemplateCampaign = ({ isOpen }) => {
 
         uploadedImages[key] = {
           file: null, // File not re-selectable, just for preview
-          preview: `${process.env.REACT_APP_API_URL}${img?.url}`, // your media prefix
+          preview: `${process.env.REACT_APP_API_URL}${JSON.parse(img?.url)}`, // your media prefix
           filename: img.filename,
         };
         captions[key] = img.caption || "";
@@ -93,7 +93,7 @@ const TemplateCampaign = ({ isOpen }) => {
     if (template.video) {
       uploadedImages.video = {
         file: null,
-        preview: `${process.env.REACT_APP_API_URL}${template?.video.url}`,
+        preview: (`${process.env.REACT_APP_API_URL}${JSON.parse(template?.video.url)}`),
         filename: template.video.filename,
       };
       captions.video = template.video.caption || "";
@@ -102,7 +102,7 @@ const TemplateCampaign = ({ isOpen }) => {
     if (template.pdf) {
       uploadedImages.pdf = {
         file: null,
-        preview: `${process.env.REACT_APP_API_URL}${template?.pdf.url}`,
+        preview: `${process.env.REACT_APP_API_URL}${JSON.parse(template?.pdf.url)}`,
         filename: template.pdf.filename,
       };
       captions.pdf = template.pdf.caption || "";
@@ -177,7 +177,7 @@ const TemplateCampaign = ({ isOpen }) => {
       <td className="px-2 py-2 border border-gray-900">{log?.name}</td>
       <td className="px-2 py-2 border border-gray-900">{log?.message?.text || '-'}</td>
       <td className="px-2 py-2 border border-gray-900">  {new Date(log.updatedAt).toLocaleDateString('en-GB')}</td>
-      <td className="px-2 py-2 flex justify-center items-center h-full w-40">
+      <td className="px-2 py-2 flex justify-center items-center h-full w-full min-w-32">
         <div className="flex items-center justify-center gap-2 flex-1 max-h-full">
           <button
             className="bg-[#ffc107] rounded-md py-1 px-2 text-bas font-medium me-2"
@@ -349,21 +349,22 @@ const TemplateCampaign = ({ isOpen }) => {
       console.log("media.file", media);
 
       if (media?.file && mediaCaptions[key]) {
-        formData.append(`images[${index}][url]`, media);
+        formData.append(`images[${index}][url]`, JSON.stringify(media.file));
         formData.append(`images[${index}][caption]`, mediaCaptions[key] || "");
         formData.append(`images[${index}][filename]`, media.file.name);
       }
     });
 
     // Video
-    if (uploadedFiles.video?.file && mediaCaptions.video) {
-      formData.append("video[url]", uploadedFiles.video.file);
+    if (uploadedFiles.video?.file) {
+      console.log("Upload Videos",uploadedFiles?.video);
+      formData.append("video[url]", JSON.stringify(uploadedFiles.video));
       formData.append("video[caption]", mediaCaptions.video || "");
       formData.append("video[filename]", uploadedFiles.video.file.name);
     }
 
     // PDF
-    if (uploadedFiles.pdf?.file && mediaCaptions.pdf) {
+    if (uploadedFiles.pdf?.file) {
       formData.append("pdf[url]", uploadedFiles.pdf.file);
       formData.append("pdf[caption]", mediaCaptions.pdf || "");
       formData.append("pdf[filename]", uploadedFiles.pdf.file.name);
@@ -530,7 +531,7 @@ const TemplateCampaign = ({ isOpen }) => {
                 )}
               </div>
             </div>
-            <div className={` w-full bg-gray-300 flex-shrink-0 overflow-auto custom-horizontal-scroll select-text h-full ${!isMobile ? (isOpen ? "max-w-[calc(100vw-50px)]" : "max-w-[calc(100vw-65px)]") : "max-w-[calc(100vw-64px)]"}`}>
+            <div className={` w-full bg-gray-300 flex-shrink-0 overflow-auto custom-horizontal-scroll select-text h-full custom-horizontal-scroll ${!isMobile ? (isOpen ? "max-w-[calc(100vw-50px)]" : "max-w-[calc(100vw-65px)]") : "max-w-[calc(100vw-64px)]"}`}>
               <CustomizeTable
                 headers={headers}
                 emptyMessage='No transaction logs available.'

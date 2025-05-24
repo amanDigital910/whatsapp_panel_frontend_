@@ -1,6 +1,6 @@
 /* eslint-disable react-hooks/exhaustive-deps */
 import axios from 'axios';
-import React, { useEffect, useMemo, useState } from "react";
+import React, { useEffect, useMemo, useRef, useState } from "react";
 import { toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 import CreditHeader from "../../components/CreditHeader";
@@ -11,6 +11,7 @@ import { getSecureItem } from '../utils/SecureLocalStorage';
 import { getAllUsers } from '../../redux/actions/authAction';
 import { useDispatch } from 'react-redux';
 import { useSelector } from 'react-redux';
+import '../user/whatsapp_offical/commonCSS.css'
 
 function ManageCredit({ isOpen }) {
     const [user, setUser] = useState(null); // User state
@@ -24,103 +25,133 @@ function ManageCredit({ isOpen }) {
 
     const isMobile = useIsMobile();
     const dispatch = useDispatch();
+    const dropdownRef = useRef(null);
+    const getISTDateFormatted = () => {
+        const now = new Date();
+        const options = { timeZone: 'Asia/Kolkata' };
+        const istDate = new Date(now.toLocaleString('en-US', options));
+
+        const day = String(istDate.getDate()).padStart(2, '0');
+        const month = String(istDate.getMonth() + 1).padStart(2, '0'); // Months are 0-indexed
+        const year = istDate.getFullYear();
+        const formattedTime = new Date().toLocaleString("en-IN", {
+            timeZone: "Asia/Kolkata",
+            hour: "2-digit",
+            minute: "2-digit",
+            second: "2-digit",
+            hour12: false,
+        });
+
+        return `${day}-${month}-${year} ${formattedTime}`;
+    };
+
+
     const storedData = JSON.parse(getSecureItem("userData"));
     const [inputValue, setInputValue] = useState('');
     const [isDropdownOpen, setIsDropdownOpen] = useState(false);
-    const handleInputChange = (e) => {
-        const value = e.target.value;
-        setInputValue(value);
-        setFormData((prev) => ({ ...prev, toUserId: value })); // Update formData with input value
-        setIsDropdownOpen(value.length > 0); // Open dropdown if input is not empty
-    };
-    const handleOptionClick = (username, userId) => {
-        setInputValue(username);
-        setFormData((prev) => ({ ...prev, toUserId: userId }));
-        // setIsDropdownOpen(false); // Close dropdown
-    };
-    const filteredUsers = users?.data?.filter(user =>
-        user.username.toLowerCase().includes(inputValue.toLowerCase())
-    );
-
-    console.log("User Token Data", user);
 
     const groupedOptions = {
-        Virtual: ['Quick Campaign', 'DP Campaign', 'Button Campaign'],
-        Personal: ['Quick Campaign', 'POLL Campaign', 'Professional Campaign'],
-        International: ['International Personal Campaign', 'International Virtual Campaign'],
+        Virtual: ['Virtual Quick Credit', 'Virtual DP Credit', 'Virtual Button Credit'],
+        Personal: ['Personal Quick Credit', 'Personal POLL Credit', 'Personal Professional Credit'],
+        International: ['International Personal Credit', 'International Virtual Credit'],
     };
 
     const recordsPerPage = 5; // You can adjust this as needed
-
-    console.log("Stored Data", storedData?.id);
-
 
     const [formData, setFormData] = useState({
         toUserId: "",
         creditDebit: "",
         creditAmount: "",
+        currentDate: "",
         selectedCampaign: "",
     });
 
-    console.log("FormData", formData);
+    const handleInputChange = (e) => {
+        const value = e.target.value;
+        setInputValue(value);
+        setIsDropdownOpen(value.length > 0);
+        setFormData(prev => ({ ...prev, toUserId: value }));
+    };
+
+    console.log("Selected user:", formData);
+    const handleOptionClick = (username, userId) => {
+        setInputValue(username);
+        setFormData(prev => ({ ...prev, toUserId: userId }));
+        setIsDropdownOpen(false);
+    };
+
+    const handleClickOutside = (e) => {
+        if (dropdownRef.current && !dropdownRef.current.contains(e.target)) {
+            setIsDropdownOpen(false);
+        }
+    };
+
+    useEffect(() => {
+        document.addEventListener("mousedown", handleClickOutside);
+        return () => {
+            document.removeEventListener("mousedown", handleClickOutside);
+        };
+    }, []);
+
+    const filteredUsers = users?.data?.filter(user =>
+        user.username.toLowerCase().includes(inputValue.toLowerCase())
+    );
 
     const headers = [
         { key: 'id', label: 'ID' },
         { key: 'userName', label: 'UserName' },
         { key: 'balanceType', label: 'Balance Type' },
         { key: 'balance', label: 'Balance' },
-        { key: 'creditType', label: 'Credit Type' },
-        { key: 'creditDate', label: 'Credit Date' },
+        { key: 'currentDate', label: 'Current Date' },
+        { key: 'creditNote', label: 'Credit Note' },
     ]
 
     const dummyData = [
         {
             id: 1,
             userName: "john_doe",
-            balanceType: "Savings",
+            balanceType: "Debit",
             balance: 1500.75,
-            creditType: "Salary",
-            creditDate: "2025-04-28",
+            creditNote: "WAV",
+            currentDate: "2025-04-28",
         },
         {
             id: 2,
             userName: "jane_smith",
-            balanceType: "Checking",
+            balanceType: "Debit",
             balance: 234.50,
-            creditType: "Refund",
-            creditDate: "2025-05-01",
+            creditNote: "WAVDP",
+            currentDate: "2025-05-01",
         },
         {
             id: 3,
             userName: "michael_lee",
-            balanceType: "Savings",
+            balanceType: "Credit",
             balance: 9876.00,
-            creditType: "Bonus",
-            creditDate: "2025-04-15",
+            creditNote: "WAP",
+            currentDate: "2025-04-15",
         },
         {
             id: 4,
             userName: "emily_watson",
-            balanceType: "Investment",
+            balanceType: "Credit",
             balance: 15000.00,
-            creditType: "Dividend",
-            creditDate: "2025-03-30",
+            creditNote: "WAVDP",
+            currentDate: "2025-03-30",
         },
         {
             id: 5,
             userName: "david_clark",
-            balanceType: "Checking",
+            balanceType: "Debit",
             balance: 512.35,
-            creditType: "Transfer",
-            creditDate: "2025-05-05",
+            creditNote: "WAVBT",
+            currentDate: "2025-05-05",
         },
     ];
 
     useEffect(() => {
         dispatch(getAllUsers())
     }, [dispatch])
-
-    console.log("Data found", users?.data);
 
     // Simulating user data fetching from localStorage
     useEffect(() => {
@@ -216,7 +247,14 @@ function ManageCredit({ isOpen }) {
     // Handle form submission
     const handleSubmit = async (e) => {
         e.preventDefault();
-
+        if (!formData.toUserId || !formData.creditAmount || !formData.creditDebit) {
+            toast.error("Please fill in all required fields", {
+                position: "top-right",
+                autoClose: 3000,
+                theme: "dark",
+            });
+            return;
+        }
         try {
             let payload, response;
 
@@ -226,6 +264,7 @@ function ManageCredit({ isOpen }) {
                     toUserId: formData?.toUserId,
                     creditDebit: formData?.creditDebit,
                     creditAmount: parseInt(formData?.creditAmount),
+                    currentDate: getISTDateFormatted(),
                     selectedCampaign: formData?.selectedCampaign,
                 };
 
@@ -236,6 +275,7 @@ function ManageCredit({ isOpen }) {
                     toUserId: formData?.toUserId,
                     creditDebit: formData?.creditDebit,
                     creditAmount: parseInt(formData?.creditAmount),
+                    currentDate: getISTDateFormatted(),
                     selectedCampaign: formData?.selectedCampaign,
                 };
 
@@ -259,6 +299,7 @@ function ManageCredit({ isOpen }) {
                     toUserId: "",
                     creditDebit: "",
                     creditAmount: "",
+                    currentDate: getISTDateFormatted(),
                     selectedCampaign: "",
                 });
             } else {
@@ -298,8 +339,8 @@ function ManageCredit({ isOpen }) {
             <td className="px-4 py-2 border border-gray-700">{item.userName}</td>
             <td className="px-4 py-2 border border-gray-700">{item.balanceType}</td>
             <td className="px-4 py-2 border border-gray-700">${item.balance.toFixed(2)}</td>
-            <td className="px-4 py-2 border border-gray-700">{item.creditType}</td>
-            <td className="px-4 py-2 border border-gray-700">{new Date(item.creditDate).toLocaleDateString('en-GB')}</td>
+            <td className="px-4 py-2 border border-gray-700">{new Date(item.currentDate).toLocaleDateString('en-GB')}</td>
+            <td className="px-4 py-2 border border-gray-700">{item.creditNote}</td>
         </tr>
     );
 
@@ -361,16 +402,14 @@ function ManageCredit({ isOpen }) {
                                                 onChange={handleInputChange}
                                                 placeholder="Select Username"
                                                 className="border border-black w-full p-1.5 pl-3 rounded"
-                                                onFocus={() => setIsDropdownOpen(true)} // Open dropdown on focus
-                                                onBlur={() => setIsDropdownOpen(false)} // Close dropdown on blur
                                             />
                                             {isDropdownOpen && filteredUsers.length > 0 && (
-                                                <ul className="absolute z-50 w-full bg-white border border-gray-300 rounded shadow-lg max-h-60 overflow-auto">
+                                                <ul className="absolute z-40 w-full bg-white border border-gray-300 rounded shadow-lg max-h-60 overflow-auto custom-horizontal-scroll">
                                                     {filteredUsers.map((user) => (
                                                         <li
                                                             key={user._id}
-                                                            onClick={() => handleOptionClick(user.username, user._id)}
-                                                            className="p-2 hover:bg-gray-200 cursor-pointer"
+                                                            onMouseDown={() => handleOptionClick(user.username, user._id)}
+                                                            className="py-2 -ml-8 px-3 hover:bg-gray-300 cursor-pointer"
                                                         >
                                                             {user.username}
                                                         </li>
