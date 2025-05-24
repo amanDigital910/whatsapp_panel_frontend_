@@ -43,14 +43,6 @@ const TemplateCampaign = ({ isOpen }) => {
     pdf: null,
     video: null,
   });
-  const [uploadedURLs, setUploadedURLs] = useState({
-    image1: null,
-    image2: null,
-    image3: null,
-    image4: null,
-    pdf: null,
-    video: null,
-  });
 
   // New state for media captions.
   const [mediaCaptions, setMediaCaptions] = useState({
@@ -139,12 +131,20 @@ const TemplateCampaign = ({ isOpen }) => {
   };
 
   const handleConfirmDelete = (userId) => {
-    dispatch(deleteTemplate(userId)); // redux action
-    setShowDeleteModal(false);
-    setSelectedUser(null);
-    dispatch(getAllTemplates());
-    if (userId) {
-      toast.success("Template Deleted Successfully")
+    try {
+      const response = dispatch(deleteTemplate(userId)); // redux action
+      if (response) {
+        toast.success("Template deleted successfully!");
+        dispatch(getAllTemplates());
+      } else {
+        toast.error(response?.message || "Failed to delete template.");
+      }
+    } catch (error) {
+      console.error("Delete failed:", error);
+      toast.error("Something went wrong while deleting the template.");
+    } finally {
+      setShowDeleteModal(false);
+      setSelectedUser(null);
     }
   };
 
@@ -229,51 +229,94 @@ const TemplateCampaign = ({ isOpen }) => {
   // Handle file uploads for images, PDF, and video.
   const handleFileUpload = (e, type) => {
     const files = e.target.files;
-    if (!files.length) {
+    if (!files || !files.length) {
       console.warn("No file selected");
       return;
     }
+
     const file = files[0];
 
+    if (!(file instanceof Blob)) {
+      console.error("Invalid file type");
+      return;
+    }
+
+    // IMAGE
     if (type.startsWith("image")) {
       const validImageTypes = ["image/jpeg", "image/png", "image/gif"];
       if (!validImageTypes.includes(file.type)) {
         alert("Invalid file type. Please select a valid image (JPEG, PNG, or GIF).");
         return;
       }
+
       const maxSizeInMB = 2;
       if (file.size > maxSizeInMB * 1024 * 1024) {
         alert("File size exceeds 2MB. Please select a smaller image.");
         return;
       }
+
       const preview = URL.createObjectURL(file);
-      setUploadedFiles((prev) => ({ ...prev, [type]: { file, preview } }));
-    } else if (type === "pdf") {
-      if (file.type !== "application/pdf") {
+      setUploadedFiles((prev) => ({
+        ...prev,
+        [type]: { file, preview, filename: file.name },
+      }));
+    }
+
+    // PDF
+    else if (type === "pdf") {
+      const file = e.target.files?.[0];
+
+      if (!file) {
+        alert("No PDF file selected.");
+        return;
+      }
+
+      const isPdf =
+        file.type === "application/pdf" || file.name.toLowerCase().endsWith(".pdf");
+
+      if (!isPdf) {
         alert("Invalid file type. Please select a PDF file.");
         return;
       }
+
       const maxPdfSizeInMB = 10;
       if (file.size > maxPdfSizeInMB * 1024 * 1024) {
-        alert("File size exceeds 10MB. Please select a smaller PDF.");
+        alert("PDF file size exceeds 10MB.");
         return;
       }
-      setUploadedFiles((prev) => ({ ...prev, pdf: file }));
+
+      try {
+        const preview = URL.createObjectURL(file);
+
+        setUploadedFiles((prev) => ({
+          ...prev,
+          pdf: { file, preview, filename: file.name },
+        }));
+      } catch (error) {
+        console.error("Failed to create preview for PDF:", error);
+        alert("Unable to preview this PDF. Please try a different file.");
+      }
     } else if (type === "video") {
       const validVideoTypes = ["video/mp4"];
       if (!validVideoTypes.includes(file.type)) {
         alert("Invalid file type. Please select a valid video (MP4).");
         return;
       }
+
       const maxVideoSizeInMB = 15;
       if (file.size > maxVideoSizeInMB * 1024 * 1024) {
         alert("File size exceeds 15MB. Please select a smaller video.");
         return;
       }
+
       const preview = URL.createObjectURL(file);
-      setUploadedFiles((prev) => ({ ...prev, video: { file, preview } }));
+      setUploadedFiles((prev) => ({
+        ...prev,
+        video: { file, preview, filename: file.name },
+      }));
     }
   };
+
 
   const removeFile = (type) => {
     setUploadedFiles((prev) => ({ ...prev, [type]: null }));
@@ -295,84 +338,70 @@ const TemplateCampaign = ({ isOpen }) => {
     }
 
     const formData = new FormData();
+    console.log("Forma Data Every Click", formData);
 
     // Append basic text fields
     formData.append("name", templateName);
     formData.append("message[text]", templateMsg);
 
-    // Append images (with url, caption, filename)
-    // const imageKeys = ["image1", "image2", "image3", "image4"];
-    // imageKeys.forEach((key, index) => {
-    //   const file = uploadedFiles[key]; // Get the file for the current key
-    //   if (file) {
-    //     formData.append(`images[${index}][url]`, file); // Ensure this is a string
-    //     formData.append(`images[${index}][caption]`, mediaCaptions[index] || ""); // Use caption or empty string
-    //     formData.append(`images[${index}][filename]`, file.name); // Add filename
-    //   }
-    // });
-    // Append image1
-    if (uploadedFiles.image1) {
-      formData.append(`images[0][url]`, uploadedFiles.image1); // Ensure this is a string
-      formData.append(`images[0][caption]`, mediaCaptions.image1 || ""); // Use caption or empty string
-      formData.append(`images[0][filename]`, uploadedFiles.image1); // Add filename
-    }
+    ["image1", "image2", "image3", "image4"].forEach((key, index) => {
+      const media = uploadedFiles[key];
+      console.log("media.file", media);
 
-    // Append image2
-    if (uploadedFiles.image2) {
-      formData.append(`images[1][url]`, uploadedFiles.image2.url); // Ensure this is a string
-      formData.append(`images[1][caption]`, mediaCaptions.image2 || ""); // Use caption or empty string
-      formData.append(`images[1][filename]`, uploadedFiles.image2); // Add filename
-    }
+      if (media?.file && mediaCaptions[key]) {
+        formData.append(`images[${index}][url]`, media);
+        formData.append(`images[${index}][caption]`, mediaCaptions[key] || "");
+        formData.append(`images[${index}][filename]`, media.file.name);
+      }
+    });
 
-    // Append image3
-    if (uploadedFiles.image3) {
-      formData.append(`images[2][url]`, uploadedFiles.image3.url); // Ensure this is a string
-      formData.append(`images[2][caption]`, mediaCaptions.image3 || ""); // Use caption or empty string
-      formData.append(`images[2][filename]`, uploadedFiles.image3.filename); // Add filename
-    }
-
-    // Append image4
-    if (uploadedFiles.image4) {
-      formData.append(`images[3][url]`, uploadedFiles.image4.url); // Ensure this is a string
-      formData.append(`images[3][caption]`, mediaCaptions.image4 || ""); // Use caption or empty string
-      formData.append(`images[3][filename]`, uploadedFiles.image4.filename); // Add filename
-    }
-
-    // Append video
-    if (uploadedFiles.video?.file) {
-      formData.append("video[url]", uploadedFiles.video.url);
+    // Video
+    if (uploadedFiles.video?.file && mediaCaptions.video) {
+      formData.append("video[url]", uploadedFiles.video.file);
       formData.append("video[caption]", mediaCaptions.video || "");
-      formData.append("video[filename]", uploadedFiles.video.file.filename); // Add filename
+      formData.append("video[filename]", uploadedFiles.video.file.name);
     }
 
-    // Append PDF
-    if (uploadedFiles.pdf?.file) {
+    // PDF
+    if (uploadedFiles.pdf?.file && mediaCaptions.pdf) {
       formData.append("pdf[url]", uploadedFiles.pdf.file);
       formData.append("pdf[caption]", mediaCaptions.pdf || "");
-      formData.append("pdf[filename]", uploadedFiles.pdf.file.name); // Add filename
+      formData.append("pdf[filename]", uploadedFiles.pdf.file.name);
     }
 
+
     try {
-      const response = await dispatch(createTemplate(formData));
+      let response;
+      if (editingId) {
+        response = await dispatch(updateTemplate(editingId, formData));
+      } else {
+        response = await dispatch(createTemplate(formData));
+      }
 
       if (response?.ok) {
-        toast.success("Template created successfully!");
-
-        // setFormData({ _id: "", name: "", templateMessage: "" });
+        toast.success(editingId ? "Template updated successfully!" : "Template created successfully!");
         setTemplateName("");
         setTemplateMsg("");
         setUploadedFiles({
-          image1: null, image2: null, image3: null, image4: null,
-          pdf: null, video: null,
+          image1: null,
+          image2: null,
+          image3: null,
+          image4: null,
+          pdf: null,
+          video: null,
         });
         setMediaCaptions({
-          image1: "", image2: "", image3: "", image4: "",
-          pdf: "", video: "",
+          image1: "",
+          image2: "",
+          image3: "",
+          image4: "",
+          pdf: "",
+          video: "",
         });
         setEditingId(null);
         dispatch(getAllTemplates());
       } else {
-        toast.error(response?.message || "Failed to create template.");
+        toast.error(response?.message || (editingId ? "Failed to update template." : "Failed to create template."));
       }
     } catch (error) {
       console.error("Error saving template:", error);
@@ -529,7 +558,7 @@ const TemplateCampaign = ({ isOpen }) => {
                 <button type="button" className="btn-close" onClick={handleCancelDelete} aria-label="Close"></button>
               </div>
               <div className="modal-body m-0">
-                <p className="m-0">Are you sure you want to delete user <strong>{selectedUser.name}</strong>?</p>
+                <p className="m-0">Confirm Delete: <strong>{selectedUser.name}</strong>?</p>
               </div>
               <div className="modal-footer">
                 <div className="modal-footer">
