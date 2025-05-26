@@ -34,6 +34,31 @@ function AddNewUser() {
         "International Virtual",
     ];
 
+    const userControlsOptions = [
+        "Create Users",
+        "Update Users",
+        "Delete Users",
+        "View All Users",
+        "Manage Admins",
+        "Manage Resellers",
+        "Manage Users",
+        "View Analytics",
+        "Manage Settings",
+        "Manage Pricing Plans",
+        "View System Stats",
+        "Manage All Campaigns",
+        "Manage All Reports",
+        "Manage All Groups",
+        "Manage All Templates",
+        "Manage All Credits",
+        "Manage All APIKeys",
+        "Unlimited Credits"
+    ];
+
+    const data = getSecureItem("userData");
+    console.log(JSON.parse(data));
+
+
     const roleKeyMap = {
         Virtual: "virtual",
         Personal: "personal",
@@ -276,30 +301,62 @@ function AddNewUser() {
                                     )}
                                 </select>
                             </div>
-                            <div className="mb-4">
-                                <label className="text-lg font-medium text-black">User Permissions</label>
-                                <div className="mt-1 block border-2 border-black rounded-md p-2 overflow-auto max-h-40">
-                                    {userRolesOptions.map((role, index) => (
-                                        <div key={index} className="flex items-center mb-1">
-                                            <input
-                                                type="checkbox"
-                                                className="form-check-input mr-2 mt-0 border-black border-2"
-                                                id={`permission-${index}`}
-                                                value={role}
-                                                checked={formData.selectedRoles.includes(role)}
-                                                onChange={() => handleCheckboxChange(role)}
-                                            />
-                                            <label
-                                                className="form-check-label pt-0.5"
-                                                htmlFor={`permission-${index}`}
-                                            >
-                                                {role}
-                                            </label>
+                            <div className="flex  gap-2 w-full h-full">
+                                {/* User Permissions Section */}
+                                <div className="flex gap-4 w-full md:flex-col">
+                                    {/* User Permissions */}
+                                    <div className="flex flex-col w-fit md:w-full h-fit md:min-h-fit min-h-full">
+                                        <label className="text-lg font-medium text-black mb-1">User Permissions</label>
+                                        <div className="flex-1 border-2 border-black rounded-md p-2 gap-1 h-fit">
+                                            {userRolesOptions.map((role, index) => (
+                                                <div key={index} className="flex items-center">
+                                                    <input
+                                                        type="checkbox"
+                                                        className="form-check-input mr-2 mt-0 border-black border-2"
+                                                        id={`role-permission-${index}`}
+                                                        value={role}
+                                                        checked={formData.selectedRoles.includes(role)}
+                                                        onChange={() => handleCheckboxChange(role)}
+                                                    />
+                                                    <label
+                                                        className="form-check-label pt-0.5"
+                                                        htmlFor={`role-permission-${index}`}
+                                                    >
+                                                        {role}
+                                                    </label>
+                                                </div>
+                                            ))}
                                         </div>
-                                    ))}
+                                    </div>
+
+                                    {/* Controls Section */}
+                                    <div className="flex-1 h-full flex flex-col mb-4">
+                                        <label className="text-lg font-medium text-black">Controls</label>
+                                        <div className="mt-1 flex-1 border-2 border-black rounded-md p-2 overflow-auto grid smm:lg:grid-cols-1 lg:grid-cols-2 grid-cols-3 gap-x-4">
+                                            {userControlsOptions.map((role, index) => (
+                                                <div key={index} className="flex items-center">
+                                                    <input
+                                                        type="checkbox"
+                                                        className="form-check-input mr-2 mt-0 border-black border-2"
+                                                        id={`control-permission-${index}`}
+                                                        value={role}
+                                                        checked={formData.selectedRoles.includes(role)}
+                                                        onChange={() => handleCheckboxChange(role)}
+                                                    />
+                                                    <label
+                                                        className="form-check-label pt-0.5 whitespace-nowrap"
+                                                        htmlFor={`control-permission-${index}`}
+                                                    >
+                                                        {role}
+                                                    </label>
+                                                </div>
+                                            ))}
+                                        </div>
+                                    </div>
                                 </div>
                             </div>
-                            <button type="submit" className="w-full bg-blue-500 text-white font-semibold py-2 rounded-md hover:bg-blue-600">
+
+                            <button type="submit" className="w-full mt-4 bg-blue-500 text-white font-semibold py-2 rounded-md hover:bg-blue-600">
                                 {formData.userid ? "Update User" : "Create User"}
                             </button>
                         </form>

@@ -7,6 +7,7 @@ import CreditHeader from "../../components/CreditHeader";
 import { CampaignHeading, CampaignTitle, CopyToClipboard, CustomizeTable, DownloadCSVButton, DownloadPDFButton, PdfUploader, VideoUploader } from "../utils/Index";
 import ImageUploaderGroup from "../utils/ImageUploaderGroup";
 import useIsMobile from "../../hooks/useMobileSize";
+import 'react-toastify/dist/ReactToastify.css';
 
 const GroupCampaign = ({ isOpen }) => {
   const [groupName, setGroupName] = useState("");

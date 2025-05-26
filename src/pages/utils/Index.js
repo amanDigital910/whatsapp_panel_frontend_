@@ -573,6 +573,7 @@ export const ImagesUploader = ({ type, index, inputRef, uploadedFile, onFileUplo
                 <div className="flex md:flex-col w-full">
                     <button
                         className="bg-[#23a31af5] text-white py-2 px-4 md:rounded-t-md md:rounded-br-none md:rounded-bl-none rounded-l-md flex  "
+                        type="button"
                         onClick={() => inputRef.current.click()}
                     >
                         Image {index + 1}

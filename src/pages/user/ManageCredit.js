@@ -21,7 +21,8 @@ function ManageCredit({ isOpen }) {
     const [currentPage, setCurrentPage] = useState(1);
     const [sortConfig, setSortConfig] = useState({ key: '', direction: 'asc' });
     const [searchTerm, setSearchTerm] = useState('');
-    const { loading, users, error } = useSelector((state) => state.userCreate);
+
+    const { userList, transactionsLogs, loading, error } = useSelector((state) => state.creditsTransaction);
 
     const isMobile = useIsMobile();
     const dispatch = useDispatch();
@@ -73,7 +74,6 @@ function ManageCredit({ isOpen }) {
         setFormData(prev => ({ ...prev, toUserId: value }));
     };
 
-    console.log("Selected user:", formData);
     const handleOptionClick = (username, userId) => {
         setInputValue(username);
         setFormData(prev => ({ ...prev, toUserId: userId }));
@@ -93,7 +93,7 @@ function ManageCredit({ isOpen }) {
         };
     }, []);
 
-    const filteredUsers = users?.data?.filter(user =>
+    const filteredUsers = userList?.data?.filter(user =>
         user.username.toLowerCase().includes(inputValue.toLowerCase())
     );
 
@@ -102,6 +102,7 @@ function ManageCredit({ isOpen }) {
         { key: 'userName', label: 'UserName' },
         { key: 'balanceType', label: 'Balance Type' },
         { key: 'balance', label: 'Balance' },
+        { key: 'availableBalance', label: 'Available Balance' },
         { key: 'currentDate', label: 'Current Date' },
         { key: 'creditNote', label: 'Credit Note' },
     ]
@@ -112,6 +113,7 @@ function ManageCredit({ isOpen }) {
             userName: "john_doe",
             balanceType: "Debit",
             balance: 1500.75,
+            availableBalance: 1500.75,
             creditNote: "WAV",
             currentDate: "2025-04-28",
         },
@@ -120,6 +122,7 @@ function ManageCredit({ isOpen }) {
             userName: "jane_smith",
             balanceType: "Debit",
             balance: 234.50,
+            availableBalance: 234.50,
             creditNote: "WAVDP",
             currentDate: "2025-05-01",
         },
@@ -128,6 +131,7 @@ function ManageCredit({ isOpen }) {
             userName: "michael_lee",
             balanceType: "Credit",
             balance: 9876.00,
+            availableBalance: 9876.00,
             creditNote: "WAP",
             currentDate: "2025-04-15",
         },
@@ -136,6 +140,7 @@ function ManageCredit({ isOpen }) {
             userName: "emily_watson",
             balanceType: "Credit",
             balance: 15000.00,
+            availableBalance: 15000.00,
             creditNote: "WAVDP",
             currentDate: "2025-03-30",
         },
@@ -144,6 +149,7 @@ function ManageCredit({ isOpen }) {
             userName: "david_clark",
             balanceType: "Debit",
             balance: 512.35,
+            availableBalance: 512.35,
             creditNote: "WAVBT",
             currentDate: "2025-05-05",
         },
@@ -166,78 +172,6 @@ function ManageCredit({ isOpen }) {
         }
     }, []);
 
-    // Fetch users based on parentuser_id
-    const fetchUsers = async (userid) => {
-        try {
-            const response = await axios.get(
-                `${process.env.REACT_APP_API_URL}/auth/parentuser/${userid}`
-            );
-            if (response.status === 200) {
-                setUsersList(response.data.data);
-            } else {
-                toast.error("Failed to fetch users!", {
-                    position: "top-right",
-                    autoClose: 3000,
-                    theme: "dark",
-                });
-            }
-        } catch (error) {
-            console.error("Error fetching users:", error);
-            toast.error("Error fetching users. Please try again.", {
-                position: "top-right",
-                autoClose: 3000,
-                theme: "dark",
-            });
-        }
-    };
-
-    const fetchTransactionLogs = async (userId) => {
-        try {
-            const response = await axios.get(
-                `${process.env.REACT_APP_API_URL}/transfer/transactions/log/${userId}`
-            );
-            if (response.status === 200) {
-                setTransactionLogs(response.data.data);
-            } else {
-                toast.error("Failed to fetch transaction logs!", {
-                    position: "top-right",
-                    autoClose: 3000,
-                    theme: "dark",
-                });
-            }
-        } catch (error) {
-            console.error("Error fetching transaction logs:", error);
-            toast.error("Error fetching transaction logs. Please try again.", {
-                position: "top-right",
-                autoClose: 3000,
-                theme: "dark",
-            });
-        }
-    };
-
-    // Fetch categories
-    const fetchCategories = async () => {
-        try {
-            const response = await axios.get(`${process.env.REACT_APP_API_URL}/transfer/category`);
-            if (response.status === 200) {
-                setCategories(response.data.data);
-            } else {
-                toast.error("Failed to fetch categories!", {
-                    position: "top-right",
-                    autoClose: 3000,
-                    theme: "dark",
-                });
-            }
-        } catch (error) {
-            console.error("Error fetching categories:", error);
-            toast.error("Error fetching categories. Please try again.", {
-                position: "top-right",
-                autoClose: 3000,
-                theme: "dark",
-            });
-        }
-    };
-
     // Handle form data change
     const handleChange = (e) => {
         const { name, value } = e.target;
@@ -257,6 +191,7 @@ function ManageCredit({ isOpen }) {
         }
         try {
             let payload, response;
+            console.log("Selected user:", formData);
 
             // Prepare the payload based on Credit or Debit
             if (formData?.creditDebit === "Credit") {
@@ -338,7 +273,8 @@ function ManageCredit({ isOpen }) {
             <td className="px-4 py-2 border border-gray-700">{item.id}</td>
             <td className="px-4 py-2 border border-gray-700">{item.userName}</td>
             <td className="px-4 py-2 border border-gray-700">{item.balanceType}</td>
-            <td className="px-4 py-2 border border-gray-700">${item.balance.toFixed(2)}</td>
+            <td className="px-4 py-2 border border-gray-700">₹ {item.balance.toFixed(2)}</td>
+            <td className="px-4 py-2 border border-gray-700">₹ {item.availableBalance.toFixed(2)}</td>
             <td className="px-4 py-2 border border-gray-700">{new Date(item.currentDate).toLocaleDateString('en-GB')}</td>
             <td className="px-4 py-2 border border-gray-700">{item.creditNote}</td>
         </tr>
@@ -347,7 +283,7 @@ function ManageCredit({ isOpen }) {
     const filteredAndSortedLogs = useMemo(() => {
         const term = searchTerm.toLowerCase().trim();
 
-        const filtered = dummyData.filter(data => {
+        const filtered = (dummyData || transactionsLogs).filter(data => {
             const userMatch = data?.userName?.toLowerCase().includes(term);
             return userMatch;
         });
@@ -442,7 +378,7 @@ function ManageCredit({ isOpen }) {
                                                 onChange={handleChange}
                                                 className="form-select border border-black w-full"
                                             >
-                                                <option value="" disabled>Select</option>
+                                                <option value="" disabled>Select Transaction</option>
                                                 <option value="Credit">Credit</option>
                                                 <option value="Debit">Debit</option>
                                             </select>
@@ -492,9 +428,31 @@ function ManageCredit({ isOpen }) {
                             </div>
 
                             {/* Table Section */}
-                            <div className={`min-w-max py-3`}>
+                            {loading ? (
+                                <div className="text-center my-4">
+                                    <div className="spinner-border text-dark" role="status">
+                                        <span className="visually-hidden">Loading...</span>
+                                    </div>
+                                </div>
+                            ) : error ? (
+                                <div className="text-center text-red-600 my-4 font-semibold">
+                                    {error}
+                                </div>) : <div className={`min-w-max py-3`}>
                                 <div className={`w-full bg-gray-300 flex-shrink-0 overflow-auto custom-horizontal-scroll select-text h-full ${!isMobile ? (isOpen ? "max-w-[calc(100vw-50px)]" : "max-w-[calc(100vw-65px)]") : "max-w-[calc(100vw-64px)]"}`}>
-                                    {/* <table className="min-w-full text-sm">
+                                    <CustomizeTable
+                                        headers={headers}
+                                        data={filteredAndSortedLogs}
+                                        sortConfig={sortConfig}
+                                        onSort={handleSort}
+                                        emptyMessage='No Credits Available'
+                                        renderRow={renderRow}
+                                        className="table-auto border-collapse"
+                                        theadClassName="bg-gray-800"
+                                    />
+                                </div>
+                            </div>
+                            }
+                            {/* <table className="min-w-full text-sm">
                                     <thead className="bg-gray-100 sticky top-0 z-10 ">
                                         <tr>
                                             {headers.map(({ label, key }) => (
@@ -538,18 +496,6 @@ function ManageCredit({ isOpen }) {
                                     </tbody>
                                 </table> */}
 
-                                    <CustomizeTable
-                                        headers={headers}
-                                        data={filteredAndSortedLogs}
-                                        sortConfig={sortConfig}
-                                        onSort={handleSort}
-                                        emptyMessage='No Credits Available'
-                                        renderRow={renderRow}
-                                        className="table-auto border-collapse"
-                                        theadClassName="bg-gray-800"
-                                    />
-                                </div>
-                            </div>
                             {/* Pagination Controls */}
                             <div className="d-flex justify-content-end align-items-center gap-3">
                                 <button className="btn btn-dark" onClick={handlePrevious} disabled={currentPage === 1}>

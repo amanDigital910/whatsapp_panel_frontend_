@@ -22,6 +22,9 @@ const TemplateCampaign = ({ isOpen }) => {
   const dispatch = useDispatch();
   const isMobile = useIsMobile();
 
+  console.log("Templates", templatesData);
+
+
   // const [isModalOpen, setIsModalOpen] = useState(false);
   const [showDeleteModal, setShowDeleteModal] = useState(false);
   const [selectedUser, setSelectedUser] = useState(null);
@@ -64,7 +67,7 @@ const TemplateCampaign = ({ isOpen }) => {
     video: useRef(null),
   };
 
-  console.log("Templated Data", templatesData);
+
 
   const textareaRef = useRef(null);
 
@@ -83,7 +86,7 @@ const TemplateCampaign = ({ isOpen }) => {
 
         uploadedImages[key] = {
           file: null, // File not re-selectable, just for preview
-          preview: `${process.env.REACT_APP_API_URL}${JSON.parse(img?.url)}`, // your media prefix
+          preview: `${process.env.REACT_APP_API_URL}${img?.url}`, // your media prefix
           filename: img.filename,
         };
         captions[key] = img.caption || "";
@@ -93,7 +96,7 @@ const TemplateCampaign = ({ isOpen }) => {
     if (template.video) {
       uploadedImages.video = {
         file: null,
-        preview: (`${process.env.REACT_APP_API_URL}${JSON.parse(template?.video.url)}`),
+        preview: (`${process.env.REACT_APP_API_URL}${template?.video.url}`),
         filename: template.video.filename,
       };
       captions.video = template.video.caption || "";
@@ -102,7 +105,7 @@ const TemplateCampaign = ({ isOpen }) => {
     if (template.pdf) {
       uploadedImages.pdf = {
         file: null,
-        preview: `${process.env.REACT_APP_API_URL}${JSON.parse(template?.pdf.url)}`,
+        preview: `${process.env.REACT_APP_API_URL}${template?.pdf.url}`,
         filename: template.pdf.filename,
       };
       captions.pdf = template.pdf.caption || "";
@@ -349,7 +352,7 @@ const TemplateCampaign = ({ isOpen }) => {
       console.log("media.file", media);
 
       if (media?.file && mediaCaptions[key]) {
-        formData.append(`images[${index}][url]`, JSON.stringify(media.file));
+        formData.append(`images[${index}][url]`, media);
         formData.append(`images[${index}][caption]`, mediaCaptions[key] || "");
         formData.append(`images[${index}][filename]`, media.file.name);
       }
@@ -358,14 +361,14 @@ const TemplateCampaign = ({ isOpen }) => {
     // Video
     if (uploadedFiles.video?.file) {
       console.log("Upload Videos",uploadedFiles?.video);
-      formData.append("video[url]", JSON.stringify(uploadedFiles.video));
+      formData.append("video[url]", uploadedFiles.video);
       formData.append("video[caption]", mediaCaptions.video || "");
       formData.append("video[filename]", uploadedFiles.video.file.name);
     }
 
     // PDF
     if (uploadedFiles.pdf?.file) {
-      formData.append("pdf[url]", uploadedFiles.pdf.file);
+      formData.append("pdf[url]", uploadedFiles.pdf);
       formData.append("pdf[caption]", mediaCaptions.pdf || "");
       formData.append("pdf[filename]", uploadedFiles.pdf.file.name);
     }

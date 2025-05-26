@@ -164,7 +164,7 @@ const App = () => {
                   {/* Protected routes */}
                   <Route element={<PrivateRoute allowedRoles={[ROLES.SUPER_ADMIN]} />}>
                     {/* Dashboard admin and user */}
-                    <Route path="/admin-dashboard" element={<AdminDashboard />} />
+                    <Route path="/admin-dashboard" element={<AdminDashboard isOpen={isOpen} />} />
                     <Route path='/transitiontable' element={<TransitionCReditUser />} />
                   </Route>
                   <Route element={<PrivateRoute allowedRoles={[ROLES.SUPER_ADMIN, ROLES.ADMIN, ROLES.RESELLER, ROLES.USER]} />}>

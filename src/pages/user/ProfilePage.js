@@ -8,6 +8,7 @@ import profileDemoImg from '../../assets/profile.png';
 import { getSecureItem } from '../utils/SecureLocalStorage';
 import { changeUserPassword, uploadProfilePicture } from '../../redux/actions/authAction';
 import DefaultImage from '../../assets/profile.png';
+import 'react-toastify/dist/ReactToastify.css';
 
 const ProfilePage = () => {
   const dispatch = useDispatch();
