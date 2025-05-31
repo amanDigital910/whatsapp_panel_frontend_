@@ -24,6 +24,14 @@ export const DELETE_USER_REQUEST = "DELETE_USER_REQUEST";
 export const DELETE_USER_SUCCESS = "DELETE_USER_SUCCESS";
 export const DELETE_USER_FAILURE = "DELETE_USER_FAILURE";
 
+export const CHANGE_USER_PASSWORD_REQUEST = 'CHANGE_USER_PASSWORD_REQUEST';
+export const CHANGE_USER_PASSWORD_SUCCESS = 'CHANGE_USER_PASSWORD_SUCCESS';
+export const CHANGE_USER_PASSWORD_FAILURE = 'CHANGE_USER_PASSWORD_FAILURE';
+
+export const UPLOAD_PROFILE_PICTURE_REQUEST = 'UPLOAD_PROFILE_PICTURE_REQUEST';
+export const UPLOAD_PROFILE_PICTURE_SUCCESS = 'UPLOAD_PROFILE_PICTURE_SUCCESS';
+export const UPLOAD_PROFILE_PICTURE_FAILURE = 'UPLOAD_PROFILE_PICTURE_FAILURE';
+
 // Dynamic headers with latest token
 const getAuthHeaders = () => ({
   'Content-Type': 'application/json',
@@ -55,6 +63,7 @@ export const login = (username, password) => async (dispatch) => {
       setSecureItem('userToken', token);
 
       dispatch(loginSuccess(user));
+      return user;
     }
   } catch (error) {
     let errorMessage = 'An unknown error occurred. Please try again.';
@@ -101,10 +110,10 @@ export const createUser = (userData) => async (dispatch) => {
 
     if ([200, 201].includes(response.status)) {
       dispatch({ type: CREATE_USER_SUCCESS, payload: response.data.data });
-      toast.success("User successfully created!");
     }
+    return response?.data;
   } catch (error) {
-    toast.error(error?.response?.data?.message || "Failed to create user");
+    toast.error(error.response?.data?.message || "Failed to create user");
     dispatch({
       type: CREATE_USER_FAILURE,
       payload: error?.response?.data?.message || "Something went wrong",
@@ -124,6 +133,7 @@ export const getAllUsers = () => async (dispatch) => {
     if (response?.status === 200) {
       dispatch({ type: GET_USERS_SUCCESS, payload: response.data });
     }
+    return response.data;
   } catch (error) {
     toast.error(error?.response?.data?.message || "Failed to fetch users");
     dispatch({
@@ -147,6 +157,7 @@ export const updateUser = (userId, updatedData) => async (dispatch) => {
       dispatch({ type: UPDATE_USER_SUCCESS, payload: response.data });
       toast.success("User successfully updated!");
     }
+    return response.data;
   } catch (error) {
     toast.error(error?.response?.data?.message || "Failed to update user");
     dispatch({
@@ -169,11 +180,64 @@ export const deleteUser = (userId) => async (dispatch) => {
       dispatch({ type: DELETE_USER_SUCCESS, payload: userId });
       toast.success("User successfully deleted!");
     }
+    return response.data;
   } catch (error) {
     toast.error(error?.response?.data?.message || "Failed to delete user");
     dispatch({
       type: DELETE_USER_FAILURE,
       payload: error?.response?.data?.message || "Failed to delete user",
+    });
+  }
+};
+
+export const changeUserPassword = (userId, payload) => async (dispatch) => {
+  dispatch({ type: CHANGE_USER_PASSWORD_REQUEST });
+
+  try {
+    const response = await axios.post(
+      `${process.env.REACT_APP_API_URL}/api/auth/admin/change-user-password/${userId}`,
+      { payload },
+      { headers: getAuthHeaders() }
+    );
+
+    if (response?.status === 200) {
+      dispatch({ type: CHANGE_USER_PASSWORD_SUCCESS, payload: response.data.message });
+      toast.success(response.data.message || 'Password changed successfully');
+    }
+    return response?.data?.message;
+  } catch (error) {
+    const errorMessage = error?.response?.data?.message || 'Failed to change user password';
+    toast.error(errorMessage);
+    dispatch({ type: CHANGE_USER_PASSWORD_FAILURE, payload: errorMessage });
+  }
+};
+
+export const uploadProfilePicture = (file) => async (dispatch) => {
+  dispatch({ type: UPLOAD_PROFILE_PICTURE_REQUEST });
+
+  try {
+    const token = getSecureItem('userToken');
+    const formData = new FormData();
+    formData.append('profilePicture', file);
+    console.log(formData);
+    
+
+    const response = await axios.put(`${process.env.REACT_APP_API_URL}/api/auth/profile-picture`, formData, {
+      headers: {
+        'Authorization': `Bearer ${token}`,
+        'Content-Type': 'multipart/form-data',
+      },
+    });
+
+    dispatch({
+      type: UPLOAD_PROFILE_PICTURE_SUCCESS,
+      payload: response.data?.data?.profilePicture, // contains the image path
+    });
+    return response.data?.data?.profilePicture;
+  } catch (error) {
+    dispatch({
+      type: UPLOAD_PROFILE_PICTURE_FAILURE,
+      payload: error.response?.data?.message || 'Failed to upload profile picture',
     });
   }
 };

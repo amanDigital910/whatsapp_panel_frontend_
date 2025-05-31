@@ -268,9 +268,9 @@ const PersonalCampaignScan = ({ isOpen }) => {
           <div className="w-full bg-white rounded mt-2 py-3 px-3">
             <div className="w-full flex justify-between items-center">
               <div className="flex items-center gap-3">
-                                <CopyToClipboard headers={headers} dataLogs={dummyData}/>
-                <DownloadCSVButton />
-                <DownloadPDFButton />
+                <CopyToClipboard headers={headers} data={dummyData} />
+                <DownloadCSVButton headers={headers} dataLogs={dummyData} />
+                <DownloadPDFButton headers={headers} dataLogs={dummyData} />
               </div>
               <div className="d-flex align-items-center sm:w-full">
                 <input

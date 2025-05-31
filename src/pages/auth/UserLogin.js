@@ -8,6 +8,7 @@ import usernameSvgLogo from '../../assets/icons/username-svg-logo.svg';
 import passwordSvgLogo from '../../assets/icons/password-svg-logo.svg';
 import './style.css';
 import { toast } from 'react-toastify';
+import 'react-toastify/dist/ReactToastify.css';
 import { getSecureItem } from '../utils/SecureLocalStorage';
 
 const UserLogin = () => {

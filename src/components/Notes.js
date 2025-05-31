@@ -14,7 +14,7 @@ const Notes = () => {
     <>
       <div className='w-[100%] bg-white py-3 px-4 my-3 rounded-md'>
         <h1 className='text-black text-[25px] mb-2'>Note :-</h1>
-        <ul className='w-[100%] text-red-500 text-[18px] font-semibold list-disc pl-5'>
+        <ul className='w-[100%] text-red-500 text-[18px] font-semibold list-disc whitespace-pre-wrap pl-5'>
           {notes.map((note, index) => (
             <li key={index} className='mb-1'>
               {note}

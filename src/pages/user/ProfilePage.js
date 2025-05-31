@@ -1,225 +1,210 @@
 /* eslint-disable jsx-a11y/img-redundant-alt */
-import React, { useState } from 'react'
-import CreditHeader from '../../components/CreditHeader'
-import profileDemoImg from '../../assets/profile.png'
+import React, { useState, useEffect } from 'react';
+import { useDispatch, useSelector } from 'react-redux';
 import { FaEye, FaEyeSlash } from 'react-icons/fa';
 import { toast } from 'react-toastify';
+import CreditHeader from '../../components/CreditHeader';
+import profileDemoImg from '../../assets/profile.png';
+import { getSecureItem } from '../utils/SecureLocalStorage';
+import { changeUserPassword, uploadProfilePicture } from '../../redux/actions/authAction';
+import DefaultImage from '../../assets/profile.png';
+import 'react-toastify/dist/ReactToastify.css';
 
 const ProfilePage = () => {
+  const dispatch = useDispatch();
+
+  const { user, error } = useSelector((state) => state.passwordChange);
+  const { profileUploadError, uploadedProfilePicture } = useSelector((state) => state.uploadProfilePic);
+
+  const userDetails = JSON.parse(getSecureItem('userData'));
+
+  const [croppedImageUrl, setCroppedImageUrl] = useState(profileDemoImg);
+  const [formData, setFormData] = useState({ currentPassword: '', newPassword: '' });
+  const [showCurrentPassword, setCurrentShowPassword] = useState(false);
   const [showPassword, setShowPassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
 
-  const [croppedImageUrl, setCroppedImageUrl] = useState(profileDemoImg || '');
+  useEffect(() => {
+    if (uploadedProfilePicture) {
+      toast.success('Profile picture uploaded successfully');
+      setCroppedImageUrl(`${process.env.REACT_APP_BASE_URL}${uploadedProfilePicture}`);
+    }
+    if (profileUploadError) {
+      toast.error(profileUploadError);
+    }
+  }, [uploadedProfilePicture, profileUploadError]);
 
   const handleImageChange = (e) => {
     const file = e.target.files[0];
-    if (file) {
-      const reader = new FileReader();
-      reader.onloadend = () => {
-        const img = new Image();
-        img.src = reader.result;
-        img.onload = () => {
-          cropAndResizeImage(img);
-        };
-      };
-      reader.readAsDataURL(file);
-    }
-  };  
+    if (!file) return;
 
-  const cropAndResizeImage = (img) => {
-    // Create a canvas to crop and resize the image
+    const reader = new FileReader();
+    reader.onloadend = () => {
+      const img = new Image();
+      img.src = reader.result;
+      img.onload = () => cropAndResizeImage(img, file);
+    };
+    reader.readAsDataURL(file);
+  };
+
+  const cropAndResizeImage = (img, file) => {
     const canvas = document.createElement('canvas');
     const ctx = canvas.getContext('2d');
-
-    // Define the desired width and height (24x24 in this case)
-    const width = 720; // 24x24 rem based on your Tailwind classes
+    const width = 720;
     const height = 720;
 
-    // Calculate the center of the image to crop it (if it's larger than 24x24)
     const x = (img.width - width) / 2;
     const y = (img.height - height) / 2;
 
-    // Set the canvas size to the crop size
     canvas.width = width;
     canvas.height = height;
 
-    // Draw the image on the canvas with the cropping values
     ctx.drawImage(img, x, y, width, height, 0, 0, width, height);
+    setCroppedImageUrl(canvas.toDataURL());
 
-    // Get the data URL for the cropped and resized image
-    const croppedImageUrl = canvas.toDataURL();
-    setCroppedImageUrl(croppedImageUrl);
+    dispatch(uploadProfilePicture(file));
   };
-
-
-  const [formData, setFormData] = useState({
-    userid: "",
-    username: "",
-    password: "",
-    croppedImageUrl: "",
-  });
 
   const handleChange = (e) => {
     const { name, value } = e.target;
-
     setFormData((prev) => ({ ...prev, [name]: value }));
   };
+  console.log("Data foiund", formData, userDetails, userDetails?.profilePicture);
 
-  const handleSubmit = async (e) => {
+  const handleSubmit = (e) => {
     e.preventDefault();
+    const { password, confirmPassword } = formData;
 
-    if (formData.password !== formData.confirmPassword) {
-      return toast.error("Passwords do not match!");
-    }
+    if (!password) return toast.error('Please enter a new password');
+    if (password.length < 8) return toast.error('Password must be at least 8 characters');
+    if (password !== confirmPassword) return toast.error('Passwords do not match');
 
-    if (!formData.password.length || formData.password.length <= 6 || formData.selectedRoles.length === 0) {
-      return toast.error("Password and User Permissions are required!");
-    }
 
-    // const payload = {
-    //   username: formData.username,
-    //   password: formData.password,
-    //   role: formData.userRole,
-    //   permission: formData.selectedRoles,
-    //   // parentuser_id: user?.userid,
-    //   email: "example11@gmail.com",
-    //   firstName: "Amansingh",
-    //   lastName: "Chauhan",
-    //   mobileNumber: "9234234234",
-    // };
-    try {
-      // Dispatch Redux action to create the user
-      // await dispatch(createUser(payload)); // Wait until it's done
-
-      setFormData({
-        userid: "",
-        username: "",
-        password: "",
-        croppedImageUrl: "",
-      });
-    } catch (error) {
-      // No need for toast here since it's handled in the action
-      console.error("Error dispatching createUser:", error);
-    }
+    dispatch(changeUserPassword(userDetails?.id, formData));
   };
 
   return (
     <div>
       <CreditHeader />
-      <div className='p-4 bg-gray-200'>
-        <div className='w-full min-h-screen h-full py-4 bg-white'>
-          <h2 className='w-full text-2xl font-bold text-center m-0'>Users Profile Page</h2>
-          <form onSubmit={handleSubmit} className="w-full px-10 pt-4">
-            {/* Profile Img Container */}
-            <div className="flex md:flex-col gap-4 w-full mb-4">
-              <div className='md:w-full flex justify-center items-center'>
-                <div className="w-40 h-40 bg-gray-200 flex items-center justify-center p-2 shadow-[0px_5px_15px_rgba(0,0,0,0.35)]">
-                  <img
-                    className="w-full h-full object-cover"
-                    alt="Profile Image"
-                    src={croppedImageUrl || '/default-avatar.png'}
+      <div className="p-4 bg-gray-200">
+        <div className="w-full min-h-screen py-4 bg-white">
+          <h2 className="text-2xl font-bold text-center">User Profile Page</h2>
+          <form onSubmit={handleSubmit} className="px-10 pt-4">
+            <div className="flex md:flex-col gap-4 mb-4">
+              <div className="flex justify-center items-center">
+                <div className="flex justify-center items-center">
+                  <input
+                    type="file"
+                    accept="image/jpeg, image/jpg, image/png"
+                    id="fileInput"
+                    className="hidden"
+                    onChange={handleImageChange}
                   />
+                  <label htmlFor="fileInput" className="cursor-pointer">
+                    <div className="w-40 h-40 bg-gray-200 p-2 shadow-md rounded-md overflow-hidden hover:opacity-90 transition">
+                      <img
+                        className="w-full h-full object-cover"
+                        alt="Profile Picture Image"
+                        src={croppedImageUrl || (userDetails?.profilePicture && userDetails?.profilePicture) || DefaultImage}
+                      />
+                    </div>
+                  </label>
                 </div>
               </div>
-              <div className="flex flex-col gap-4 w-80 md:w-full md:justify-center justify-start ">
-                <input
-                  type="file"
-                  accept="image/jpeg, image/jpg, image/png"
-                  id="fileInput"
-                  className="hidden"
-                  onChange={handleImageChange}
-                />
-                <label
-                  htmlFor="fileInput"
-                  className="w-full py-2 bg-blue-500 text-white rounded-lg font-semibold text-center text-xl cursor-pointer hover:bg-blue-600 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-opacity-50"
-                >
-                  Upload
-                </label>
-                {/* <span className="w-full text-center text-black m-0 border-none text-xl font-semibold px-4 py-2 rounded-md bg-gray-400 cursor-not-allowed">
-                  User Name
-                </span> */}
-              </div>
             </div>
-            <div className="mb-4 ">
-              <label htmlFor="username" className="block text-lg font-medium text-black">
-                Username
-              </label>
+
+            <div className="mb-4">
+              <label htmlFor="username" className="block text-lg font-medium">Username</label>
               <input
                 type="text"
-                className="mt-1 block w-full border-2 text-lg border-black rounded-md p-2"
+                className="mt-1 block w-full border-2 text-lg bg-gray-200 cursor-not-allowed rounded-md p-2"
                 id="username"
                 name="username"
-                placeholder="Ex. (vikram)"
-                value={formData.username}
-                onChange={handleChange}
+                value={userDetails?.username || ''}
                 readOnly
-                required
               />
             </div>
+
             <div className="mb-4">
-              <label htmlFor="password" className="block text-lg font-medium text-black">
-                Password
-              </label>
+              <label htmlFor="password" className="block text-lg font-medium">Current Password</label>
               <div className="relative">
                 <input
-                  type={showPassword ? "text" : "password"}
-                  className="mt-1 block w-full text-lg border-2 border-black rounded-md p-2"
-                  id="password"
-                  name="password"
-                  placeholder="Max 8 Characters Required"
-                  value={formData.password}
+                  type={showCurrentPassword ? 'text' : 'password'}
+                  className="mt-1 block w-full text-lg border-2 rounded-md p-2"
+                  id="currentPassword"
+                  name="currentPassword"
+                  placeholder="Type your current password"
+                  value={formData.currentPassword}
                   onChange={handleChange}
-                  required={!formData.userid} // Required only for new users
+                  minLength={8}
+                  required
                 />
                 <span
-                  className="absolute inset-y-0 right-0 flex text-black z-20 items-center pr-5 w-10 cursor-pointer"
+                  className="absolute inset-y-0 right-0 flex items-center pr-5 cursor-pointer"
+                  onClick={() => setCurrentShowPassword(!showCurrentPassword)}
+                >
+                  {showCurrentPassword ? <FaEyeSlash size={20} /> : <FaEye size={20} />}
+                </span>
+              </div>
+            </div>
+
+            <div className="mb-4">
+              <label htmlFor="password" className="block text-lg font-medium">New Password</label>
+              <div className="relative">
+                <input
+                  type={showPassword ? 'text' : 'password'}
+                  className="mt-1 block w-full text-lg border-2 rounded-md p-2"
+                  id="newPassword"
+                  name="newPassword"
+                  placeholder="Password must be 8 characters or more"
+                  value={formData.newPassword}
+                  onChange={handleChange}
+                  minLength={8}
+                  required
+                />
+                <span
+                  className="absolute inset-y-0 right-0 flex items-center pr-5 cursor-pointer"
                   onClick={() => setShowPassword(!showPassword)}
                 >
                   {showPassword ? <FaEyeSlash size={20} /> : <FaEye size={20} />}
                 </span>
               </div>
-              {formData.userid && (
-                <small className="text-gray-500">
-                  Leave blank to keep the current password.
-                </small>
-              )}
             </div>
+
             <div className="mb-4">
-              <label htmlFor="confirmPassword" className="block text-lg font-medium text-black">
-                Confirm Password
-              </label>
+              <label htmlFor="confirmPassword" className="block text-lg font-medium">Confirm Password</label>
               <div className="relative">
                 <input
-                  type={showConfirmPassword ? "text" : "password"}
-                  className="mt-1 block w-full border-2 text-lg border-black rounded-md p-2"
+                  type={showConfirmPassword ? 'text' : 'password'}
+                  className="mt-1 block w-full text-lg border-2 rounded-md p-2"
                   id="confirmPassword"
                   name="confirmPassword"
-                  placeholder="Write same password as above"
+                  placeholder="Enter Same Password again"
                   value={formData.confirmPassword}
                   onChange={handleChange}
-                  required={!formData.userid} // Required only for new users
+                  minLength={8}
+                  required
                 />
                 <span
-                  className="absolute inset-y-0 right-0 flex text-black z-20 items-center pr-5 w-10 cursor-pointer"
+                  className="absolute inset-y-0 right-0 flex items-center pr-5 cursor-pointer"
                   onClick={() => setShowConfirmPassword(!showConfirmPassword)}
                 >
                   {showConfirmPassword ? <FaEyeSlash size={20} /> : <FaEye size={20} />}
                 </span>
               </div>
-              {formData.userid && (
-                <small className="text-gray-500">
-                  Leave blank to keep the current password.
-                </small>
-              )}
             </div>
-            <button type="submit" className="w-full bg-blue-500 text-white font-semibold py-2 rounded-md hover:bg-blue-600">
-              {formData.userid ? "Update User" : "Submit your Details"}
+
+            <button
+              type="submit"
+              className="w-full bg-blue-500 text-white font-semibold py-2 rounded-md hover:bg-blue-600"
+            >
+              Update Password
             </button>
           </form>
-        </div >
-      </div >
-    </div >
-  )
-}
+        </div>
+      </div>
+    </div>
+  );
+};
 
-export default ProfilePage
+export default ProfilePage;

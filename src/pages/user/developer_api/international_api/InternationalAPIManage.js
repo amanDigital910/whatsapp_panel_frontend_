@@ -155,7 +155,7 @@ const InternationalAPIManage = ({ isOpen }) => {
             <div className="flex gap-3  ">
               <CopyToClipboard headers={headers} dataLogs={data} />
               <DownloadCSVButton headers={headers} dataLogs={data} />
-              <DownloadPDFButton />
+              <DownloadPDFButton headers={headers} dataLogs={data} />
             </div>
             <div className="relative md:w-full  max-w-[300px]">
               <input
@@ -204,7 +204,7 @@ const InternationalAPIManage = ({ isOpen }) => {
               {/* <div style="background-color:#ff9102;padding: 10px; font-weight: bold;"> Response </div> */}
               <p className='text-white font-bold text-xl m-0 p-0'>Response</p>
               <div className='text-white font-bold text-xl m-0 p-0 break-words'>
-                <p className="font-bold m-0 break-words">Array: https://wahbulk.com/api/wintapi?apikey=
+                <p className="font-bold m-0 break-words whitespace-pre-wrap">Array: https://wahbulk.com/api/wintapi?apikey=
                   <HighlightAPIText message={"Key"} />
                   &mobile=
                   <HighlightAPIText message={"MobileNumber"} />
@@ -212,7 +212,7 @@ const InternationalAPIManage = ({ isOpen }) => {
                   <HighlightAPIText message={"TextMessage"} />
                 </p>
               </div>
-              <div className='text-white font-bold text-xl m-0 p-0 break-words'>
+              <div className='text-white font-bold text-xl m-0 p-0 break-words whitespace-pre-wrap'>
                 <p className="font-bold m-0 break-words">Json : https://wahbulk.com/api/wintapi?json=true&apikey=
                   <HighlightAPIText message={"Key"} />
                   &mobile=

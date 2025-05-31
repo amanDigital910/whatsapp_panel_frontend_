@@ -42,13 +42,21 @@ const SideBar = ({ isOpen, toggleDropdown, activeDropdown }) => {
     const sidebarMenu = [
         {
             label: "Admin Dashboard",
-            to: "/admin-dashboard",
-            icon: dashboardIcon
+            // permissionKey: "adminDashboard",
+            icon: dashboardIcon,
+            dropdown: [
+                { label: "Dashboard", to: "/admin-dashboard", },
+                { label: "Create Campaign", to: "/create-campaigns", },
+                { label: "All Campaigns", to: "/all-campaigns", },
+                { label: "All Templates", to: "/all-templates", },
+                { label: "All Groups", to: "/all-groups", },
+            ]
         },
         {
             label: "Transaction Logs",
             to: "/transitiontable",
-            icon: dashboardIcon
+            icon: dashboardIcon,
+            // permissionKey: "transactionLogs"
         },
         {
             label: "Dashboard",
@@ -58,17 +66,18 @@ const SideBar = ({ isOpen, toggleDropdown, activeDropdown }) => {
         {
             label: "Wa Virtual",
             icon: whatsappIcon,
+            permissionKey: "virtual",
             dropdown: [
                 { label: "Quick Campaign", to: "/virtual-quick-csv" },
                 { label: "Button Campaign", to: "/virtual-button" },
                 { label: "DP Campaign", to: "/virtual-dp" },
-                // { label: "CSV Campaign", to: "/user/csvvirtual" },
                 { label: "WhatsApp Report", to: "/virtual-whatsapp-report" }
             ]
         },
         {
             label: "Wa Personal",
             icon: whatsappIcon,
+            permissionKey: "personal",
             dropdown: [
                 { label: "Quick Campaign", to: "/personal-quick-csv" },
                 { label: "Button Campaign", to: "/personal-button" },
@@ -82,9 +91,9 @@ const SideBar = ({ isOpen, toggleDropdown, activeDropdown }) => {
         {
             label: "Wa Int. Virtual",
             icon: world,
+            permissionKey: "internationalVirtual",
             dropdown: [
                 { label: "Quick Campaign", to: "/international-virtual-quick-csv" },
-                // { label: "CSV Campaign", to: "/international-csvcampaign" },
                 { label: "Button Campaign", to: "/international-virtual-button" },
                 { label: "Whatsapp Reports", to: "/international-virtual-whatsapp-report" }
             ]
@@ -92,9 +101,9 @@ const SideBar = ({ isOpen, toggleDropdown, activeDropdown }) => {
         {
             label: "Wa Int. Personal",
             icon: exchange,
+            permissionKey: "internationalPersonal",
             dropdown: [
                 { label: "Quick Campaign", to: "/international-personal-quick-csv" },
-                // { label: "Csv Campaign", to: "/international-personal-csvcampaign" },
                 { label: "Button Campaign", to: "/international-personal-button" },
                 { label: "Poll Campaign", to: "/international-personal-poll" },
                 { label: "Whatsapp Reports", to: "/international-personal-whatsapp-report" },
@@ -102,11 +111,17 @@ const SideBar = ({ isOpen, toggleDropdown, activeDropdown }) => {
             ]
         },
         {
+            label: "Credit History",
+            to: "/credit-history",
+            icon: home
+        },
+        {
             label: "Whatsapp Official",
             icon: whatsappOfficialIcon,
+            permissionKey: "whatsappOfficial",
             dropdown: [
-                { label: "Dashboard ", to: "/whatsapp-dashboard" },
-                { label: "Send Whatsapp ", to: "/whatsapp-send" },
+                { label: "Dashboard", to: "/whatsapp-dashboard" },
+                { label: "Send Whatsapp", to: "/whatsapp-send" },
                 {
                     label: "Reports",
                     subDropdown: [
@@ -143,28 +158,6 @@ const SideBar = ({ isOpen, toggleDropdown, activeDropdown }) => {
             ]
         },
         {
-            label: "Developer API",
-            icon: DeveloperAPI,
-            dropdown: [
-                {
-                    label: "Personal API",
-                    subDropdown: [
-                        { label: "Manage API", to: "/personal/developer-api" },
-                        { label: "Whatsapp Report", to: "/personal/whatsapp-report" }
-                    ]
-
-                },
-                {
-                    label: "International API",
-                    subDropdown: [
-                        { label: "Manage API", to: "/international/developer-api" },
-                        { label: "Whatsapp Report", to: "/international/whatsapp-report" }
-                    ]
-
-                }
-            ]
-        },
-        {
             label: "Template",
             to: "/template",
             icon: templateIcon
@@ -184,14 +177,59 @@ const SideBar = ({ isOpen, toggleDropdown, activeDropdown }) => {
             to: "/manage-user",
             icon: UserIcon
         },
+        {
+            label: "Developer API",
+            icon: DeveloperAPI,
+            // permissionKey: "developerAPI",
+            dropdown: [
+                {
+                    label: "Personal API",
+                    subDropdown: [
+                        { label: "Manage API", to: "/personal/developer-api" },
+                        { label: "Whatsapp Report", to: "/personal/whatsapp-report" }
+                    ]
+
+                },
+                {
+                    label: "International API",
+                    subDropdown: [
+                        { label: "Manage API", to: "/international/developer-api" },
+                        { label: "Whatsapp Report", to: "/international/whatsapp-report" }
+                    ]
+
+                }
+            ]
+        },
     ];
 
     const userRole = JSON.parse(getSecureItem("userData"));
-    
-    const filteredSidebarMenu = sidebarMenu.filter(item => {
-        if (userRole?.role === "admin" || userRole?.role === "super_admin") return true;
-        return item.label !== "Admin Dashboard" && item.label !== "Transaction Logs";
-    });
+    // const userPermissions = Array.isArray(userRole?.permissions) ? userRole.permissions : [];
+
+    function filterMenuItems(menu) {
+        return menu.reduce((acc, item) => {
+            if (
+                (userRole?.role === "user" && ["Manage User", "Manage Credits",].includes(item.label)) ||
+                (!["admin", "super_admin"].includes(userRole?.role) && ["Admin Dashboard", "Transaction Logs"].includes(item.label))
+                // || (item.permissionKey && !userPermissions.includes(item.permissionKey))
+            ) {
+                return acc;
+            }
+
+            const newItem = { ...item };
+            acc.push(newItem);
+            return acc;
+        }, []);
+    }
+    // if (newItem.dropdown) {
+    //     newItem.dropdown = filterMenuItems(newItem.dropdown);
+    // }
+
+    // if (newItem.subDropdown) {
+    //     newItem.subDropdown = filterMenuItems(newItem.subDropdown);
+    // }
+
+
+    const filteredSidebarMenu = filterMenuItems(sidebarMenu);
 
     return (
         <>

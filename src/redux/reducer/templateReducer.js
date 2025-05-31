@@ -1,117 +1,105 @@
-import { createSlice } from '@reduxjs/toolkit';
+import {
+  CREATE_TEMPLATE_SUCCESS,
+  GET_TEMPLATES_SUCCESS,
+  GET_TEMPLATE_BY_ID_SUCCESS,
+  UPDATE_TEMPLATE_SUCCESS,
+  DELETE_TEMPLATE_SUCCESS,
+  TEMPLATE_REQUEST_START,
+  TEMPLATE_REQUEST_FAILURE,
+  FETCH_PENDING_TEMPLATES_SUCCESS,
+  APPROVE_TEMPLATE_SUCCESS,
+  REJECT_TEMPLATE_SUCCESS,
+} from '../actions/templateAction';
 
 const initialState = {
   templatesData: [],
   currentTemplate: null,
   loading: false,
   error: null,
+  pendingTemplates: [],
 };
 
-const templateSlice = createSlice({
-  name: 'template',
-  initialState,
-  reducers: {
-    // Create Template
-    createTemplateStart: (state) => {
-      state.loading = true;
-    },
-    createTemplateSuccess: (state, action) => {
-      state.loading = false;
-      state.templatesData.push(action.payload);
-    },
-    createTemplateFailure: (state, action) => {
-      state.loading = false;
-      state.error = action.payload;
-    },
+export const templateReducer = (state = initialState, action) => {
+  switch (action.type) {
+    case TEMPLATE_REQUEST_START:
+      return { ...state, loading: true, error: null };
 
-    // Get All Templates
-    getTemplatesStart: (state) => {
-      state.loading = true;
-    },
-    getTemplatesSuccess: (state, action) => {
-      state.loading = false;
-      state.templatesData = action.payload;
-    },
-    getTemplatesFailure: (state, action) => {
-      state.loading = false;
-      state.error = action.payload;
-    },
+    case CREATE_TEMPLATE_SUCCESS:
+      return {
+        ...state,
+        loading: false,
+        templatesData: [...state.templatesData, action.payload],
+      };
 
-    // Get Template by ID
-    getTemplateByIdStart: (state) => {
-      state.loading = true;
-    },
-    getTemplateByIdSuccess: (state, action) => {
-      state.loading = false;
-      state.currentTemplate = action.payload;
-    },
-    getTemplateByIdFailure: (state, action) => {
-      state.loading = false;
-      state.error = action.payload;
-    },
+    case GET_TEMPLATES_SUCCESS:
+      return {
+        ...state,
+        loading: false,
+        templatesData: action.payload,
+      };
 
-    // Approve
-    approveTemplateStart: (state) => {
-      state.loading = true;
-    },
-    approveTemplateSuccess: (state, action) => {
-      state.loading = false;
-      // handle approved data
-    },
-    approveTemplateFailure: (state, action) => {
-      state.loading = false;
-      state.error = action.payload;
-    },
+    case GET_TEMPLATE_BY_ID_SUCCESS:
+      return {
+        ...state,
+        loading: false,
+        currentTemplate: action.payload,
+      };
 
-    // Reject
-    rejectTemplateStart: (state) => {
-      state.loading = true;
-    },
-    rejectTemplateSuccess: (state, action) => {
-      state.loading = false;
-      // handle rejected data
-    },
-    rejectTemplateFailure: (state, action) => {
-      state.loading = false;
-      state.error = action.payload;
-    },
-
-    // Delete
-    deleteTemplateStart: (state) => {
-      state.loading = true;
-    },
-    deleteTemplateSuccess: (state, action) => {
-      state.loading = false;
-      state.templatesData = state.templatesData.filter(
-        (template) => template.id !== action.payload.id
+    case UPDATE_TEMPLATE_SUCCESS: {
+      const updatedTemplates = state.templatesData.map((t) =>
+        (t.id || t._id) === (action.payload.id || action.payload._id)
+          ? action.payload
+          : t
       );
-    },
-    deleteTemplateFailure: (state, action) => {
-      state.loading = false;
-      state.error = action.payload;
-    },
-  },
-});
+      return {
+        ...state,
+        loading: false,
+        templatesData: updatedTemplates,
+        currentTemplate:
+          state.currentTemplate &&
+          (state.currentTemplate.id === action.payload.id ||
+            state.currentTemplate._id === action.payload._id)
+            ? action.payload
+            : state.currentTemplate,
+      };
+    }
 
-export const {
-  createTemplateStart,
-  createTemplateSuccess,
-  createTemplateFailure,
-  getTemplatesStart,
-  getTemplatesSuccess,
-  getTemplatesFailure,
-  getTemplateByIdStart,
-  getTemplateByIdSuccess,
-  getTemplateByIdFailure,
-  approveTemplateStart,
-  approveTemplateSuccess,
-  approveTemplateFailure,
-  rejectTemplateStart,
-  rejectTemplateSuccess,
-  rejectTemplateFailure,
-  deleteTemplateStart,
-  deleteTemplateSuccess,
-  deleteTemplateFailure,
-} = templateSlice.actions;
+    case DELETE_TEMPLATE_SUCCESS:
+      return {
+        ...state,
+        loading: false,
+        templatesData: state.templatesData.filter(
+          (t) => (t.id || t._id) !== (action.payload.id || action.payload._id)
+        ),
+      };
 
-export const templateReducer = templateSlice.reducer;
+    case FETCH_PENDING_TEMPLATES_SUCCESS:
+      return {
+        ...state,
+        loading: false,
+        pendingTemplates: action.payload,
+      };
+
+    case APPROVE_TEMPLATE_SUCCESS:
+    case REJECT_TEMPLATE_SUCCESS:
+      return {
+        ...state,
+        loading: false,
+        templatesData: state.templatesData.map((t) =>
+          (t.id || t._id) === (action.payload.id || action.payload._id)
+            ? action.payload
+            : t
+        ),
+      };
+
+    case TEMPLATE_REQUEST_FAILURE:
+      return {
+        ...state,
+        loading: false,
+        error: action.payload,
+      };
+
+    default:
+      return state;
+  }
+};

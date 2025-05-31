@@ -71,7 +71,7 @@ const UserDashboard = () => {
       cardCredit: 0,
       bg: "#25D366",
       redirectUrl: "/personal-channel-create-bulk-sms",
-      charName: 'WPG'
+      charName: 'WPCG'
     },
     {
       id: 9,
@@ -79,7 +79,7 @@ const UserDashboard = () => {
       cardCredit: 0,
       bg: "#25D366",
       redirectUrl: "/personal-poll",
-      charName: 'WPCC'
+      charName: 'WPP'
     },
     {
       id: 10,
@@ -87,7 +87,7 @@ const UserDashboard = () => {
       cardCredit: 0,
       bg: "#7b1111",
       redirectUrl: "/international-virtual-quick-csv",
-      charName: 'WPP'
+      charName: 'WIV'
     },
     {
       id: 11,
@@ -103,7 +103,7 @@ const UserDashboard = () => {
       cardCredit: 0,
       bg: "#52117b",
       redirectUrl: "/international-virtual-button",
-      charName: 'WIVB'
+      charName: 'WIP'
     },
     {
       id: 13,
@@ -151,7 +151,7 @@ const UserDashboard = () => {
                 {/* Card Content */}
                 <div className="flex justify-between items-center h-full w-full gap-4 relative z-10">
                   <div className='w-[82%]' onClick={() => handleCardClick(item.redirectUrl)}>
-                    <h2 className="text-primary font-bold leading-snug text-[16px] transition-colors duration-300 hover:text-blue-500 group-hover:underline underline-offset-4">
+                    <h2 className="text-primary font-bold leading-snug text-[16px] whitespace-pre-wrap transition-colors duration-300 hover:text-blue-500 group-hover:underline underline-offset-4">
                       {item.cardName}
                     </h2>
                     <h3 className="text-primary font-semibold text-lg transition-colors duration-300 hover:text-blue-500">

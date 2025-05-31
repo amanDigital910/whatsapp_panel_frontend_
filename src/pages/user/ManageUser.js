@@ -1,10 +1,9 @@
 import React, { useState, useEffect, useMemo } from "react";
 import CreditHeader from "../../components/CreditHeader";
-import 'react-toastify/dist/ReactToastify.css'; // Import Toastify CSS
-import { ToastContainer } from 'react-toastify'; // Import Toastify
+import 'react-toastify/dist/ReactToastify.css';
 import { useNavigate } from "react-router-dom";
 import { getSecureItem } from "../utils/SecureLocalStorage";
-import { CampaignHeading, CopyToClipboard, CustomizeTable, DownloadCSVButton, DownloadPDFButton } from "../utils/Index";
+import { CopyToClipboard, CustomizeTable, DownloadCSVButton, DownloadPDFButton, RecordsPerPageDropdown } from "../utils/Index";
 import useIsMobile from "../../hooks/useMobileSize";
 import { useDispatch, useSelector } from "react-redux";
 import { deleteUser, getAllUsers, updateUser } from "../../redux/actions/authAction";
@@ -13,20 +12,23 @@ function ManageUser({ isOpen }) {
     const navigate = useNavigate();
     const dispatch = useDispatch();
     const isMobile = useIsMobile();
+    const getUser = getSecureItem("userData");
 
     const { loading, users, error } = useSelector((state) => state.userCreate);
 
     const [filteredUsers, setFilteredUsers] = useState([]);
     // const [searchQuery, setSearchQuery] = useState('');
     const [currentPage, setCurrentPage] = useState(1);
-    const recordsPerPage = 5;
-    const [sortConfig, setSortConfig] = useState({ key: '', direction: 'desc' });
+    const [recordsPerPage, setRecordsPerPage] = useState(25);
+    const [sortConfig, setSortConfig] = useState({ key: 'updatedAt', direction: 'desc' });
     const [searchTerm, setSearchTerm] = useState('');
     const storedData = JSON.parse(getSecureItem("userData"));
 
     const [isModalOpen, setIsModalOpen] = useState(false);
     const [showDeleteModal, setShowDeleteModal] = useState(false);
-    const [selectedUser, setSelectedUser] = useState(null); // For delete confirmation
+    const [selectedUser, setSelectedUser] = useState(null);
+    const [selectedUserEdit, setSelectedUserEdit] = useState(null);
+
     const [formData, setFormData] = useState({
         _id: "",
         username: "",
@@ -65,6 +67,8 @@ function ManageUser({ isOpen }) {
 
         if (formData._id) {
             dispatch(updateUser(formData._id, payload));
+            dispatch(getAllUsers());
+            console.log("Payload Data", payload);
         }
 
         setIsModalOpen(false);
@@ -76,28 +80,39 @@ function ManageUser({ isOpen }) {
         });
     };
 
-    const renderRoleOptions = () => {
-        if (!users) return null;
+    const allRoles = ["super_admin", "admin", "reseller", "user"];
+    const renderRoleOptions = (role) => {
+        if (!role) return null;
 
-        const options = {
+        const roleAccessMap = {
             selectRole: "Select a Role",
             super_admin: ["admin", "reseller", "user"],
-            admin: ["reseller", "user"],
-            reseller: ["user"],
+            admin: ["admin", "reseller", "user"],
+            reseller: ["reseller", "user"],
             user: ["user"],
         };
+        //  admin: ["admin", "reseller", "user"],
+        //     reseller: ["admin", "reseller", "user"],
+        //     user: ["admin", "reseller", "user"]
 
-        const availableRoles = options[users.role || "user"] || [];
+
+        const allowedRoles = roleAccessMap[role] || [];
+
+        const filteredAndSortedRoles = allRoles
+            .filter(r => allowedRoles.includes(r))
+            .sort((a, b) => allowedRoles.indexOf(a) - allowedRoles.indexOf(b));
 
         return [
             <option key="default" value="" disabled>Select a Role</option>,
-            ...availableRoles.map((role) => (
-                <option key={role} value={role}>
-                    {role.charAt(0).toUpperCase() + role.slice(1)}
+            ...filteredAndSortedRoles.map(r => (
+                <option key={r} value={r}>
+                    {r.charAt(0).toUpperCase() + r.slice(1)}
                 </option>
             )),
         ];
     };
+
+    console.log("Data Logged", users);
 
     const handleChange = (e) => {
         const { name, value } = e.target;
@@ -123,7 +138,7 @@ function ManageUser({ isOpen }) {
     // Close form modal
     const closeModal = () => {
         setIsModalOpen(false);
-        setFormData({}); // Reset formData if needed
+        setFormData({});
     };
 
     // Delete confirmation handlers
@@ -141,26 +156,25 @@ function ManageUser({ isOpen }) {
         dispatch(deleteUser(userId)); // redux action
         setShowDeleteModal(false);
         setSelectedUser(null);
+        dispatch(getAllUsers());
     };
 
 
     useEffect(() => {
         dispatch(getAllUsers());
         // console.log("Set Filtered User", filteredUsers);
-    }, [dispatch, users?.data?.length]);
+    }, [dispatch]);
 
     useEffect(() => {
-        if (users?.data?.length) {
-            setFilteredUsers(users.data);
-        }
+        setFilteredUsers(users?.data || []);
     }, [users]);
 
     const headers = [
         { key: '_id', label: 'User ID' },
         { key: 'username', label: 'Username' },
         { key: 'role', label: 'User Role' },
-        { key: 'firstName', label: 'Firstname (usertype)' },
-        { key: 'updatedAt', label: 'Last Login' },
+        { key: 'createdBy._id', label: 'Created By' },
+        { key: 'updatedAt', label: 'Last Updated' },
         { key: 'action', label: 'Action' }
     ];
 
@@ -229,13 +243,22 @@ function ManageUser({ isOpen }) {
 
     const renderRow = (log, index) => (
         <tr key={index} className="text-black border border-gray-700 hover:bg-gray-500 whitespace-nowrap ">
-            <td className="px-2 py-2 border text-[1rem] border-gray-900">{log?._id || '-'}</td>
+            <td className="px-2 py-2 border text-[1rem] border-gray-900 w-20">{log?._id.slice(-5) || '-'}</td>
             <td className="px-2 py-2 border text-[1rem] border-gray-900">{log?.username || '-'}</td>
             <td className="px-2 py-2 border text-[1rem] border-gray-900">{log?.role || '-'}</td>
-            <td className="px-2 py-2 border text-[1rem] border-gray-900">{log?.firstName || '-'}</td>
-            <td className="px-2 py-2 border text-[1rem] border-gray-900">{new Date(log?.createdAt).toLocaleDateString('en-GB')}</td>
+            <td className="px-2 py-2 border text-[1rem] border-gray-900">{log?.createdBy?._id.slice(-5) || '-'}</td>
+            <td className="px-2 py-2 border text-[1rem] border-gray-900">
+                {new Date(log?.updatedAt).toLocaleString('en-GB', {
+                    day: '2-digit',
+                    month: '2-digit',
+                    year: 'numeric',
+                    hour: '2-digit',
+                    minute: '2-digit',
+                    hour12: true,
+                })}
+            </td>
 
-            <td className="px-2 py-2 border border-gray-900 flex justify-center">
+            <td className="px-2 py-2 flex justify-center">
                 <button
                     className="bg-[#ffc107] rounded-md py-1 px-2 text-bas font-medium me-2"
                     onClick={() => {
@@ -246,6 +269,7 @@ function ManageUser({ isOpen }) {
                             permissions: extractSelectedRoles(log.permissions || {}),
                         });
                         setIsModalOpen(true);
+                        setSelectedUserEdit(log);
                     }}
                 >
                     Edit
@@ -262,35 +286,27 @@ function ManageUser({ isOpen }) {
         </tr>
     );
 
-    console.log("All Customers Records", currentRecords, '\n', filteredAndSortedLogs);
-
-
     return (
         <>
             <section className='w-[100%] bg-gray-200 h-full min-h-[calc(100vh-70px)] flex flex-col pb-3 '>
                 <CreditHeader />
                 <div className="w-full mt-8">
-                    <CampaignHeading campaignHeading="Manage User" />
+                    <div className='px-3 w-full'>
+                        <div className="w-full flex md:flex- bg-white rounded-lg whitespace-nowrap m-0 py-2">
+                            <h1 className="text-2xl ss:text-xl md:text-xl text-start pl-4 md:pl-2 md:flex justify-center text-black font-semibold py-0 m-0">
+                                Manage User
+                            </h1>
+                            <div className={`w-full flex gap-4 pr-4 md:pr-2 justify-end items-center`}>
+                                {storedData?.role !== "user" && <button className={`py-0 px-3 m-0 text-white rounded-md bg-black text-lg font-medium `} onClick={handleAddNewUser}>
+                                    Add User
+                                </button>}
+                            </div>
+                        </div>
+                    </div>
                     <div className='px-3 pt-3'>
-                        <div className='bg-white px-3 py-3 w-full'>
-                            <div className="container-fluid p-0">
-                                <div className={`w-full flex md:flex-col gap-4 ${storedData?.role === "user" ? "justify-end" : "justify-between"} items-center mb-3`}>
-                                    {storedData?.role !== "user" && <button className={`" btn btn-dark "}`} onClick={handleAddNewUser}>
-                                        Add User
-                                    </button>}
-                                    <div className="flex justify-end ">
-                                        <input
-                                            type="text"
-                                            className="form-control me-2 border border-black"
-                                            placeholder="Search User by Name"
-                                            value={searchTerm}
-                                            onChange={handleSearch}
-                                        />
-                                        {/* <button className="btn btn-dark">Search</button> */}
-                                    </div>
-                                </div>
-
-                                <div className="pt-3 border-t border-[#383387] ">
+                        <div className='bg-white border-t border-[#383387] pb-3 w-full'>
+                            <div className="container-fluid px-3 p-0">
+                                <div className="pt-3">
                                     {loading ? (
                                         <div className="text-center my-4">
                                             <div className="spinner-border text-dark" role="status">
@@ -308,29 +324,54 @@ function ManageUser({ isOpen }) {
                                                     <DownloadCSVButton headers={headers} dataLogs={filteredAndSortedLogs} />
                                                     <DownloadPDFButton headers={headers} dataLogs={filteredAndSortedLogs} />
                                                 </div>
-                                                <div className="d-flex md:justify-center justify-end gap-3 align-items-center ">
-                                                    <button
-                                                        className="btn btn-dark"
-                                                        onClick={handlePrevious}
-                                                        disabled={currentPage === 1}
-                                                    >
-                                                        &lt;
-                                                    </button>
-                                                    <div className="">
-                                                        {indexOfFirstRecord + 1} -{' '}
-                                                        {Math.min(indexOfLastRecord, filteredUsers.length)} of{' '}
-                                                        {filteredUsers.length}
+                                                <div className="flex justify-end gap-3 md:flex-col ">
+                                                    <div className="relative h-full">
+                                                        <input
+                                                            type="text"
+                                                            className="form-control h-full border border-black"
+                                                            placeholder="Search User by Name"
+                                                            value={searchTerm}
+                                                            onChange={handleSearch}
+                                                        />
+                                                        {searchTerm && (
+                                                            <button
+                                                                type="button"
+                                                                onClick={() => setSearchTerm('')}
+                                                                className="absolute right-2 top-1/2 transform -translate-y-1/2 text-gray-500 bg-white px-1 hover:text-black"
+                                                            >
+                                                                ❌
+                                                            </button>
+                                                        )}
                                                     </div>
-                                                    <button
-                                                        className="btn btn-dark"
-                                                        onClick={handleNext}
-                                                        disabled={currentPage === totalPages}
-                                                    >
-                                                        &gt;
-                                                    </button>
+                                                    <RecordsPerPageDropdown
+                                                        recordsPerPage={recordsPerPage}
+                                                        setRecordsPerPage={setRecordsPerPage}
+                                                        setCurrentPage={setCurrentPage}
+                                                    />
+                                                    <div className="flex flex-row whitespace-nowrap md:justify-center justify-end gap-3 align-items-center ">
+                                                        <button
+                                                            className="btn btn-dark"
+                                                            onClick={handlePrevious}
+                                                            disabled={currentPage === 1}
+                                                        >
+                                                            &lt;
+                                                        </button>
+                                                        <div className="">
+                                                            {indexOfFirstRecord + 1} -{' '}
+                                                            {Math.min(indexOfLastRecord, filteredUsers.length)} of{' '}
+                                                            {filteredUsers.length}
+                                                        </div>
+                                                        <button
+                                                            className="btn btn-dark"
+                                                            onClick={handleNext}
+                                                            disabled={currentPage === totalPages}
+                                                        >
+                                                            &gt;
+                                                        </button>
+                                                    </div>
                                                 </div>
                                             </div>
-                                            <div className={`w-full bg-gray-300 flex-shrink-0 overflow-auto custom-horizontal-scroll select-text h-full ${!isMobile ? (isOpen ? "max-w-[calc(100vw-50px)]" : "max-w-[calc(100vw-65px)]") : "max-w-[calc(100vw-64px)]"}`}>
+                                            <div className={`w-full border-t border-[#383387] pt-3 flex-shrink-0 overflow-auto custom-horizontal-scroll select-text h-full ${!isMobile ? (isOpen ? "max-w-[calc(100vw-50px)]" : "max-w-[calc(100vw-65px)]") : "max-w-[calc(100vw-64px)]"}`}>
                                                 <CustomizeTable
                                                     headers={headers}
                                                     emptyMessage='No transaction logs available.'
@@ -338,9 +379,9 @@ function ManageUser({ isOpen }) {
                                                     onSort={handleSort}
                                                     renderRow={renderRow}
                                                     data={currentRecords}
-                                                    className="table-auto border-collapse"
+                                                    className="table-auto border-collapse  bg-gray-300"
                                                     theadClassName="px-4 py-2 text-left cursor-pointer select-none whitespace-nowrap"
-                                                    rowClassName=''
+                                                    rowClassName=' bg-gray-300'
                                                 // className="text-center py-3 text-lg font-semibold"
                                                 />
                                             </div>
@@ -374,22 +415,22 @@ function ManageUser({ isOpen }) {
                                             value={formData.username}
                                             onChange={handleChange}
                                             required
+                                            disabled
                                         />
                                     </div>
-                                    <div className="mb-3">
-                                        <label htmlFor="userRole" className="form-label m-0">User Role</label>
+                                    {selectedUserEdit?._id && <div className="mb-3">
+                                        <label htmlFor={`role-${selectedUserEdit._id}`} className="form-label m-0">User Role</label>
                                         <select
                                             className="form-select"
-                                            id="userRole"
-                                            name="userRole"
-                                            value={formData.userRole}
+                                            htmlFor={`role-${selectedUserEdit._id}`}
+                                            name="role"
+                                            value={formData.role}
                                             onChange={handleChange}
                                             required
                                         >
-                                            {renderRoleOptions()}
+                                            {renderRoleOptions(selectedUserEdit.role)}
                                         </select>
-                                    </div>
-
+                                    </div>}
                                     <div className="mb-3">
                                         <label className="form-label m-0">User Permissions</label>
                                         <div className="border p-2 overflow-auto" style={{ maxHeight: "150px" }}>
@@ -443,7 +484,7 @@ function ManageUser({ isOpen }) {
             )}
 
             {/* Toast Container to Display Toasts */}
-            <ToastContainer />
+            {/* <ToastContainer autoClose="3000" /> */}
         </>
     );
 }

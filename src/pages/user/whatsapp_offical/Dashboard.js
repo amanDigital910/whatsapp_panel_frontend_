@@ -4,6 +4,7 @@ import { DashboardBarChart, PieChart } from './Components/Charts'
 import { CodeSnippet } from './CodeSnippet';
 import './commonCSS.css'
 import { toast } from 'react-toastify';
+import 'react-toastify/dist/ReactToastify.css';
 
 const Dashboard = () => {
   const [activeTab, setActiveTab] = useState(CodeSnippet[0].language);

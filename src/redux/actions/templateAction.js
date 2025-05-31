@@ -1,187 +1,152 @@
-/* eslint-disable react-hooks/rules-of-hooks */
+// actions/templateAction.js
 import axios from 'axios';
-import {
-    createTemplateStart, createTemplateSuccess, createTemplateFailure,
-    getTemplatesStart, getTemplatesSuccess, getTemplatesFailure,
-    approveTemplateStart, approveTemplateSuccess, approveTemplateFailure,
-    rejectTemplateStart, rejectTemplateSuccess, rejectTemplateFailure,
-    deleteTemplateStart, deleteTemplateSuccess, deleteTemplateFailure,
-    getTemplateByIdStart, getTemplateByIdSuccess, getTemplateByIdFailure,
-} from '../reducer/templateReducer';
 import { getSecureItem } from '../../pages/utils/SecureLocalStorage';
 
-const authToken = getSecureItem('userToken');
-const payload = {
-    "metadata": {
-        "whatsappComponents": []
-    },
-    "_id": "newID123",
-    "name": "welcome UV Digital Solution",
-    "category": "MARKETING",
-    "language": "en",
-    "components": [
-        {
-            "example": {
-                "header_text": [],
-                "body_text": [],
-                "header_handle": [],
-                "header_url": []
-            },
-            "type": "HEADER",
-            "format": "TEXT",
-            "text": "Welcome to Our Service! Digital Marketing 🎉",
-            "_id": "682464f7c9d00c3230dea0323fe",
-            "buttons": []
-        },
-        {
-            "example": {
-                "header_text": [],
-                "body_text": [],
-                "header_handle": [],
-                "header_url": []
-            },
-            "type": "BODY",
-            "text": "Hello Vikram , thank you for joining us! We're excited to have you on board.",
-            "_id": "682464f7c9d00c3230dea0fef",
-            "buttons": []
-        },
-        {
-            "example": {
-                "header_text": [],
-                "body_text": [],
-                "header_handle": [],
-                "header_url": []
-            },
-            "type": "BUTTONS",
-            "buttons": [
-                {
-                    "type": "QUICK_REPLY",
-                    "text": "Get Started Now",
-                    "example": [],
-                    "_id": "682464f7c9d00c3230dea101"
-                },
-                {
-                    "type": "URL",
-                    "text": "Visit Website This",
-                    "url": "https://uvdigitalsolution.com",
-                    "example": [],
-                    "_id": "682464f7c9d00c3230dea102"
-                }
-            ]
-        }
-    ]
-}
+// Action Types
+export const TEMPLATE_REQUEST_START = 'TEMPLATE_REQUEST_START';
+export const TEMPLATE_REQUEST_FAILURE = 'TEMPLATE_REQUEST_FAILURE';
 
-// Headers Config
-const headers = {
-    'Content-Type': 'application/json',
-    Authorization: `Bearer ${authToken}`,
-    // 'x-api-key': apiKey,
-};
+export const CREATE_TEMPLATE_SUCCESS = 'CREATE_TEMPLATE_SUCCESS';
+export const GET_TEMPLATES_SUCCESS = 'GET_TEMPLATES_SUCCESS';
+export const GET_TEMPLATE_BY_ID_SUCCESS = 'GET_TEMPLATE_BY_ID_SUCCESS';
+export const UPDATE_TEMPLATE_SUCCESS = 'UPDATE_TEMPLATE_SUCCESS';
+export const DELETE_TEMPLATE_SUCCESS = 'DELETE_TEMPLATE_SUCCESS';
+export const FETCH_PENDING_TEMPLATES_SUCCESS = 'FETCH_PENDING_TEMPLATES_SUCCESS';
+
+export const APPROVE_TEMPLATE_SUCCESS = 'APPROVE_TEMPLATE_SUCCESS';
+export const REJECT_TEMPLATE_SUCCESS = 'REJECT_TEMPLATE_SUCCESS';
+
+// Headers
+const getAuthHeaders = () => ({
+  'Content-Type': 'application/json',
+  Authorization: `Bearer ${getSecureItem('userToken')}`,
+});
 
 // Create Template
 export const createTemplate = (templateData) => async (dispatch) => {
-    dispatch(createTemplateStart());
-    try {
-        const response = await axios.post(
-            `${process.env.REACT_APP_API_URL}/api/templates`,
-            payload,
-            { headers },
-        );
-        console.log("Created Template", response);
-        dispatch(createTemplateSuccess(payload));
-    } catch (error) {
-        dispatch(createTemplateFailure(error.response?.data?.message || error.message));
-    }
+  dispatch({ type: TEMPLATE_REQUEST_START });
+
+  try {
+    const response = await axios.post(`${process.env.REACT_APP_API_URL}/api/templates`, templateData, {
+      headers: getAuthHeaders(),
+    });
+
+    dispatch({ type: CREATE_TEMPLATE_SUCCESS, payload: response.data.data });
+
+    return response.data;
+  } catch (error) {
+    dispatch({ type: TEMPLATE_REQUEST_FAILURE, payload: error.response?.data?.message || 'Failed to create template' });
+  }
 };
 
 // Get All Templates
 export const getAllTemplates = () => async (dispatch) => {
-    dispatch(getTemplatesStart());
-    try {
-        const response = await axios.get(`${process.env.REACT_APP_API_URL}/api/templates`, { headers });
-        dispatch(getTemplatesSuccess(response.data.data));
-        console.log("Template Fetched", response.data.data);
-    } catch (error) {
-        dispatch(getTemplatesFailure(error.response?.data?.message || error.message));
-    }
+  dispatch({ type: TEMPLATE_REQUEST_START });
+
+  try {
+    const response = await axios.get(`${process.env.REACT_APP_API_URL}/api/templates`, {
+      headers: getAuthHeaders(),
+    });
+
+    dispatch({ type: GET_TEMPLATES_SUCCESS, payload: response.data.data });
+    
+    return response.data;
+  } catch (error) {
+    dispatch({ type: TEMPLATE_REQUEST_FAILURE, payload: error.response?.data?.message || 'Failed to fetch templates' });
+  }
 };
 
 // Get Template by ID
 export const getTemplateById = (templateId) => async (dispatch) => {
-    dispatch(getTemplateByIdStart());
-    try {
-        const response = await axios.get(`${process.env.REACT_APP_API_URL}/api/templates/${templateId}`, { headers });
-        dispatch(getTemplateByIdSuccess(response.data.data));
-    } catch (error) {
-        dispatch(getTemplateByIdFailure(error.response?.data?.message || error.message));
-    }
+  dispatch({ type: TEMPLATE_REQUEST_START });
+
+  try {
+    const response = await axios.get(`${process.env.REACT_APP_API_URL}/api/templates/${templateId}`, {
+      headers: getAuthHeaders(),
+    });
+
+    dispatch({ type: GET_TEMPLATE_BY_ID_SUCCESS, payload: response.data.data });
+    return response.data;
+  } catch (error) {
+    dispatch({ type: TEMPLATE_REQUEST_FAILURE, payload: error.response?.data?.message || 'Failed to fetch template' });
+  }
 };
 
 // Update Template
-export const updateTemplate = async (templateId, templateData) => {
-    try {
-        const response = await axios.put(
-            `${process.env.REACT_APP_API_URL}/api/templates/${templateId}`,
-            templateData,
-            { headers }
-        );
-        return response.data;
-    } catch (error) {
-        throw new Error(error.response?.data?.message || error.message);
-    }
-};
+export const updateTemplate = (templateId, templateData) => async (dispatch) => {
+  dispatch({ type: TEMPLATE_REQUEST_START });
 
-// Fetch Pending Templates (Pure function – no dispatch)
-export const fetchPendingTemplates = async () => {
-    try {
-        const response = await axios.get(`${process.env.REACT_APP_API_URL}/api/templates/pending`, { headers });
-        return response.data;
-    } catch (error) {
-        throw new Error(error.response?.data?.message || error.message);
-    }
-};
-
-// Approve Template
-export const approveTemplate = (templateId) => async (dispatch) => {
-    dispatch(approveTemplateStart());
-    try {
-        const response = await axios.post(
-            `${process.env.REACT_APP_API_URL}/api/templates/${templateId}/approve`,
-            {},
-            { headers }
-        );
-        dispatch(approveTemplateSuccess(response.data.data));
-    } catch (error) {
-        dispatch(approveTemplateFailure(error.response?.data?.message || error.message));
-    }
-};
-
-// Reject Template
-export const rejectTemplate = (templateId, reason) => async (dispatch) => {
-    dispatch(rejectTemplateStart());
-    try {
-        const response = await axios.post(
-            `${process.env.REACT_APP_API_URL}/api/templates/${templateId}/reject`,
-            { reason },
-            { headers }
-        );
-        dispatch(rejectTemplateSuccess(response.data.data));
-    } catch (error) {
-        dispatch(rejectTemplateFailure(error.response?.data?.message || error.message));
-    }
+  try {
+    const response = await axios.put(`${process.env.REACT_APP_API_URL}/api/templates/${templateId}`, templateData, { headers: getAuthHeaders() });
+    dispatch({ type: UPDATE_TEMPLATE_SUCCESS, payload: response.data.data });
+    return response.data;
+  } catch (error) {
+    dispatch({ type: TEMPLATE_REQUEST_FAILURE, payload: error.response?.data?.message || 'Failed to update template' });
+  }
 };
 
 // Delete Template
 export const deleteTemplate = (templateId) => async (dispatch) => {
-    dispatch(deleteTemplateStart());
-    try {
-        const response = await axios.delete(
-            `${process.env.REACT_APP_API_URL}/api/templates/${templateId}`,
-            { headers }
-        );
-        dispatch(deleteTemplateSuccess(response.data.data));
-    } catch (error) {
-        dispatch(deleteTemplateFailure(error.response?.data?.message || error.message));
-    }
+  dispatch({ type: TEMPLATE_REQUEST_START });
+
+  try {
+    const response = await axios.delete(`${process.env.REACT_APP_API_URL}/api/templates/${templateId}`, {
+      headers: getAuthHeaders(),
+    });
+
+    console.log("Response Data Delete Template Success",response.data);
+    
+    dispatch({ type: DELETE_TEMPLATE_SUCCESS, payload: response.data });
+    return response.data;
+  } catch (error) {
+    dispatch({ type: TEMPLATE_REQUEST_FAILURE, payload: error.response?.data?.message || 'Failed to delete template' });
+  }
+};
+
+// Fetch Pending Templates
+export const fetchPendingTemplates = () => async (dispatch) => {
+  dispatch({ type: TEMPLATE_REQUEST_START });
+
+  try {
+    const response = await axios.get(`${process.env.REACT_APP_API_URL}/api/templates/pending`, {
+      headers: getAuthHeaders(),
+    });
+
+    dispatch({ type: FETCH_PENDING_TEMPLATES_SUCCESS, payload: response.data.data });
+    return response.data.data;
+  } catch (error) {
+    dispatch({ type: TEMPLATE_REQUEST_FAILURE, payload: error.response?.data?.message || 'Failed to fetch pending templates' });
+  }
+};
+
+// Approve Template
+export const approveTemplate = (templateId) => async (dispatch) => {
+  dispatch({ type: TEMPLATE_REQUEST_START });
+
+  try {
+    const response = await axios.post(`${process.env.REACT_APP_API_URL}/api/templates/${templateId}/approve`, {}, {
+      headers: getAuthHeaders(),
+    });
+
+    dispatch({ type: APPROVE_TEMPLATE_SUCCESS, payload: response.data.data });
+    return response.data.data;
+  } catch (error) {
+    dispatch({ type: TEMPLATE_REQUEST_FAILURE, payload: error.response?.data?.message || 'Failed to approve template' });
+  }
+};
+
+// Reject Template
+export const rejectTemplate = (templateId) => async (dispatch) => {
+  dispatch({ type: TEMPLATE_REQUEST_START });
+
+  try {
+    const response = await axios.post(`${process.env.REACT_APP_API_URL}/api/templates/${templateId}/reject`, {}, {
+      headers: getAuthHeaders(),
+    });
+
+    dispatch({ type: REJECT_TEMPLATE_SUCCESS, payload: response.data.data });
+    return response.data.data;
+  } catch (error) {
+    dispatch({ type: TEMPLATE_REQUEST_FAILURE, payload: error.response?.data?.message || 'Failed to reject template' });
+  }
 };

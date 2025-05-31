@@ -68,17 +68,18 @@ const NavBar = ({ setIsOpen, isOpen }) => {
                 <img src={bulkicon} alt="icon" width="30px" className='ms-4 h-8 flex' />
                 <h1 className="font-bold text-[30px] m-0 md:hidden">Whatsapp Bulk Marketing</h1>
             </div>
-            <div className={`absolute top-4 right-6 flex flex-row hover:opacity-40 text-white cursor-pointer ${!isMobile ? isOpen ? " mr-64 " : "mr-24" : " mr-6"}`}
+            <div className={`absolute top-4 right-6 flex flex-col items-center hover:opacity-40 text-white cursor-pointer ${!isMobile ? isOpen ? " mr-64 " : "mr-24" : " mr-6"}`}
                 onClick={(e) => { setIsOpenMenu(prev => !prev); }}
                 ref={toggleRef}
             >
-                <img src={userImage} alt="User  Profile" width={40} height={15} className='flex flex-1 justify-end' />
+                <img src={userImage} alt="User  Profile" width={30} height={10} className='flex flex-1 justify-end' />
+                <p className='m-0 flex items-center text-sm'>{usersData ? usersData.username : "Error"}</p>
             </div>
             {isOpenMenu && (
-                <div ref={dropdownRef} className={`absolute right-0 mt-48 w-48 bg-white border rounded-lg shadow-lg z-50 ${!isMobile ? isOpen ? "mr-[260px]" : "mr-[100px]" : "mr-6"}`}>
+                <div ref={dropdownRef} className={`absolute right-0 mt-48 w-fit bg-white border rounded-lg shadow-lg z-50 ${!isMobile ? isOpen ? "mr-[260px]" : "mr-[100px]" : "mr-6"}`}>
                     <Link to={"/profile"} className='no-underline'>
                         <button className="bg-[#383387] w-full text-white text-lg px-4 py-3 rounded-t-lg font-medium flex items-center gap-2 cursor-pointer">
-                            <BsPersonCircle /> {usersData ? usersData.username : "VikramRajput"}
+                            <BsPersonCircle /> {usersData ? usersData.username : "Error"}
                         </button>
                     </Link>
                     <button onClick={handleLogout} className="w-full px-4 py-3 flex items-center gap-2 text-red-500 text-lg hover:bg-gray-100 border-2 rounded-b-lg border-[#383387] cursor-pointer">

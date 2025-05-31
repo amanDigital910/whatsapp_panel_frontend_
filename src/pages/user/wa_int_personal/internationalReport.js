@@ -158,9 +158,9 @@ const WhatsappReport = ({ isOpen }) => {
           <div className=" bg-white flex flex-col gap-3 px-3 py-3 rounded-md pr-1">
             <div className=" flex justify-between md:flex-col gap-4 items-center ">
               <div className="flex items-center gap-3">
-                <CopyToClipboard activeSnippet={'Data'} />
-                <DownloadCSVButton />
-                <DownloadPDFButton />
+                <CopyToClipboard headers={headers} data={dummyData} />
+                <DownloadCSVButton headers={headers} dataLogs={dummyData} />
+                <DownloadPDFButton headers={headers} dataLogs={dummyData} />
               </div>
               <div className="relative md:w-full  max-w-[300px]">
                 <input

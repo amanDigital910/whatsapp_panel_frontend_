@@ -4,6 +4,7 @@ import { FaFileCsv } from "react-icons/fa6"
 import { useEffect, useRef, useState } from "react"
 import { LuArrowDown, LuArrowUp } from 'react-icons/lu'
 import { toast } from 'react-toastify'
+import '../user/whatsapp_offical/commonCSS.css'
 
 const RequireMark = () => {
     return (
@@ -45,20 +46,18 @@ export const CampaignTitle = ({ mainTitle, inputTitle, setCampaignTitle, placeho
 // Campaign Status for all 
 export const CampaignStatus = ({ totalStatus, validStatus, invalidStatus, duplicateStatus }) => {
     return (
-        <div>
-            <div className=" custom-grid ">
-                <div className="w-full  whitespace-nowrap h-fit px-4 py-[9px] rounded-md text-white font-semibold bg-[#0d0c0d] text-center">
-                    Total {totalStatus}
-                </div>
-                <div className="w-full whitespace-nowrap h-fit px-4 py-[9px] rounded-md text-white font-semibold bg-[#23a31af5] text-center">
-                    Valid {validStatus}
-                </div>
-                <div className="w-full whitespace-nowrap h-fit px-4 py-[9px] rounded-md text-white font-semibold bg-[#b00202] text-center">
-                    InValid {invalidStatus}
-                </div>
-                <div className="w-full whitespace-nowrap h-fit text text-center px-4 py-[9px] rounded-md text-white font-semibold bg-[#8a0418] ">
-                    Duplicates {duplicateStatus}
-                </div>
+        <div className=" custom-grid w-full">
+            <div className="w-full  whitespace-nowrap h-fit px-4 py-[9px] rounded-md text-white font-semibold bg-[#0d0c0d] text-center">
+                Total {totalStatus}
+            </div>
+            <div className="w-full whitespace-nowrap h-fit px-4 py-[9px] rounded-md text-white font-semibold bg-[#23a31af5] text-center">
+                Valid {validStatus}
+            </div>
+            <div className="w-full whitespace-nowrap h-fit px-4 py-[9px] rounded-md text-white font-semibold bg-[#b00202] text-center">
+                InValid {invalidStatus}
+            </div>
+            <div className="w-full whitespace-nowrap h-fit text text-center px-4 py-[9px] rounded-md text-white font-semibold bg-[#8a0418] ">
+                Duplicates {duplicateStatus}
             </div>
         </div>
     )
@@ -549,17 +548,6 @@ export const PollCampaign = ({ question, setQuestion, inputs, handleInputChange,
                     </button>
                 </div>
             </div>
-            {/* Button Detail and Delay Between Messages Section */}
-            {/*<div className="w-full flex mt-3">
-                <button
-                    className="w-full rounded text-center py-2 bg-brand_colors h-[40px] text-white font-[500] flex items-center justify-center"
-                    value={buttonDetail}
-                    onChange={(e) => setButtonDetail(e.target.value)}
-                    placeholder="Enter Button Detail"
-                >
-                    Button Detail
-                </button>
-            </div>*/}
         </div>
     )
 }
@@ -584,6 +572,7 @@ export const ImagesUploader = ({ type, index, inputRef, uploadedFile, onFileUplo
                 <div className="flex md:flex-col w-full">
                     <button
                         className="bg-[#23a31af5] text-white py-2 px-4 md:rounded-t-md md:rounded-br-none md:rounded-bl-none rounded-l-md flex  "
+                        type="button"
                         onClick={() => inputRef.current.click()}
                     >
                         Image {index + 1}
@@ -622,19 +611,6 @@ export const PdfUploader = ({ inputRef, uploadedFile, onFileUpload, onRemove, ca
         onRemove("pdf");
     };
 
-
-    useEffect(() => {
-        let url;
-        if (uploadedFile) {
-            url = URL.createObjectURL(uploadedFile);
-        }
-        return () => {
-            if (url) {
-                URL.revokeObjectURL(url);
-            }
-        };
-    }, [uploadedFile]);
-
     return (
         <div className="flex flex-col gap-1">
             <h6 className="font-semibold m-0">PDF (Max 15MB):</h6>
@@ -658,7 +634,7 @@ export const PdfUploader = ({ inputRef, uploadedFile, onFileUpload, onRemove, ca
                 <div className="relative w-full h-[400px] flex justify-center items-center border border-gray-200 rounded">
                     {/* <FaFilePdf className="text-[150px] text-red-400" /> */}
                     {/* Give preview of PDF */}
-                    <embed src={URL.createObjectURL(uploadedFile)} type="application/pdf" className="text-[150px] h-full text-red-400" />
+                    <embed src={uploadedFile.preview || URL.createObjectURL(uploadedFile) || URL.createObjectURL(uploadedFile.preview)} type="application/pdf" className="text-[150px] h-full text-red-400" />
                     <MdDelete
                         className="text-red-500 absolute top-2 right-2 text-xl cursor-pointer"
                         onClick={() => removeRestBtn(inputRef)}
@@ -791,7 +767,7 @@ export const VideoUploader = ({ inputRef, uploadedFile, onFileUpload, onRemove, 
             </div>
             {uploadedFile && (
                 <div className="relative w-full h-[250px] border border-gray-200 rounded overflow-hidden">
-                    <video src={uploadedFile.preview} className="w-full h-full object-contain" controls />
+                    <video src={uploadedFile?.preview} className="w-full h-full object-contain" controls />
                     <MdDelete
                         className="text-red-500 absolute top-2 right-2 text-xl cursor-pointer"
                         onClick={() => removeRestBtn(inputRef)}
@@ -842,7 +818,7 @@ export const CustomizeTable = ({
                     ))}
                 </tr>
             </thead>
-            <tbody>
+            <tbody className='custom-horizontal-scroll '>
                 {data.length > 0 ? (
                     data.map((item, index) => renderRow(item, index))
                 ) : (
@@ -857,6 +833,28 @@ export const CustomizeTable = ({
     );
 };
 
+export const RecordsPerPageDropdown = ({ recordsPerPage, setRecordsPerPage, setCurrentPage }) => {
+    const options = [25, 50, 75, 100];
+
+    return (
+        <div className="flex items-center gap-2 pr-2 border border-black rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500">
+            <select
+                value={recordsPerPage}
+                onChange={(e) => {
+                    setRecordsPerPage(Number(e.target.value));
+                    setCurrentPage(1); // Reset to first page when changing page size
+                }}
+                className="  px-2 py-2 text-lg rounded-md focus:border-none focus-within:border-none focus:outline-none "
+            >
+                {options.map((option) => (
+                    <option key={option} value={option}>
+                        {option}
+                    </option>
+                ))}
+            </select>
+        </div>
+    );
+};
 
 export const SendNowButton = ({ handleSendCampaign }) => {
     return (
@@ -870,36 +868,63 @@ export const SendNowButton = ({ handleSendCampaign }) => {
     )
 }
 
-export const CopyToClipboard = ({ headers = [], data = [] }) => {
-    const copyFilteredJSON = () => {
-        if (!Array.isArray(headers) || !headers.length || !Array.isArray(data) || !data.length) {
+export const CopyToClipboard = ({ headers, data }) => {
+    const copyToClipboard = () => {
+        if (!Array.isArray(headers) || headers.length === 0 || !Array.isArray(data) || data.length === 0) {
             toast.error("Missing headers or data");
             return;
         }
 
-        const allowedKeys = headers.slice(0, -1).map(h => h.key);
+        const allowedKeys = headers.map(({ key }) => key);
 
-        const filteredData = data.map(row => {
-            const filteredRow = {};
-            allowedKeys.forEach(key => {
-                filteredRow[key] = row[key] ?? ''; // Default to empty string if missing
-            });
-            return filteredRow;
-        });
+        const filteredData = data.map(row =>
+            Object.fromEntries(
+                allowedKeys.map(key => [key, row[key] ?? ""])
+            )
+        );
 
-        const jsonText = JSON.stringify(filteredData, null, 2);
+        const jsonString = JSON.stringify(filteredData, null, 2);
 
-        navigator.clipboard.writeText(jsonText)
-            .then(() => toast.success("JSON copied to clipboard!"))
-            .catch(err => {
-                console.error("Failed to copy:", err);
+        // Try native clipboard first
+        if (navigator.clipboard && window.isSecureContext) {
+            navigator.clipboard.writeText(jsonString)
+                .then(() => toast.success("Selected fields copied to clipboard!"))
+                .catch(() => {
+                    fallbackCopy(jsonString);
+                });
+        } else {
+            fallbackCopy(jsonString);
+        }
+    };
+
+    // Fallback using a temporary textarea
+    const fallbackCopy = (text) => {
+        const textarea = document.createElement("textarea");
+        textarea.value = text;
+        textarea.style.position = "fixed"; // prevent scrolling to bottom
+        textarea.style.opacity = "0";
+        document.body.appendChild(textarea);
+        textarea.focus();
+        textarea.select();
+
+        try {
+            const successful = document.execCommand("copy");
+            if (successful) {
+                toast.success("Selected fields copied to clipboard!")
+            } else {
                 toast.error("Copy failed.");
-            });
+            }
+        } catch (err) {
+            console.error("Fallback copy failed:", err);
+            toast.error("Copy failed.");
+        }
+
+        document.body.removeChild(textarea);
     };
 
     return (
         <button
-            onClick={copyFilteredJSON}
+            onClick={copyToClipboard}
             className="px-3 py-1 text-base font-medium border-2 border-[#0d6efd] text-[#0d6efd] rounded-md hover:text-white hover:bg-[#0d6efd]"
         >
             Copy
@@ -940,7 +965,7 @@ export const DownloadCSVButton = ({ headers, dataLogs }) => {
 
     return (
         <button
-            className='px-3 py-1 h-10 text-base font-medium border-2 border-[#dc3545] text-[#dc3545] rounded-md hover:text-white hover:bg-[#dc3545]'
+            className='px-3 py-1 text-base font-medium border-2 border-[#dc3545] text-[#dc3545] rounded-md hover:text-white hover:bg-[#dc3545]'
             onClick={downloadCSV}
         >
             CSV
@@ -1005,7 +1030,7 @@ export const DownloadPDFButton = ({ headers, dataLogs }) => {
 
     return (
         <button
-            className="px-3 py-1 h-10 text-base font-medium border-2 border-[#198754] text-[#198754] rounded-md hover:text-white hover:bg-[#198754]"
+            className="px-3 py-1 text-base font-medium border-2 border-[#198754] text-[#198754] rounded-md hover:text-white hover:bg-[#198754]"
             onClick={downloadPDF}
         >
             PDF

@@ -1,173 +1,189 @@
 /* eslint-disable react-hooks/exhaustive-deps */
 import axios from 'axios';
-import React, { useEffect, useMemo, useState } from "react";
+import React, { useEffect, useMemo, useRef, useState } from "react";
 import { toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 import CreditHeader from "../../components/CreditHeader";
 import useIsMobile from '../../hooks/useMobileSize';
 import '../user/whatsapp_offical/commonCSS.css'
-import { CampaignHeading, CopyToClipboard, CustomizeTable, DownloadCSVButton, DownloadPDFButton } from '../utils/Index';
+import { CampaignHeading, CopyToClipboard, CustomizeTable, DownloadCSVButton, DownloadPDFButton, RecordsPerPageDropdown } from '../utils/Index';
 import { getSecureItem } from '../utils/SecureLocalStorage';
+import { getAllUsers } from '../../redux/actions/authAction';
+import { useDispatch } from 'react-redux';
+import { useSelector } from 'react-redux';
+import '../user/whatsapp_offical/commonCSS.css'
+import { handleGetCampaigns } from '../../redux/actions/campaignAction';
+import { fetchCreditStats, fetchTransactionLogs, handleCreditTransactions } from '../../redux/actions/transactionAction';
 
 function ManageCredit({ isOpen }) {
-    const [user, setUser] = useState(null); // User state
-    const [usersList, setUsersList] = useState([]); // List of users fetched from the API
-    const [categories, setCategories] = useState([]); // List of categories
-    const [transactionLogs, setTransactionLogs] = useState([]); // Transaction logs
-    const [currentPage, setCurrentPage] = useState(1);
-    const [sortConfig, setSortConfig] = useState({ key: '', direction: 'asc' });
-    const [searchTerm, setSearchTerm] = useState('');
     const isMobile = useIsMobile();
+    const dispatch = useDispatch();
+    const dropdownRef = useRef(null);
 
-    const userToken = getSecureItem("userToken");
+    const storedData = JSON.parse(getSecureItem("userData"));
+    const [inputValue, setInputValue] = useState('');
+    const [isDropdownOpen, setIsDropdownOpen] = useState(false);
 
-    const recordsPerPage = 5; // You can adjust this as needed
+    const [user, setUser] = useState(null); // User state
+    const [currentPage, setCurrentPage] = useState(1);
+    const [sortConfig, setSortConfig] = useState({ key: 'createdAt', direction: 'desc' });
+    const [searchTerm, setSearchTerm] = useState('');
 
-    const [formData, setFormData] = useState({
-        sendUser: "",
-        selectedCategory: "",
-        balance: "",
-        creditDebit: "",
-    }); // Form data state
+    const [recordsPerPage, setRecordsPerPage] = useState(25);
+    const [campaignInputValue, setCampaignInputValue] = useState('');
+    const [filteredUsers, setFilteredUsers] = useState([]);
 
-    const headers = [
-        // UserName Balance Type Balance Credit Type Credit Date
-        { key: 'id', label: 'ID' },
-        { key: 'userName', label: 'UserName' },
-        { key: 'balanceType', label: 'Balance Type' },
-        { key: 'balance', label: 'Balance' },
-        { key: 'creditType', label: 'Credit Type' },
-        { key: 'creditDate', label: 'Credit Date' },
-    ]
+    const { loading, users, error } = useSelector((state) => state.userCreate);
+    const { getCampLoading = loading, campaigns, getCampError = error } = useSelector((state) => state.campaigns);
+    const { trnasLoading = loading, stats, logs, transError = error } = useSelector((state) => state.creditsTransaction);
 
-    const dummyData = [
-        {
-            id: 1,
-            userName: "john_doe",
-            balanceType: "Savings",
-            balance: 1500.75,
-            creditType: "Salary",
-            creditDate: "2025-04-28",
-        },
-        {
-            id: 2,
-            userName: "jane_smith",
-            balanceType: "Checking",
-            balance: 234.50,
-            creditType: "Refund",
-            creditDate: "2025-05-01",
-        },
-        {
-            id: 3,
-            userName: "michael_lee",
-            balanceType: "Savings",
-            balance: 9876.00,
-            creditType: "Bonus",
-            creditDate: "2025-04-15",
-        },
-        {
-            id: 4,
-            userName: "emily_watson",
-            balanceType: "Investment",
-            balance: 15000.00,
-            creditType: "Dividend",
-            creditDate: "2025-03-30",
-        },
-        {
-            id: 5,
-            userName: "david_clark",
-            balanceType: "Checking",
-            balance: 512.35,
-            creditType: "Transfer",
-            creditDate: "2025-05-05",
-        },
-    ];
+    useEffect(() => {
+        dispatch(handleGetCampaigns());
+    }, []);
+
+    useEffect(() => {
+        dispatch(getAllUsers());
+    }, []);
+
+    useEffect(() => {
+        dispatch(fetchTransactionLogs());
+    }, []);
+
+    useEffect(() => {
+        dispatch(fetchCreditStats());
+    }, []);
+
+    // Filter logs when logs update (not users)
+    useEffect(() => {
+        setFilteredUsers(logs || []);
+    }, [logs]);    
+
+    // // Filter campaigns based on search input
+    // useEffect(() => {
+    //     if (campaignInputValue.trim() === '') {
+    //         setFilteredCampaigns([]);
+    //         return;
+    //     }
+
+    //     const filtered = campaigns?.filter((c) =>
+    //         c?.name?.toLowerCase().includes(campaignInputValue.toLowerCase())
+    //     );
+    //     setFilteredCampaigns(filtered);
+    // }, [campaignInputValue, campaigns]);
 
 
     // Simulating user data fetching from localStorage
     useEffect(() => {
-        const storedData = localStorage.getItem("userData");
         if (storedData) {
             const parsedData = (storedData);
-            setUser(parsedData?.user);
-            // Fetch all necessary data
-            // fetchUsers(parsedData.user.userid);
-            // fetchTransactionLogs(parsedData.user.userid);
-            // fetchCategories();
+            setUser(parsedData?.username);
         }
     }, []);
 
-    // Fetch users based on parentuser_id
-    const fetchUsers = async (userid) => {
-        try {
-            const response = await axios.get(
-                `${process.env.REACT_APP_API_URL}/auth/parentuser/${userid}`
-            );
-            if (response.status === 200) {
-                setUsersList(response.data.data);
-            } else {
-                toast.error("Failed to fetch users!", {
-                    position: "top-right",
-                    autoClose: 3000,
-                    theme: "dark",
-                });
-            }
-        } catch (error) {
-            console.error("Error fetching users:", error);
-            toast.error("Error fetching users. Please try again.", {
-                position: "top-right",
-                autoClose: 3000,
-                theme: "dark",
-            });
+    const groupedOptions = {
+        Virtual: ['Virtual Quick Credit', 'Virtual DP Credit', 'Virtual Button Credit'],
+        Personal: ['Personal Quick Credit', 'Personal POLL Credit', 'Personal Professional Credit'],
+        International: ['International Personal Credit', 'International Virtual Credit'],
+    };
+
+    const transactionTypes = [
+        { value: '', label: 'Select Transaction', disabled: true },
+        { value: 'Credit', label: 'Credit' },
+        { value: 'Debit', label: 'Debit' },
+    ];
+
+    const [formData, setFormData] = useState({
+        toUserId: "",
+        // creditDebit: "",
+        creditAmount: "",
+        categoryId: "",
+    });
+
+    const handleCampaignChange = (e) => {
+        const selectedId = e.target.value;
+        const selectedCampaign = campaigns.find(c => c._id === selectedId);
+        setFormData((prev) => ({
+            ...prev,
+            categoryId: selectedId,
+        }));
+        setCampaignInputValue(selectedCampaign?.name || '');
+    }
+
+    const handleInputChange = (e) => {
+        const value = e.target.value;
+        setInputValue(value);
+        setIsDropdownOpen(value.length > 0);
+        setFormData(prev => ({ ...prev, toUserId: value }));
+    };
+
+    const handleOptionClick = (username, userId) => {
+        setInputValue(username);
+        setFormData(prev => ({ ...prev, toUserId: userId }));
+        setIsDropdownOpen(false);
+    };
+
+    const handleClickOutside = (e) => {
+        if (dropdownRef.current && !dropdownRef.current.contains(e.target)) {
+            setIsDropdownOpen(false);
         }
     };
 
-    const fetchTransactionLogs = async (userId) => {
-        try {
-            const response = await axios.get(
-                `${process.env.REACT_APP_API_URL}/transfer/transactions/log/${userId}`
-            );
-            if (response.status === 200) {
-                setTransactionLogs(response.data.data);
-            } else {
-                toast.error("Failed to fetch transaction logs!", {
-                    position: "top-right",
-                    autoClose: 3000,
-                    theme: "dark",
-                });
-            }
-        } catch (error) {
-            console.error("Error fetching transaction logs:", error);
-            toast.error("Error fetching transaction logs. Please try again.", {
-                position: "top-right",
-                autoClose: 3000,
-                theme: "dark",
-            });
-        }
+    useEffect(() => {
+        document.addEventListener("mousedown", handleClickOutside);
+        return () => {
+            document.removeEventListener("mousedown", handleClickOutside);
+        };
+    }, []);
+
+    const filteredAllUser = users?.data?.filter(user =>
+        user.username.toLowerCase().includes(inputValue.toLowerCase())
+    );
+
+    const headers = [
+        { key: '_id', label: 'ID' },
+        { key: 'fromUserId.username', label: 'From User' },
+        { key: 'toUserId.username', label: 'To User ID' },
+        { key: 'credit', label: 'Credit Balance' },
+        { key: 'creditType', label: 'Credit Type' },
+        { key: 'createdAt', label: 'Current Date' },
+        { key: 'creditNote', label: 'Credit Note' },
+    ];
+
+    const customAbbreviations = {
+        'Virtual Quick Campaign': 'WV',
+        'Virtual Button Campaign': 'WVB',
+        'Virtual DP Campaign': 'WVD',
+        'Personal Quick Campaign': 'WP',
+        'Personal Button Campaign': 'WPB',
+        'Personal POLL Campaign': 'WPP',
+        'International Personal Quick Campaign': 'WIP',
+        'International Personal Button Campaign': 'WIPB',
+        'International Personal POLL Campaign': 'WIPP',
+        'International Virtual Quick Campaign': 'WIV',
+        'International Virtual Button Campaign': 'WIVB',
     };
 
-    // Fetch categories
-    const fetchCategories = async () => {
-        try {
-            const response = await axios.get(`${process.env.REACT_APP_API_URL}/transfer/category`);
-            if (response.status === 200) {
-                setCategories(response.data.data);
-            } else {
-                toast.error("Failed to fetch categories!", {
-                    position: "top-right",
-                    autoClose: 3000,
-                    theme: "dark",
-                });
-            }
-        } catch (error) {
-            console.error("Error fetching categories:", error);
-            toast.error("Error fetching categories. Please try again.", {
-                position: "top-right",
-                autoClose: 3000,
-                theme: "dark",
-            });
-        }
-    };
+    const renderRow = (item) => (
+        <tr key={item._id} className="text-black border border-gray-700 hover:bg-gray-500">
+            <td className="px-4 py-2 border border-gray-700">{item?._id.slice(-5)}</td>
+            <td className="px-4 py-2 border border-gray-700">{item?.fromUserId?.username}</td>
+            <td className="px-4 py-2 border border-gray-700">{item?.toUserId?.username}</td>
+            <td className="px-4 py-2 border border-gray-700">{item.credit}</td>
+            <td className="px-4 py-2 border border-gray-700">{item.creditType}</td>
+            <td className="px-4 py-2 border border-gray-700">{new Date(item.createdAt).toLocaleDateString('en-GB', {
+                day: '2-digit',
+                month: '2-digit',
+                year: 'numeric',
+                hour: '2-digit',
+                minute: '2-digit',
+                hour12: true,
+            })}</td>
+            {/* <td className="px-4 py-2 border border-gray-700">{item?.categoryId?.name}</td> */}
+            <td className="px-4 py-2 border border-gray-700 uppercase">
+                {customAbbreviations[item?.categoryId?.name] || 'N/A'}
+            </td>
+        </tr>
+    );
 
     // Handle form data change
     const handleChange = (e) => {
@@ -178,100 +194,75 @@ function ManageCredit({ isOpen }) {
     // Handle form submission
     const handleSubmit = async (e) => {
         e.preventDefault();
-
-        try {
-            let payload, response;
-
-            // Prepare the payload based on Credit or Debit
-            if (formData.creditDebit === "Credit") {
-                payload = {
-                    fromUserId: user.userid,
-                    toUserId: parseInt(formData.sendUser),
-                    categoryId: parseInt(formData.selectedCategory),
-                    creditAmount: parseInt(formData.balance),
-                };
-
-                // Call the Credit API
-                response = await axios.post(`${process.env.REACT_APP_API_URL}/transfer/credit`, payload);
-            } else {
-                payload = {
-                    fromUserId: parseInt(formData.sendUser),
-                    toUserId: user.userid,
-                    categoryId: parseInt(formData.selectedCategory),
-                    creditAmount: parseInt(formData.balance),
-                };
-
-                // Call the Debit API
-                response = await axios.post(`${process.env.REACT_APP_API_URL}/transfer/debit`, payload);
-            }
-
-            // Handle API response
-            if (response.status === 200) {
-                toast.success("Transaction successful!", {
-                    position: "top-right",
-                    autoClose: 3000,
-                    theme: "dark",
-                });
-
-                // Fetch updated transaction logs
-                // fetchTransactionLogs(user.userid);
-
-                // Clear the form
-                setFormData({
-                    sendUser: "",
-                    selectedCategory: "",
-                    balance: "",
-                    creditDebit: "",
-                });
-            } else {
-                throw new Error("Unexpected response from server.");
-            }
-        } catch (error) {
-            console.error("Error during transaction:", error.response?.data || error.message);
-
-            toast.error("Transaction failed. Please try again.", {
+        if (!formData.toUserId || !formData.creditAmount || !formData.creditDebit) {
+            toast.error("All required fields must be completed.", {
                 position: "top-right",
                 autoClose: 3000,
                 theme: "dark",
             });
+            return;
+        }
+        try {
+            let response;
+
+            // Prepare the payload based on Credit or Debit
+            // if (formData?.creditDebit === "Credit") {
+            const payload = {
+                toUserId: formData?.toUserId,
+                // creditDebit: formData?.creditDebit,
+                creditAmount: parseInt(formData?.creditAmount),
+                categoryId: formData?.categoryId,
+            };
+
+            // Call the Credit API
+            response = await dispatch(handleCreditTransactions(payload));
+            // } else {
+            //     payload = {
+            //         toUserId: formData?.toUserId,
+            //         // creditDebit: formData?.creditDebit,
+            //         creditAmount: parseInt(formData?.creditAmount),
+            //         categoryId: formData?.categoryId,
+            //     };
+
+            //     // Call the Debit API
+            //     response = await axios.post(`${process.env.REACT_APP_API_URL}/api/credits/transfer`, payload);
+            // }
+
+            // Handle API response
+            if (response?.success) {
+                toast.success(response?.message || "Credit Transferred Successfully!");
+                // Fetch updated transaction logs
+                dispatch(fetchTransactionLogs())
+                dispatch(fetchCreditStats())
+                console.log("dispatch(fetchCreditStats())", stats)
+                // Clear the form
+                setInputValue("")
+                setFormData({
+                    toUserId: "",
+                    creditDebit: "",
+                    creditAmount: "",
+                    categoryId: "",
+                });
+            } else {
+                toast.error(response || transError || "Transaction failed. Please try again.");
+                throw new Error("Unexpected response from server.");
+            }
+        } catch (error) {
+            console.log("Response Data Error::::::", getCampError);
+            toast.error(error || "Transaction failed. Please try again.");
         }
     };
-
-    const indexOfLastRecord = currentPage * recordsPerPage;
-    const indexOfFirstRecord = indexOfLastRecord - recordsPerPage;
-    const currentRecords = transactionLogs.slice(indexOfFirstRecord, indexOfLastRecord);
-    const totalRecords = transactionLogs.length;
-
-    const handlePrevious = () => {
-        if (currentPage > 1) {
-            setCurrentPage(currentPage - 1);
-        }
-    };
-
-    const handleNext = () => {
-        if (currentPage < Math.ceil(totalRecords / recordsPerPage)) {
-            setCurrentPage(currentPage + 1);
-        }
-    };
-
-    const renderRow = (item, index) => (
-        <tr key={index} className="text-black border border-gray-700 hover:bg-gray-500">
-            <td className="px-4 py-2 border border-gray-700">{item.id}</td>
-            <td className="px-4 py-2 border border-gray-700">{item.userName}</td>
-            <td className="px-4 py-2 border border-gray-700">{item.balanceType}</td>
-            <td className="px-4 py-2 border border-gray-700">${item.balance.toFixed(2)}</td>
-            <td className="px-4 py-2 border border-gray-700">{item.creditType}</td>
-            <td className="px-4 py-2 border border-gray-700">{new Date(item.creditDate).toLocaleDateString('en-GB')}</td>
-        </tr>
-    );
 
     const filteredAndSortedLogs = useMemo(() => {
         const term = searchTerm.toLowerCase().trim();
 
-        const filtered = dummyData.filter(data => {
-            const userMatch = data?.userName?.toLowerCase().includes(term);
+        const filtered = filteredUsers.filter(data => {
+            const userMatch = data?.fromUserId?.username?.toLowerCase().includes(term) ||
+                data?.toUserId?.username?.toLowerCase().includes(term);
             return userMatch;
         });
+        // console.log("Filtered Data", filtered, logs);
+
 
         if (sortConfig.key) {
             return [...filtered].sort((a, b) => {
@@ -294,7 +285,7 @@ function ManageCredit({ isOpen }) {
         }
 
         return filtered;
-    }, [searchTerm, sortConfig, dummyData]);
+    }, [searchTerm, sortConfig, filteredUsers]);
 
     const handleSort = (key) => {
         setSortConfig(prev => ({
@@ -303,75 +294,122 @@ function ManageCredit({ isOpen }) {
         }));
     };
 
+    const indexOfLastRecord = currentPage * recordsPerPage;
+    const indexOfFirstRecord = indexOfLastRecord - recordsPerPage;
+    const currentRecords = filteredAndSortedLogs.slice(indexOfFirstRecord, indexOfLastRecord);
+    const totalRecords = filteredAndSortedLogs.length;
+    const totalPages = Math.max(1, Math.ceil(filteredAndSortedLogs.length / recordsPerPage));
+
+
+    const handlePrevious = () => {
+        if (currentPage > 1) {
+            setCurrentPage(currentPage - 1);
+        }
+    };
+
+    const handleNext = () => {
+        if (currentPage < Math.ceil(totalRecords / recordsPerPage)) {
+            setCurrentPage(currentPage + 1);
+        }
+    };
+
     return (
         <>
-            <section className='w-[100%] bg-gray-200 h-full min-h-[calc(100vh-70px)] flex flex-col '>
+            <section className={`w-[100%] h-full pb-3 bg-gray-200 min-h-[calc(100vh-70px)] ${!isMobile ? isOpen ? "ml-[240px] w-[calc(100vw-250px)]" : "ml-20 w-[calc(100vw-90px)]" : "left-0 w-full"} `}>
                 <CreditHeader />
                 <div className="w-full mt-8">
                     <CampaignHeading campaignHeading="Manage Credits" />
                     <div className="w-full px-3 pt-3 ">
-                        <div className='bg-white px-3 py-3'>
+                        <div className='bg-white border-t border-[#383387] px-3 py-3 mb-3'>
                             {/* Filters Section */}
                             <form onSubmit={handleSubmit}>
-                                <div className="me-0 flex md:flex-col gap-3 pb-3 border-b border-[#383387]">
-                                    {/* Left Section */}
-                                    <div className="flex sm:flex-col w-full gap-3 align-items-center ">
-                                        <div className="grow w-full">
-                                            <select
-                                                name="sendUser"
-                                                value={formData.sendUser}
-                                                onChange={handleChange}
-                                                className="form-select border border-black w-full"
-                                            >
-                                                <option value="">Select User</option>
-                                                {usersList.map((user) => (
-                                                    <option key={user.userid} value={user.userid}>
-                                                        {user.userName}
-                                                    </option>
-                                                ))}
-                                            </select>
-                                        </div>
-                                        <div className="grow w-full">
-                                            <select
-                                                name="selectedCategory"
-                                                value={formData.selectedCategory}
-                                                onChange={handleChange}
-                                                className="form-select border border-black w-full"
-                                            >
-                                                <option value="">Select Category</option>
-                                                {categories.map((category) => (
-                                                    <option key={category.id} value={category.id}>
-                                                        {category.name}
-                                                    </option>
-                                                ))}
-                                            </select>
-                                        </div>
-                                    </div>
+                                <div className="flex flex-col gap-3 pb-3 border-b border-[#383387]">
+                                    <div className="flex gap-3 md:flex-col">
+                                        <div className="relative grow w-full">
+                                            <input
+                                                type="text"
+                                                name="toUserId"
+                                                value={inputValue}
+                                                onChange={handleInputChange}
+                                                placeholder="Select Username"
+                                                className="border border-black w-full p-1.5 pl-3 rounded"
+                                                onFocus={() => setIsDropdownOpen(true)}
+                                            />
+                                            {isDropdownOpen && (
+                                                <ul className="absolute z-40 w-full bg-white border border-gray-300 rounded shadow-lg max-h-60 overflow-auto custom-horizontal-scroll">
+                                                    {filteredAllUser.length > 0 ? (
+                                                        filteredAllUser.map((user) => (
+                                                            <li
+                                                                key={user._id}
+                                                                onMouseDown={() => handleOptionClick(user.username, user._id)}
+                                                                className="py-2 -ml-8 px-3 hover:bg-gray-300 cursor-pointer"
+                                                            >
+                                                                {user.username}
+                                                            </li>
 
-                                    {/* Right Section */}
-                                    <div className="flex sm:flex-col w-full gap-3 align-items-center">
+                                                        ))) : (
+                                                        <li className="py-2 -ml-8 px-3 text-gray-500 cursor-default">No users found</li>
+                                                    )}
+                                                </ul>
+                                            )}
+                                        </div>
+                                        <div className="grow w-full">
+                                            <select
+                                                name="categoryId"
+                                                value={formData.categoryId}
+                                                onChange={handleCampaignChange}
+                                                className="form-select border border-black w-full p-1.5 rounded"
+                                            >
+                                                <option value="" disabled>Select Campaign</option>
+                                                {Object.entries(groupedOptions).map(([group, options]) => {
+                                                    const matchingCampaigns = campaigns.filter(c => {
+                                                        const firstWord = c.name?.split(" ")[0];
+                                                        return firstWord === group;
+                                                    });
+
+                                                    if (matchingCampaigns.length === 0) return null;
+
+                                                    return (
+                                                        <optgroup key={group} label={group}>
+                                                            {matchingCampaigns.map((c) => (
+                                                                <option key={c._id} value={c._id}>
+                                                                    {c.name}
+                                                                </option>
+                                                            ))}
+                                                        </optgroup>
+                                                    );
+                                                })}
+                                            </select>
+                                        </div>
                                         <div className="grow w-full">
                                             <select
                                                 name="creditDebit"
                                                 value={formData.creditDebit}
                                                 onChange={handleChange}
-                                                className="form-select border border-black w-full"
+                                                className="form-select border border-black w-full p-1.5 rounded"
                                             >
-                                                <option value="Credit">Credit</option>
-                                                <option value="Debit">Debit</option>
+                                                {transactionTypes.map((type, index) => (
+                                                    <option
+                                                        key={index}
+                                                        value={type.value}
+                                                        disabled={type.disabled}
+                                                    >
+                                                        {type.label}
+                                                    </option>
+                                                ))}
                                             </select>
                                         </div>
                                         <div className="grow w-full">
                                             <input
                                                 type="text"
-                                                name="balance"
-                                                value={formData.balance}
+                                                name="creditAmount"
+                                                value={formData?.creditAmount}
                                                 onChange={handleChange}
                                                 className="form-control border border-black w-full"
                                                 placeholder="Balance"
                                             />
                                         </div>
-                                        <div className="grow w-fit ">
+                                        <div className="grow w-fit">
                                             <button type="submit" className="btn text-white bg-black w-100 px-4">Submit</button>
                                         </div>
                                     </div>
@@ -381,34 +419,85 @@ function ManageCredit({ isOpen }) {
                             {/* Buttons Section */}
                             <div className="flex  md:justify-start justify-between gap-3 md:flex-col pt-3">
                                 <div className="flex gap-3  ">
-                                    <CopyToClipboard headers={headers} dataLogs={dummyData} />
-                                    <DownloadCSVButton headers={headers} dataLogs={dummyData} />
-                                    <DownloadPDFButton />
+                                    <CopyToClipboard headers={headers} data={filteredAndSortedLogs} />
+                                    <DownloadCSVButton headers={headers} dataLogs={filteredAndSortedLogs} />
+                                    <DownloadPDFButton headers={headers} dataLogs={filteredAndSortedLogs} />
                                 </div>
-                                <div className="relative md:w-full  max-w-[300px]">
-                                    <input
-                                        type="text"
-                                        placeholder="Search..."
-                                        value={searchTerm}
-                                        onChange={e => setSearchTerm(e.target.value)}
-                                        className="p-2 pr-8 w-full border border-black rounded-md"
+                                <div className="flex justify-end gap-3 ">
+                                    <div className="relative md:w-full  max-w-[300px]">
+                                        <input
+                                            type="text"
+                                            placeholder="Search..."
+                                            value={searchTerm}
+                                            onChange={e => setSearchTerm(e.target.value)}
+                                            className="p-2 pr-8 w-full border border-black rounded-md"
+                                        />
+                                        {searchTerm && (
+                                            <button
+                                                type="button"
+                                                onClick={() => setSearchTerm('')}
+                                                className="absolute right-2 top-1/2 transform -translate-y-1/2 text-gray-500 bg-white px-1 hover:text-black"
+                                            >
+                                                ❌
+                                            </button>
+                                        )}
+                                    </div>
+                                    <RecordsPerPageDropdown
+                                        recordsPerPage={recordsPerPage}
+                                        setRecordsPerPage={setRecordsPerPage}
+                                        setCurrentPage={setCurrentPage}
                                     />
-                                    {searchTerm && (
+                                    {/* Pagination Controls */}
+                                    <div className="flex flex-row whitespace-nowrap md:justify-center justify-end gap-3 align-items-center ">
                                         <button
-                                            type="button"
-                                            onClick={() => setSearchTerm('')}
-                                            className="absolute right-2 top-1/2 transform -translate-y-1/2 text-gray-500 bg-white px-1 hover:text-black"
+                                            className="btn btn-dark py-2"
+                                            onClick={handlePrevious}
+                                            disabled={currentPage === 1}
                                         >
-                                            ❌
+                                            &lt;
                                         </button>
-                                    )}
+                                        <div className="">
+                                            {indexOfFirstRecord + 1} -{' '}
+                                            {Math.min(indexOfLastRecord, filteredAndSortedLogs.length)} of{' '}
+                                            {filteredAndSortedLogs.length}
+                                        </div>
+                                        <button
+                                            className="btn btn-dark py-2"
+                                            onClick={handleNext}
+                                            disabled={currentPage === totalPages}
+                                        >
+                                            &gt;
+                                        </button>
+                                    </div>
                                 </div>
                             </div>
 
                             {/* Table Section */}
-                            <div className={`min-w-max py-3`}>
-                                <div className={`w-full bg-gray-300 flex-shrink-0 overflow-auto custom-horizontal-scroll select-text h-full ${!isMobile ? (isOpen ? "max-w-[calc(100vw-50px)]" : "max-w-[calc(100vw-65px)]") : "max-w-[calc(100vw-64px)]"}`}>
-                                    {/* <table className="min-w-full text-sm">
+                            <div className={`w-full bg-gray-300 flex-shrink-0 overflow-auto custom-horizontal-scroll select-text h-full mt-3 ${!isMobile ? (isOpen ? "max-w-[calc(100vw-50px)]" : "max-w-[calc(100vw-65px)]") : "max-w-[calc(100vw-64px)]"}`}>
+                                {loading ? (
+                                    <div className="text-center my-4">
+                                        <div className="spinner-border text-dark" role="status">
+                                            <span className="visually-hidden">Loading...</span>
+                                        </div>
+                                    </div>
+                                ) : transError ? (
+                                    <div className="text-center text-red-600 my-4 font-semibold">
+                                        {transError}
+                                    </div>) : <div className={`min-w-max`}>
+                                    <CustomizeTable
+                                        headers={headers}
+                                        data={currentRecords}
+                                        sortConfig={sortConfig}
+                                        onSort={handleSort}
+                                        emptyMessage='No Credits Available'
+                                        renderRow={renderRow}
+                                        className="table-auto border-collapse"
+                                        theadClassName="bg-gray-800"
+                                    />
+                                </div>
+                                }
+                            </div>
+                            {/* <table className="min-w-full text-sm">
                                     <thead className="bg-gray-100 sticky top-0 z-10 ">
                                         <tr>
                                             {headers.map(({ label, key }) => (
@@ -451,36 +540,6 @@ function ManageCredit({ isOpen }) {
                                         )}
                                     </tbody>
                                 </table> */}
-
-                                    <CustomizeTable
-                                        headers={headers}
-                                        data={filteredAndSortedLogs}
-                                        sortConfig={sortConfig}
-                                        onSort={handleSort}
-                                        emptyMessage='No Credits Available'
-                                        renderRow={renderRow}
-                                        className="table-auto border-collapse"
-                                        theadClassName="bg-gray-800"
-                                    />
-                                </div>
-                            </div>
-                            {/* Pagination Controls */}
-                            <div className="d-flex justify-content-end align-items-center gap-3 mt-3">
-                                <button className="btn btn-dark" onClick={handlePrevious} disabled={currentPage === 1}>
-                                    &lt;
-                                </button>
-                                <div>
-                                    {indexOfFirstRecord + 1} - {Math.min(indexOfLastRecord, totalRecords)} of {totalRecords}
-                                </div>
-                                <button
-                                    className="btn btn-dark"
-                                    onClick={handleNext}
-                                    disabled={currentPage === Math.ceil(totalRecords / recordsPerPage)}
-                                >
-                                    &gt;
-                                </button>
-                            </div>
-
                         </div>
                     </div>
                 </div>

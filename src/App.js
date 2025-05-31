@@ -22,7 +22,13 @@ import MembershipValidTill from './pages/user/Membership_Valid_Till.js';
 
 // Pages
 const Dashboard = lazy(() => import('./pages/user/UserDashboard'));
+// Admin Pages
 const AdminDashboard = lazy(() => import('./pages/admin/AdminDashboard'));
+const AdminAllCampaigns = lazy(() => import('./pages/admin/AdminPages/AdminAllCampaigns'));
+const AdminAllGroups = lazy(() => import('./pages/admin/AdminPages/AdminAllGroups'));
+const AdminAllTemplates = lazy(() => import('./pages/admin/AdminPages/AdminAllTemplates'));
+const AdminCreateTemplates = lazy(() => import('./pages/admin/AdminPages/AdminCreateTemplates'));
+
 const TransitionCReditUser = lazy(() => import('./pages/admin/TransitionCReditUser'))
 
 const LoginScreen = lazy(() => import('./pages/auth/UserLogin'));
@@ -95,6 +101,7 @@ const ManageUser = lazy(() => import("./pages/user/ManageUser"));
 const ManageCredit = lazy(() => import("./pages/user/ManageCredit"));
 const AddNewUser = lazy(() => import("./pages/user/AddNewUser"));
 const ProfilePage = lazy(() => import("./pages/user/ProfilePage.js"));
+const CreditHistory = lazy(() => import("./pages/user/CreditHistory.js"))
 
 const App = () => {
   const [isOpen, setIsOpen] = useState(true);
@@ -117,7 +124,7 @@ const App = () => {
   // }, [isLoggedIn, isChangePassword, navigate]);
 
   return (
-    <div>
+    <div className='custom-horizontal-scroll'>
       <div className="flex h-full w-full flex-wrap select-none hide-scrollbar">
         {/* Sidebar */}
         {/* 
@@ -161,9 +168,14 @@ const App = () => {
                   </Route>
 
                   {/* Protected routes */}
-                  <Route element={<PrivateRoute allowedRoles={[ROLES.SUPER_ADMIN]} />}>
+                  <Route element={<PrivateRoute allowedRoles={[ROLES.SUPER_ADMIN, ROLES.ADMIN]} />}>
                     {/* Dashboard admin and user */}
-                    <Route path="/admin-dashboard" element={<AdminDashboard />} />
+                    <Route path="/admin-dashboard" element={<AdminDashboard isOpen={isOpen} />} />
+                    <Route path="/create-campaigns" element={<AdminCreateTemplates isOpen={isOpen} />} />
+                    <Route path="/all-templates" element={<AdminAllTemplates />} />
+                    <Route path="/all-campaigns" element={<AdminAllCampaigns />} />
+                    <Route path="/all-groups" element={<AdminAllGroups />} />
+
                     <Route path='/transitiontable' element={<TransitionCReditUser />} />
                   </Route>
                   <Route element={<PrivateRoute allowedRoles={[ROLES.SUPER_ADMIN, ROLES.ADMIN, ROLES.RESELLER, ROLES.USER]} />}>
@@ -243,15 +255,16 @@ const App = () => {
                     <Route path="/group" element={<GroupCampaign />} />
                     <Route path="/template" element={<TemplateCampaign isOpen={isOpen} />} />
 
-                    <Route path='/manage-user' element={<ManageUser isOpen={isOpen} />} />
+                    <Route path='/credit-history' element={<CreditHistory isOpen={isOpen} />} />
                     <Route path='/membership-validity' element={<MembershipValidTill />} />
-                    <Route path='/manage-credit' element={<ManageCredit isOpen={isOpen} />} />
                     <Route path='/profile' element={<ProfilePage />} />
                     <Route path='/unauthorized' element={<NotFoundPage />} />
                     <Route path='*' element={<NotFoundPage />} />
 
                   </Route>
                   <Route element={<PrivateRoute allowedRoles={[ROLES.SUPER_ADMIN, ROLES.ADMIN, ROLES.RESELLER]} />}>
+                    <Route path='/manage-credit' element={<ManageCredit isOpen={isOpen} />} />
+                    <Route path='/manage-user' element={<ManageUser isOpen={isOpen} />} />
                     <Route path='/add-new-user' element={<AddNewUser />} />
                   </Route>
                 </Routes>
@@ -260,7 +273,7 @@ const App = () => {
           </div>
         </div>
       </div>
-      <ToastContainer />
+      <ToastContainer autoClose="2000" />
     </div >
   );
 };
