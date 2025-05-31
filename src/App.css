@@ -1,30 +1,82 @@
 body {
-    font-family: 'Roboto', sans-serif;
-    font-optical-sizing: auto;
-    font-style: normal;
-    font-variation-settings:"wdth" 100;
+  font-family: 'Roboto', sans-serif;
+  font-optical-sizing: auto;
+  font-style: normal;
+  font-variation-settings: "wdth" 100;
 }
 
 
 #fr-logo {
-    color: white;
-    display: none !important;
+  color: white;
+  display: none !important;
 }
 
 /* HTML: <div class="loader"></div> */
 .loader {
-    width: 140px;
-    height: 140px;
-    --c: no-repeat linear-gradient(orange 0 0);
-    background: var(--c), var(--c), var(--c), var(--c);
-    background-size: 21px 21px;
-    animation: l5 1s infinite cubic-bezier(0.3, 1, 0, 1);
+  width: 140px;
+  height: 140px;
+  --c: no-repeat linear-gradient(orange 0 0);
+  background: var(--c), var(--c), var(--c), var(--c);
+  background-size: 21px 21px;
+  animation: l5 1s infinite cubic-bezier(0.3, 1, 0, 1);
+}
+
+@keyframes l5 {
+  0% {
+    background-position: 0 0, 100% 0, 100% 100%, 0 100%
   }
-  
-  @keyframes l5 {
-    0%   { background-position: 0 0, 100% 0, 100% 100%, 0 100% }
-    33%  { background-position: 0 0, 100% 0, 100% 100%, 0 100%; width: 60px; height: 60px }
-    66%  { background-position: 100% 0, 100% 100%, 0 100%, 0 0; width: 60px; height: 60px }
-    100% { background-position: 100% 0, 100% 100%, 0 100%, 0 0 }
+
+  33% {
+    background-position: 0 0, 100% 0, 100% 100%, 0 100%;
+    width: 60px;
+    height: 60px
   }
-  
+
+  66% {
+    background-position: 100% 0, 100% 100%, 0 100%, 0 0;
+    width: 60px;
+    height: 60px
+  }
+
+  100% {
+    background-position: 100% 0, 100% 100%, 0 100%, 0 0
+  }
+}
+
+.custom-horizontal-scroll {
+  overflow: auto;
+  white-space: nowrap;
+  /* Keep items in one line */
+  -webkit-overflow-scrolling: touch;
+}
+
+/* WebKit browsers (Chrome, Safari, Edge Chromium) */
+.custom-horizontal-scroll::-webkit-scrollbar {
+  height: 8px;
+  /* Horizontal scrollbar height */
+}
+
+.custom-horizontal-scroll::-webkit-scrollbar-track {
+  background: #f1f1f1;
+  /* Track color */
+  border-radius: 1px;
+}
+
+.custom-horizontal-scroll::-webkit-scrollbar-thumb {
+  background: #383387;
+  /* Scrollbar thumb color */
+  border-radius: 1px;
+}
+
+.custom-horizontal-scroll::-webkit-scrollbar-thumb:hover {
+  background: #383387;
+  /* Thumb on hover */
+}
+
+/* Firefox scrollbar styling */
+.custom-horizontal-scroll {
+  scrollbar-width: thin;
+  /* Thin scrollbar */
+  scrollbar-color: #383387 #f1f1f1;
+  /* Thumb color, Track color */
+}

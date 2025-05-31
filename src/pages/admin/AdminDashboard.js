@@ -3,10 +3,9 @@ import Admin from '../../assets/icons/user-setting.png';
 import User from '../../assets/icons/user.png';
 import Reseller from '../../assets/icons/social (1).png';
 import { useDispatch, useSelector } from 'react-redux';
-import { getSecureItem } from '../utils/SecureLocalStorage';
 import useIsMobile from '../../hooks/useMobileSize';
 import { getAllUsers } from '../../redux/actions/authAction';
-import { CopyToClipboard, CustomizeTable, DownloadCSVButton, DownloadPDFButton } from '../utils/Index';
+import { CopyToClipboard, CustomizeTable, DownloadCSVButton, DownloadPDFButton, RecordsPerPageDropdown } from '../utils/Index';
 
 const AdminDashboard = ({ isOpen }) => {
   const isMobile = useIsMobile();
@@ -16,10 +15,8 @@ const AdminDashboard = ({ isOpen }) => {
   const [userCount, setUserCount] = useState(0);
   const [resellerCount, setResellerCount] = useState(0);
   const [activeTab, setActiveTab] = useState('admin');
-  const [filteredUsers, setFilteredUsers] = useState([]);
-  // const [searchQuery, setSearchQuery] = useState('');
   const [currentPage, setCurrentPage] = useState(1);
-  const recordsPerPage = 20;
+  const [recordsPerPage, setRecordsPerPage] = useState(25);
   const [sortConfig, setSortConfig] = useState({ key: '_id', direction: 'desc' });
   const [searchTerm, setSearchTerm] = useState('');
 
@@ -30,47 +27,39 @@ const AdminDashboard = ({ isOpen }) => {
     { key: 'username', label: 'Username' },
     { key: 'role', label: 'User Role' },
     { key: 'firstName', label: 'Firstname (usertype)' },
-    { key: 'updatedAt', label: 'Last Login' },
+    { key: 'updatedAt', label: 'Last Updated' },
   ];
 
   const renderRow = (log, index) => (
-    <tr key={index} className="text-black border border-gray-700 hover:bg-gray-500 whitespace-nowrap ">
-      <td className="px-2 py-2 border text-[1rem] border-gray-900 w-20">{log?._id.slice(-5) || '-'}</td>
-      <td className="px-2 py-2 border text-[1rem] border-gray-900">{log?.username || '-'}</td>
-      <td className="px-2 py-2 border text-[1rem] border-gray-900">{log?.role || '-'}</td>
-      <td className="px-2 py-2 border text-[1rem] border-gray-900">{log?.firstName || '-'}</td>
-      <td className="px-2 py-2 border text-[1rem] border-gray-900">{new Date(log?.updatedAt).toLocaleDateString('en-GB')}</td>
+    <tr key={index} className="text-black border border-gray-700 hover:bg-gray-500 whitespace-nowrap">
+      <td className="px-2 py-2 border text-[1rem] border-gray-900 w-20">
+        {log?._id?.slice(-5) || '-'}
+      </td>
+      <td className="px-2 py-2 border text-[1rem] border-gray-900">
+        {log?.username || '-'}
+      </td>
+      <td className="px-2 py-2 border text-[1rem] border-gray-900">
+        {log?.role || '-'}
+      </td>
+      <td className="px-2 py-2 border text-[1rem] border-gray-900">
+        {log?.firstName || '-'}
+      </td>
+      <td className="px-2 py-2 border text-[1rem] border-gray-900">
+        {new Date(log?.updatedAt).toLocaleString('en-GB', {
+          day: '2-digit',
+          month: '2-digit',
+          year: 'numeric',
+          hour: '2-digit',
+          minute: '2-digit',
+          hour12: true,
+        })}
+      </td>
     </tr>
   );
 
   useEffect(() => {
-    setFilteredUsers(users?.data || []);
-  }, [users]);
-
-  useEffect(() => {
     dispatch(getAllUsers());
-    // console.log("Set Filtered User", filteredUsers);
   }, [dispatch]);
-
-  // Counter logic using useEffect
-  useEffect(() => {
-    const incrementCount = (target, setCount) => {
-      let current = 0;
-      const interval = setInterval(() => {
-        current += 5; // Increment by 5
-        if (current >= target) {
-          setCount(target);
-          clearInterval(interval);
-        } else {
-          setCount(current);
-        }
-      }, 50); // Update every 50ms
-    };
-
-    incrementCount(150, setAdminCount); // Admin's counter
-    incrementCount(110, setUserCount); // User's counter
-    incrementCount(100, setResellerCount); // Reseller's counter
-  }, []);
 
   const userTabs = [
     {
@@ -94,67 +83,114 @@ const AdminDashboard = ({ isOpen }) => {
   ];
 
   const handleSearch = (e) => {
-    const query = e.target.value.toLowerCase();
-    setSearchTerm(query);
+    setSearchTerm(e.target.value.toLowerCase());
   };
 
   const filteredAndSortedLogs = useMemo(() => {
-    const term = searchTerm.toLowerCase().trim();
+    if (!users?.data) return [];
 
-    // Filter by role
-    const roleFiltered = filteredUsers.filter(user => user.role === activeTab);
+    // Filter by active tab first
+    const roleFiltered = users.data.filter(user => user?.role?.toLowerCase() === activeTab);
 
-    // Filter by search term
-    const searched = roleFiltered.filter(user =>
-      user?.username?.toLowerCase().includes(term)
-    );
+    // Then filter by search term
+    const term = searchTerm.trim();
+    const searched = term
+      ? roleFiltered.filter(user =>
+        user?.username?.toLowerCase().includes(term))
+      : roleFiltered;
 
-    // Sort
-    if (sortConfig.key) {
-      return [...searched].sort((a, b) => {
-        const aVal = a[sortConfig.key];
-        const bVal = b[sortConfig.key];
+    // Finally sort
+    return [...searched].sort((a, b) => {
+      const aVal = a[sortConfig.key];
+      const bVal = b[sortConfig.key];
 
-        if (typeof aVal === 'string' && typeof bVal === 'string') {
-          return sortConfig.direction === 'asc'
-            ? aVal.localeCompare(bVal)
-            : bVal.localeCompare(aVal);
-        }
+      if (aVal == null || bVal == null) return 0;
 
-        if (typeof aVal === 'number' && typeof bVal === 'number') {
-          return sortConfig.direction === 'asc' ? aVal - bVal : bVal - aVal;
-        }
+      if (typeof aVal === 'string' && typeof bVal === 'string') {
+        return sortConfig.direction === 'asc'
+          ? aVal.localeCompare(bVal)
+          : bVal.localeCompare(aVal);
+      }
 
-        return 0;
-      });
-    }
+      if (typeof aVal === 'number' && typeof bVal === 'number') {
+        return sortConfig.direction === 'asc' ? aVal - bVal : bVal - aVal;
+      }
 
-    return searched;
-  }, [searchTerm, filteredUsers, sortConfig, activeTab]);
+      // Handle dates
+      if (sortConfig.key === 'updatedAt') {
+        const dateA = new Date(aVal);
+        const dateB = new Date(bVal);
+        return sortConfig.direction === 'asc'
+          ? dateA - dateB
+          : dateB - dateA;
+      }
 
+      return 0;
+    });
+  }, [searchTerm, users, sortConfig, activeTab]);
 
-  console.log("Users Data", filteredAndSortedLogs);
+  // Pagination
+  const indexOfLastRecord = currentPage * recordsPerPage;
+  const indexOfFirstRecord = indexOfLastRecord - recordsPerPage;
+  const currentRecords = filteredAndSortedLogs.slice(indexOfFirstRecord, indexOfLastRecord);
+  const totalPages = Math.max(1, Math.ceil(filteredAndSortedLogs.length / recordsPerPage));
 
+  const handleNext = () => {
+    setCurrentPage(prev => Math.min(prev + 1, totalPages));
+  };
+
+  const handlePrevious = () => {
+    setCurrentPage(prev => Math.max(prev - 1, 1));
+  };
 
   const handleSort = (key) => {
     setSortConfig(prev => ({
       key,
       direction: prev.key === key && prev.direction === 'asc' ? 'desc' : 'asc'
     }));
+    setCurrentPage(1); // Reset to first page when sorting changes
   };
 
-  const indexOfLastRecord = currentPage * recordsPerPage;
-  const indexOfFirstRecord = indexOfLastRecord - recordsPerPage;
-  const currentRecords = filteredAndSortedLogs.slice(indexOfFirstRecord, indexOfLastRecord);
-  const totalPages = Math.ceil(filteredAndSortedLogs.length / recordsPerPage);
+  // Counter animation
+  useEffect(() => {
+    if (!users?.data) return;
 
-  const handleNext = () => {
-    if (currentPage < totalPages) setCurrentPage(prev => prev + 1);
-  };
+    const counters = {
+      admin: 0,
+      user: 0,
+      reseller: 0
+    };
 
-  const handlePrevious = () => {
-    if (currentPage > 1) setCurrentPage(prev => prev - 1);
-  };
+    // Count users by role
+    users.data.forEach(user => {
+      if (user?.role) {
+        counters[user.role.toLowerCase()]++;
+      }
+    });
+
+    const interval = setInterval(() => {
+      let allDone = true;
+
+      if (adminCount < counters.admin) {
+        setAdminCount(prev => Math.min(prev + 5, counters.admin));
+        allDone = false;
+      }
+
+      if (userCount < counters.user) {
+        setUserCount(prev => Math.min(prev + 5, counters.user));
+        allDone = false;
+      }
+
+      if (resellerCount < counters.reseller) {
+        setResellerCount(prev => Math.min(prev + 5, counters.reseller));
+        allDone = false;
+      }
+
+      if (allDone) clearInterval(interval);
+    }, 50);
+
+    return () => clearInterval(interval);
+  }, [users?.data]);
 
   return (
     <>
@@ -164,7 +200,7 @@ const AdminDashboard = ({ isOpen }) => {
             <button
               key={tab.route}
               onClick={() => setActiveTab(tab.route)}
-              className={`w-52 md:w-72 rounded-xl shadow-md transition-all duration-300 ${activeTab === tab.route ? 'bg-blue-600 text-white' : 'bg-gray-300 text-gray-800 hover:bg-gray-400'}`}
+              className={`w-52 md:w-72 rounded-xl shadow-md transition-all duration-300 ${activeTab === tab.route ? 'bg-[#406dc7] text-white' : 'bg-gray-300 text-gray-800 hover:bg-gray-400'}`}
             >
               <div className="flex items-center p-4">
                 {/* Icon */}
@@ -200,36 +236,39 @@ const AdminDashboard = ({ isOpen }) => {
             <div className={`min-w-full px-3`}>
               <div className="flex justify-between mb-3 gap-3 md:flex-col">
                 <div className="flex gap-3 md:justify-center ">
-                  <CopyToClipboard headers={headers} data={filteredAndSortedLogs} />
-                  <DownloadCSVButton headers={headers} dataLogs={filteredAndSortedLogs} />
-                  <DownloadPDFButton headers={headers} dataLogs={filteredAndSortedLogs} />
+                  <CopyToClipboard headers={headers} data={currentRecords} />
+                  <DownloadCSVButton headers={headers} dataLogs={currentRecords} />
+                  <DownloadPDFButton headers={headers} dataLogs={currentRecords} />
                 </div>
 
                 <div className="flex md:flex-col md:justify-center justify-end gap-3 items-center ">
-                  <div className="flex justify-end ">
-                    <input
-                      type="text"
-                      className="form-control me-2 border border-black"
-                      placeholder="Search User by Name"
-                      value={searchTerm}
-                      onChange={handleSearch}
-                    />
-                  </div>
-                  <div className='flex gap-3 items-center'>
+                  <input
+                    type="text"
+                    className="form-control py-2 border border-black"
+                    placeholder="Search User by Name"
+                    value={searchTerm}
+                    onChange={handleSearch}
+                  />
+                  <RecordsPerPageDropdown
+                    recordsPerPage={recordsPerPage}
+                    setRecordsPerPage={setRecordsPerPage}
+                    setCurrentPage={setCurrentPage}
+                  />
+                  <div className='flex flex-row gap-3 items-center'>
                     <button
-                      className="btn btn-dark"
+                      className="btn btn-dark py-2 text-2xl"
                       onClick={handlePrevious}
                       disabled={currentPage === 1}
                     >
                       &lt;
                     </button>
 
-                    <div>
+                    <div className='flex flex-row whitespace-nowrap'>
                       {indexOfFirstRecord + 1} - {Math.min(indexOfLastRecord, filteredAndSortedLogs.length)} of {filteredAndSortedLogs.length}
                     </div>
 
                     <button
-                      className="btn btn-dark"
+                      className="btn btn-dark py-2 text-2xl"
                       onClick={handleNext}
                       disabled={currentPage === totalPages}
                     >
@@ -238,7 +277,7 @@ const AdminDashboard = ({ isOpen }) => {
                   </div>
                 </div>
               </div>
-              <div className={`w-full bg-gray-100 flex-shrink-0 overflow-auto custom-horizontal-scroll select-text h-full ${!isMobile ? (isOpen ? "max-w-[calc(100vw-50px)]" : "max-w-[calc(100vw-65px)]") : "max-w-[calc(100vw-50px)]"}`}>
+              <div className={`w-full bg-gray-200 flex-shrink-0 overflow-auto custom-horizontal-scroll select-text h-full ${!isMobile ? (isOpen ? "max-w-[calc(100vw-50px)]" : "max-w-[calc(100vw-65px)]") : "max-w-[calc(100vw-50px)]"}`}>
                 <CustomizeTable
                   headers={headers}
                   emptyMessage='No transaction logs available.'

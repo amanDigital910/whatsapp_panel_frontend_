@@ -31,7 +31,6 @@ const PersonalCampaign = () => {
         { headers: header }
       );
 
-      console.log(response?.data);
       setStatus(response.data.message);
       setisLoading(false)
       setError('');

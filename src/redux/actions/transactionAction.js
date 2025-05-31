@@ -3,59 +3,86 @@ import axios from 'axios';
 import { getSecureItem } from '../../pages/utils/SecureLocalStorage';
 
 // Action Types
-export const FETCH_USERS_START = 'FETCH_USERS_START';
-export const FETCH_TRANSACTION_SUCCESS = 'FETCH_TRANSACTION_SUCCESS';
-export const FETCH_USERS_FAILURE = 'FETCH_USERS_FAILURE';
+export const CREDIT_ACTION_START = 'CREDIT_ACTION_START';
+export const FETCH_TRANSACTIONS_SUCCESS = 'FETCH_TRANSACTIONS_SUCCESS';
+export const FETCH_STATS_SUCCESS = 'FETCH_STATS_SUCCESS';
+export const FETCH_TRANSFER_LOGS_SUCCESS = 'FETCH_TRANSFER_LOGS_SUCCESS';
+export const CREDIT_ACTION_FAILURE = 'CREDIT_ACTION_FAILURE';
 
-export const FETCH_LOGS_START = 'FETCH_LOGS_START';
-export const FETCH_LOGS_SUCCESS = 'FETCH_LOGS_SUCCESS';
-export const FETCH_LOGS_FAILURE = 'FETCH_LOGS_FAILURE';
-
-// Dynamic headers function
+// Headers with token
 const getAuthHeaders = () => ({
   'Content-Type': 'application/json',
   Authorization: `Bearer ${getSecureItem('userToken')}`,
 });
 
-// Fetch Credit Transactions
-export const fetchCreditTransaction = (userId) => async (dispatch) => {
-  dispatch({ type: FETCH_USERS_START });
+// Fetch credit transfers
+export const handleCreditTransactions = (payload) => async (dispatch) => {
+  dispatch({ type: CREDIT_ACTION_START });
 
   try {
-    const response = await axios.get(
-      `${process.env.REACT_APP_API_URL}/api/credits/transactions/user/${userId}`,
+    const response = await axios.post(
+      `${process.env.REACT_APP_API_URL}/api/credits/transfer`,
+      payload,
       { headers: getAuthHeaders() }
     );
 
     dispatch({
-      type: FETCH_TRANSACTION_SUCCESS,
-      payload: response.data.data,
+      type: FETCH_TRANSACTIONS_SUCCESS,
+      payload: response.data,
     });
+
+    return response.data;
   } catch (error) {
     dispatch({
-      type: FETCH_USERS_FAILURE,
-      payload: error.response?.data?.message || 'Error fetching users',
+      type: CREDIT_ACTION_FAILURE,
+      payload: error.response?.data?.message || 'Error fetching credit transfers',
     });
   }
 };
 
-// Fetch Transaction Logs
-export const fetchTransactionLogs = () => async (dispatch) => {
-  dispatch({ type: FETCH_LOGS_START });
+// Fetch credit stats
+export const fetchCreditStats = () => async (dispatch) => {
+  dispatch({ type: CREDIT_ACTION_START });
 
   try {
     const response = await axios.get(
-      `${process.env.REACT_APP_API_URL}/api/credits/transfer`,
+      `${process.env.REACT_APP_API_URL}/api/credits/stats`,
       { headers: getAuthHeaders() }
     );
 
     dispatch({
-      type: FETCH_LOGS_SUCCESS,
-      payload: response.data.data,
+      type: FETCH_STATS_SUCCESS,
+      payload: response.data,
     });
+
+    return response.data;
   } catch (error) {
     dispatch({
-      type: FETCH_LOGS_FAILURE,
+      type: CREDIT_ACTION_FAILURE,
+      payload: error.response?.data?.message || 'Error fetching credit stats',
+    });
+  }
+};
+
+// Fetch credit transaction logs
+export const fetchTransactionLogs = () => async (dispatch) => {
+  dispatch({ type: CREDIT_ACTION_START });
+
+  try {
+    const response = await axios.get(
+      `${process.env.REACT_APP_API_URL}/api/credits/transactions`,
+      { headers: getAuthHeaders() }
+    );
+
+    dispatch({
+      type: FETCH_TRANSFER_LOGS_SUCCESS,
+      payload: response.data.data,
+    });
+
+    return response.data;
+  } catch (error) {
+    dispatch({
+      type: CREDIT_ACTION_FAILURE,
       payload: error.response?.data?.message || 'Error fetching transaction logs',
     });
   }

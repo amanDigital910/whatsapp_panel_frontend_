@@ -4,6 +4,7 @@ import { FaFileCsv } from "react-icons/fa6"
 import { useEffect, useRef, useState } from "react"
 import { LuArrowDown, LuArrowUp } from 'react-icons/lu'
 import { toast } from 'react-toastify'
+import '../user/whatsapp_offical/commonCSS.css'
 
 const RequireMark = () => {
     return (
@@ -45,20 +46,18 @@ export const CampaignTitle = ({ mainTitle, inputTitle, setCampaignTitle, placeho
 // Campaign Status for all 
 export const CampaignStatus = ({ totalStatus, validStatus, invalidStatus, duplicateStatus }) => {
     return (
-        <div>
-            <div className=" custom-grid ">
-                <div className="w-full  whitespace-nowrap h-fit px-4 py-[9px] rounded-md text-white font-semibold bg-[#0d0c0d] text-center">
-                    Total {totalStatus}
-                </div>
-                <div className="w-full whitespace-nowrap h-fit px-4 py-[9px] rounded-md text-white font-semibold bg-[#23a31af5] text-center">
-                    Valid {validStatus}
-                </div>
-                <div className="w-full whitespace-nowrap h-fit px-4 py-[9px] rounded-md text-white font-semibold bg-[#b00202] text-center">
-                    InValid {invalidStatus}
-                </div>
-                <div className="w-full whitespace-nowrap h-fit text text-center px-4 py-[9px] rounded-md text-white font-semibold bg-[#8a0418] ">
-                    Duplicates {duplicateStatus}
-                </div>
+        <div className=" custom-grid w-full">
+            <div className="w-full  whitespace-nowrap h-fit px-4 py-[9px] rounded-md text-white font-semibold bg-[#0d0c0d] text-center">
+                Total {totalStatus}
+            </div>
+            <div className="w-full whitespace-nowrap h-fit px-4 py-[9px] rounded-md text-white font-semibold bg-[#23a31af5] text-center">
+                Valid {validStatus}
+            </div>
+            <div className="w-full whitespace-nowrap h-fit px-4 py-[9px] rounded-md text-white font-semibold bg-[#b00202] text-center">
+                InValid {invalidStatus}
+            </div>
+            <div className="w-full whitespace-nowrap h-fit text text-center px-4 py-[9px] rounded-md text-white font-semibold bg-[#8a0418] ">
+                Duplicates {duplicateStatus}
             </div>
         </div>
     )
@@ -612,19 +611,6 @@ export const PdfUploader = ({ inputRef, uploadedFile, onFileUpload, onRemove, ca
         onRemove("pdf");
     };
 
-
-    useEffect(() => {
-        let url;
-        if (uploadedFile) {
-            url = URL.createObjectURL(uploadedFile);
-        }
-        return () => {
-            if (url) {
-                URL.revokeObjectURL(url);
-            }
-        };
-    }, [uploadedFile]);
-
     return (
         <div className="flex flex-col gap-1">
             <h6 className="font-semibold m-0">PDF (Max 15MB):</h6>
@@ -648,7 +634,7 @@ export const PdfUploader = ({ inputRef, uploadedFile, onFileUpload, onRemove, ca
                 <div className="relative w-full h-[400px] flex justify-center items-center border border-gray-200 rounded">
                     {/* <FaFilePdf className="text-[150px] text-red-400" /> */}
                     {/* Give preview of PDF */}
-                    <embed src={URL.createObjectURL(uploadedFile)} type="application/pdf" className="text-[150px] h-full text-red-400" />
+                    <embed src={uploadedFile.preview || URL.createObjectURL(uploadedFile) || URL.createObjectURL(uploadedFile.preview)} type="application/pdf" className="text-[150px] h-full text-red-400" />
                     <MdDelete
                         className="text-red-500 absolute top-2 right-2 text-xl cursor-pointer"
                         onClick={() => removeRestBtn(inputRef)}
@@ -832,7 +818,7 @@ export const CustomizeTable = ({
                     ))}
                 </tr>
             </thead>
-            <tbody>
+            <tbody className='custom-horizontal-scroll '>
                 {data.length > 0 ? (
                     data.map((item, index) => renderRow(item, index))
                 ) : (
@@ -847,6 +833,28 @@ export const CustomizeTable = ({
     );
 };
 
+export const RecordsPerPageDropdown = ({ recordsPerPage, setRecordsPerPage, setCurrentPage }) => {
+    const options = [25, 50, 75, 100];
+
+    return (
+        <div className="flex items-center gap-2 pr-2 border border-black rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500">
+            <select
+                value={recordsPerPage}
+                onChange={(e) => {
+                    setRecordsPerPage(Number(e.target.value));
+                    setCurrentPage(1); // Reset to first page when changing page size
+                }}
+                className="  px-2 py-2 text-lg rounded-md focus:border-none focus-within:border-none focus:outline-none "
+            >
+                {options.map((option) => (
+                    <option key={option} value={option}>
+                        {option}
+                    </option>
+                ))}
+            </select>
+        </div>
+    );
+};
 
 export const SendNowButton = ({ handleSendCampaign }) => {
     return (
@@ -957,7 +965,7 @@ export const DownloadCSVButton = ({ headers, dataLogs }) => {
 
     return (
         <button
-            className='px-3 py-1 h-10 text-base font-medium border-2 border-[#dc3545] text-[#dc3545] rounded-md hover:text-white hover:bg-[#dc3545]'
+            className='px-3 py-1 text-base font-medium border-2 border-[#dc3545] text-[#dc3545] rounded-md hover:text-white hover:bg-[#dc3545]'
             onClick={downloadCSV}
         >
             CSV
@@ -1022,7 +1030,7 @@ export const DownloadPDFButton = ({ headers, dataLogs }) => {
 
     return (
         <button
-            className="px-3 py-1 h-10 text-base font-medium border-2 border-[#198754] text-[#198754] rounded-md hover:text-white hover:bg-[#198754]"
+            className="px-3 py-1 text-base font-medium border-2 border-[#198754] text-[#198754] rounded-md hover:text-white hover:bg-[#198754]"
             onClick={downloadPDF}
         >
             PDF

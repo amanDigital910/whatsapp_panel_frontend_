@@ -55,8 +55,7 @@ export const login = (username, password) => async (dispatch) => {
 
     if (response?.status === 200) {
       const { user, token } = response.data.data;
-      console.log("Sae the Data",response);
-      
+
       // Save to localStorage and secure storage
       localStorage.setItem('newUserToken', token);
       // localStorage.setItem('newUserData', JSON.stringify(response.data.data));
@@ -64,6 +63,7 @@ export const login = (username, password) => async (dispatch) => {
       setSecureItem('userToken', token);
 
       dispatch(loginSuccess(user));
+      return user;
     }
   } catch (error) {
     let errorMessage = 'An unknown error occurred. Please try again.';
@@ -110,10 +110,10 @@ export const createUser = (userData) => async (dispatch) => {
 
     if ([200, 201].includes(response.status)) {
       dispatch({ type: CREATE_USER_SUCCESS, payload: response.data.data });
-      toast.success("User successfully created!");
     }
+    return response?.data;
   } catch (error) {
-    toast.error(error?.response?.data?.message || "Failed to create user");
+    toast.error(error.response?.data?.message || "Failed to create user");
     dispatch({
       type: CREATE_USER_FAILURE,
       payload: error?.response?.data?.message || "Something went wrong",
@@ -133,6 +133,7 @@ export const getAllUsers = () => async (dispatch) => {
     if (response?.status === 200) {
       dispatch({ type: GET_USERS_SUCCESS, payload: response.data });
     }
+    return response.data;
   } catch (error) {
     toast.error(error?.response?.data?.message || "Failed to fetch users");
     dispatch({
@@ -156,6 +157,7 @@ export const updateUser = (userId, updatedData) => async (dispatch) => {
       dispatch({ type: UPDATE_USER_SUCCESS, payload: response.data });
       toast.success("User successfully updated!");
     }
+    return response.data;
   } catch (error) {
     toast.error(error?.response?.data?.message || "Failed to update user");
     dispatch({
@@ -178,6 +180,7 @@ export const deleteUser = (userId) => async (dispatch) => {
       dispatch({ type: DELETE_USER_SUCCESS, payload: userId });
       toast.success("User successfully deleted!");
     }
+    return response.data;
   } catch (error) {
     toast.error(error?.response?.data?.message || "Failed to delete user");
     dispatch({
@@ -197,13 +200,11 @@ export const changeUserPassword = (userId, payload) => async (dispatch) => {
       { headers: getAuthHeaders() }
     );
 
-    console.log("Users Data",response);
-    
-
     if (response?.status === 200) {
       dispatch({ type: CHANGE_USER_PASSWORD_SUCCESS, payload: response.data.message });
       toast.success(response.data.message || 'Password changed successfully');
     }
+    return response?.data?.message;
   } catch (error) {
     const errorMessage = error?.response?.data?.message || 'Failed to change user password';
     toast.error(errorMessage);
@@ -232,6 +233,7 @@ export const uploadProfilePicture = (file) => async (dispatch) => {
       type: UPLOAD_PROFILE_PICTURE_SUCCESS,
       payload: response.data?.data?.profilePicture, // contains the image path
     });
+    return response.data?.data?.profilePicture;
   } catch (error) {
     dispatch({
       type: UPLOAD_PROFILE_PICTURE_FAILURE,

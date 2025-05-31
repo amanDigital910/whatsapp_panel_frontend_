@@ -1,34 +1,34 @@
-// reducers/CreditsTransactionReducer.js
 import {
-  FETCH_USERS_START,
-  FETCH_LOGS_START,
-  FETCH_LOGS_SUCCESS,
-  FETCH_USERS_FAILURE,
-  FETCH_LOGS_FAILURE,
-  FETCH_TRANSACTION_SUCCESS,
+  CREDIT_ACTION_START,
+  FETCH_TRANSACTIONS_SUCCESS,
+  FETCH_STATS_SUCCESS,
+  FETCH_TRANSFER_LOGS_SUCCESS,
+  CREDIT_ACTION_FAILURE,
 } from '../actions/transactionAction';
 
 const initialState = {
-  userList: [],
-  transactionsLogs: [],
+  transfers: [],
+  stats: {},
+  logs: [],
   loading: false,
   error: '',
 };
 
 export const CreditsTransaction = (state = initialState, action) => {
   switch (action.type) {
-    case FETCH_USERS_START:
-    case FETCH_LOGS_START:
+    case CREDIT_ACTION_START:
       return { ...state, loading: true, error: '' };
 
-    case FETCH_TRANSACTION_SUCCESS:
-      return { ...state, loading: false, userList: action.payload };
+    case FETCH_TRANSACTIONS_SUCCESS:
+      return { ...state, loading: false, transfers: action.payload };
 
-    case FETCH_LOGS_SUCCESS:
-      return { ...state, loading: false, transactionsLogs: action.payload };
+    case FETCH_STATS_SUCCESS:
+      return { ...state, loading: false, stats: action.payload };
 
-    case FETCH_USERS_FAILURE:
-    case FETCH_LOGS_FAILURE:
+    case FETCH_TRANSFER_LOGS_SUCCESS:
+      return { ...state, loading: false, logs: action.payload };
+
+    case CREDIT_ACTION_FAILURE:
       return { ...state, loading: false, error: action.payload };
 
     default:

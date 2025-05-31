@@ -221,14 +221,14 @@ const PersonalAPIManage = ({ isOpen }) => {
             <div className='flex flex-col px-3 py-3 bg-green-700 gap-4'>
               {/* <div style="background-color:#ff9102;padding: 10px; font-weight: bold;"> Response </div> */}
               <p className='text-white font-bold text-xl m-0 p-0'>Response</p>
-              <p className='text-white font-bold text-xl m-0 p-0'>Array : https://wahbulk.com/api/wapi?apikey=
+              <p className='text-white font-bold text-xl m-0 p-0 whitespace-pre-wrap'>Array : https://wahbulk.com/api/wapi?apikey=
                 <HighlightAPI message={"Key"} />
                 &mobile=
                 <HighlightAPI message={"MobileNumber"} />
                 &msg=
                 <HighlightAPI message={"TextMessage"} />
               </p>
-              <p className='text-white font-bold text-xl m-0 p-0'>Json : https://wahbulk.com/api/wapi?json=true&apikey=
+              <p className='text-white font-bold text-xl m-0 p-0 whitespace-pre-wrap'>Json : https://wahbulk.com/api/wapi?json=true&apikey=
                 <HighlightAPI message={"Key"} />
                 &mobile=
                 <HighlightAPI message={"MobileNumber"} />

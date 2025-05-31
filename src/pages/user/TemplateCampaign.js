@@ -2,7 +2,7 @@
 /* eslint-disable no-use-before-define */
 import { useEffect, useMemo, useRef, useState } from 'react';
 import CreditHeader from '../../components/CreditHeader';
-import { ToastContainer, toast } from 'react-toastify';
+import { toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 import { CampaignHeading, CampaignTitle, CopyToClipboard, CustomizeTable, DownloadCSVButton, DownloadPDFButton, PdfUploader, VideoUploader } from '../utils/Index';
 import ImageUploaderGroup from '../utils/ImageUploaderGroup';
@@ -22,9 +22,6 @@ const TemplateCampaign = ({ isOpen }) => {
   const dispatch = useDispatch();
   const isMobile = useIsMobile();
 
-  console.log("Templates", templatesData);
-
-
   // const [isModalOpen, setIsModalOpen] = useState(false);
   const [showDeleteModal, setShowDeleteModal] = useState(false);
   const [selectedUser, setSelectedUser] = useState(null);
@@ -35,7 +32,7 @@ const TemplateCampaign = ({ isOpen }) => {
   //   templateMessage: "",
   // });
 
-  const [sortConfig, setSortConfig] = useState({ key: '', direction: 'asc' });
+  const [sortConfig, setSortConfig] = useState({ key: 'updatedAt', direction: 'desc' });
   const [searchTerm, setSearchTerm] = useState('');
 
   const [uploadedFiles, setUploadedFiles] = useState({
@@ -133,14 +130,15 @@ const TemplateCampaign = ({ isOpen }) => {
     setSelectedUser(null);
   };
 
-  const handleConfirmDelete = (userId) => {
+  const handleConfirmDelete = async (userId) => {
     try {
-      const response = dispatch(deleteTemplate(userId)); // redux action
-      if (response) {
-        toast.success("Template deleted successfully!");
-        dispatch(getAllTemplates());
+      const response = await dispatch(deleteTemplate(userId));
+
+      if (response?.success === true) {
+        toast.success(response.message || "Template deleted successfully!");
+        await dispatch(getAllTemplates());
       } else {
-        toast.error(response?.message || "Failed to delete template.");
+        toast.error(response.message || "Failed to delete template.");
       }
     } catch (error) {
       console.error("Delete failed:", error);
@@ -169,36 +167,48 @@ const TemplateCampaign = ({ isOpen }) => {
   const headers = [
     { key: '_id', label: 'Id' },
     { key: 'name', label: 'Template Name' },
-    { key: 'message[text]', label: 'Template Message' },
-    { key: 'updatedAt', label: 'Date' },
+    { key: 'nestedMsg', label: 'Template Message' },
+    { key: 'updatedAt', label: 'Last Updated' },
     { key: 'action', label: 'Action' }
   ];
 
-  const renderRow = (log, index) => (
-    <tr key={index} className="text-black border border-gray-700 hover:bg-gray-500 whitespace-wrap h-full">
-      <td className="px-2 py-2 border border-gray-900 w-20">{log?._id?.slice(-5)}</td>
-      <td className="px-2 py-2 border border-gray-900">{log?.name}</td>
-      <td className="px-2 py-2 border border-gray-900">{log?.message?.text || '-'}</td>
-      <td className="px-2 py-2 border border-gray-900">  {new Date(log.updatedAt).toLocaleDateString('en-GB')}</td>
-      <td className="px-2 py-2 flex justify-center items-center h-full w-full min-w-32">
-        <div className="flex items-center justify-center gap-2 flex-1 max-h-full">
-          <button
-            className="bg-[#ffc107] rounded-md py-1 px-2 text-bas font-medium me-2"
-            onClick={() => { handleEdit(log) }}
-          >
-            Edit
-          </button>
+  const renderRow = (log, index) => {
+    const nestedMsg = log?.message?.text;
+    return (
+      <tr key={index} className="text-black border border-gray-700 hover:bg-gray-500 whitespace-wrap h-full">
+        <td className="px-2 py-2 border border-gray-900 w-20">{log?._id?.slice(-5)}</td>
+        <td className="px-2 py-2 border border-gray-900">{log?.name}</td>
+        <td className="px-2 py-2 border border-gray-900">{nestedMsg || '-'}</td>
+        <td className="px-2 py-2 border border-gray-900">
+          {new Date(log?.updatedAt).toLocaleString('en-GB', {
+            day: '2-digit',
+            month: '2-digit',
+            year: 'numeric',
+            hour: '2-digit',
+            minute: '2-digit',
+            hour12: true,
+          })}
+        </td>
+        <td className="px-2 py-2 flex justify-center items-center h-full w-full min-w-32">
+          <div className="flex items-center justify-center gap-2 flex-1 max-h-full">
+            <button
+              className="bg-[#ffc107] rounded-md py-1 px-2 text-base font-medium me-2"
+              onClick={() => { handleEdit(log) }}
+            >
+              Edit
+            </button>
 
-          <button
-            className="bg-[#ff0000] rounded-md py-1 px-2 text-bas font-medium text-white"
-            onClick={() => handleDeleteClick(log)} // Pass the whole user
-          >
-            Delete
-          </button>
-        </div>
-      </td>
-    </tr>
-  );
+            <button
+              className="bg-[#ff0000] rounded-md py-1 px-2 text-base font-medium text-white"
+              onClick={() => handleDeleteClick(log)} // Pass the whole user
+            >
+              Delete
+            </button>
+          </div>
+        </td>
+      </tr>
+    );
+  }
 
   const filteredAndSortedLogs = useMemo(() => {
     const term = searchTerm.toLowerCase().trim();
@@ -232,94 +242,51 @@ const TemplateCampaign = ({ isOpen }) => {
   // Handle file uploads for images, PDF, and video.
   const handleFileUpload = (e, type) => {
     const files = e.target.files;
-    if (!files || !files.length) {
+    if (!files.length) {
       console.warn("No file selected");
       return;
     }
-
     const file = files[0];
 
-    if (!(file instanceof Blob)) {
-      console.error("Invalid file type");
-      return;
-    }
-
-    // IMAGE
     if (type.startsWith("image")) {
       const validImageTypes = ["image/jpeg", "image/png", "image/gif"];
       if (!validImageTypes.includes(file.type)) {
         alert("Invalid file type. Please select a valid image (JPEG, PNG, or GIF).");
         return;
       }
-
       const maxSizeInMB = 2;
       if (file.size > maxSizeInMB * 1024 * 1024) {
         alert("File size exceeds 2MB. Please select a smaller image.");
         return;
       }
-
       const preview = URL.createObjectURL(file);
-      setUploadedFiles((prev) => ({
-        ...prev,
-        [type]: { file, preview, filename: file.name },
-      }));
-    }
-
-    // PDF
-    else if (type === "pdf") {
-      const file = e.target.files?.[0];
-
-      if (!file) {
-        alert("No PDF file selected.");
-        return;
-      }
-
-      const isPdf =
-        file.type === "application/pdf" || file.name.toLowerCase().endsWith(".pdf");
-
-      if (!isPdf) {
+      setUploadedFiles((prev) => ({ ...prev, [type]: { file, preview } }));
+    } else if (type === "pdf") {
+      if (file.type !== "application/pdf") {
         alert("Invalid file type. Please select a PDF file.");
         return;
       }
-
-      const maxPdfSizeInMB = 10;
+      const maxPdfSizeInMB = 15;
       if (file.size > maxPdfSizeInMB * 1024 * 1024) {
-        alert("PDF file size exceeds 10MB.");
+        alert("File size exceeds 10MB. Please select a smaller PDF.");
         return;
       }
-
-      try {
-        const preview = URL.createObjectURL(file);
-
-        setUploadedFiles((prev) => ({
-          ...prev,
-          pdf: { file, preview, filename: file.name },
-        }));
-      } catch (error) {
-        console.error("Failed to create preview for PDF:", error);
-        alert("Unable to preview this PDF. Please try a different file.");
-      }
+      setUploadedFiles((prev) => ({ ...prev, pdf: file }));
     } else if (type === "video") {
       const validVideoTypes = ["video/mp4"];
       if (!validVideoTypes.includes(file.type)) {
         alert("Invalid file type. Please select a valid video (MP4).");
         return;
       }
-
       const maxVideoSizeInMB = 15;
       if (file.size > maxVideoSizeInMB * 1024 * 1024) {
         alert("File size exceeds 15MB. Please select a smaller video.");
         return;
       }
-
       const preview = URL.createObjectURL(file);
-      setUploadedFiles((prev) => ({
-        ...prev,
-        video: { file, preview, filename: file.name },
-      }));
+      setUploadedFiles((prev) => ({ ...prev, video: { file, preview } }));
     }
   };
-
 
   const removeFile = (type) => {
     setUploadedFiles((prev) => ({ ...prev, [type]: null }));
@@ -337,11 +304,12 @@ const TemplateCampaign = ({ isOpen }) => {
     if (!templateName || !templateMsg) {
       setFeedback("Both fields are required.");
       toast.error("Template name and message are required.");
-      return;
+      return false;
+    } else {
+      setFeedback("")
     }
 
     const formData = new FormData();
-    console.log("Forma Data Every Click", formData);
 
     // Append basic text fields
     formData.append("name", templateName);
@@ -349,26 +317,23 @@ const TemplateCampaign = ({ isOpen }) => {
 
     ["image1", "image2", "image3", "image4"].forEach((key, index) => {
       const media = uploadedFiles[key];
-      console.log("media.file", media);
-
-      if (media?.file && mediaCaptions[key]) {
-        formData.append(`images[${index}][url]`, media);
-        formData.append(`images[${index}][caption]`, mediaCaptions[key] || "");
+      if (media?.file) {
+        formData.append(`images[${index}][url]`, media.file);
         formData.append(`images[${index}][filename]`, media.file.name);
+        formData.append(`images[${index}][caption]`, mediaCaptions[key] || "");
       }
     });
 
     // Video
     if (uploadedFiles.video?.file) {
-      console.log("Upload Videos",uploadedFiles?.video);
-      formData.append("video[url]", uploadedFiles.video);
+      formData.append("video[url]", uploadedFiles.video.file);
       formData.append("video[caption]", mediaCaptions.video || "");
       formData.append("video[filename]", uploadedFiles.video.file.name);
     }
 
     // PDF
     if (uploadedFiles.pdf?.file) {
-      formData.append("pdf[url]", uploadedFiles.pdf);
+      formData.append("pdf[url]", uploadedFiles.pdf.file);
       formData.append("pdf[caption]", mediaCaptions.pdf || "");
       formData.append("pdf[filename]", uploadedFiles.pdf.file.name);
     }
@@ -381,8 +346,10 @@ const TemplateCampaign = ({ isOpen }) => {
       } else {
         response = await dispatch(createTemplate(formData));
       }
+      console.log("Response Data", response);
 
-      if (response?.ok) {
+
+      if (response?.success === true) {
         toast.success(editingId ? "Template updated successfully!" : "Template created successfully!");
         setTemplateName("");
         setTemplateMsg("");
@@ -408,8 +375,10 @@ const TemplateCampaign = ({ isOpen }) => {
         toast.error(response?.message || (editingId ? "Failed to update template." : "Failed to create template."));
       }
     } catch (error) {
-      console.error("Error saving template:", error);
-      toast.error(error?.message || "Something went wrong.");
+      const errorMsg = error.message ||
+        error.response?.data?.message ||
+        "Upload failed. Please try again.";
+      toast.error(errorMsg);
     }
   };
 
@@ -534,20 +503,31 @@ const TemplateCampaign = ({ isOpen }) => {
                 )}
               </div>
             </div>
-            <div className={` w-full bg-gray-300 flex-shrink-0 overflow-auto custom-horizontal-scroll select-text h-full custom-horizontal-scroll ${!isMobile ? (isOpen ? "max-w-[calc(100vw-50px)]" : "max-w-[calc(100vw-65px)]") : "max-w-[calc(100vw-64px)]"}`}>
-              <CustomizeTable
-                headers={headers}
-                emptyMessage='No transaction logs available.'
-                sortConfig={sortConfig}
-                onSort={handleSort}
-                renderRow={renderRow}
-                data={filteredAndSortedLogs}
-                className="table-auto border-collapse"
-                theadClassName="px-4 py-2 text-left cursor-pointer select-none whitespace-nowrap"
-                rowClassName=''
-              // className="text-center py-3 text-lg font-semibold"
-              />
-            </div>
+            {loading ? (
+              <div className="text-center my-4">
+                <div className="spinner-border text-dark" role="status">
+                  <span className="visually-hidden">Loading...</span>
+                </div>
+              </div>
+            )
+              // : error ? (
+              //   <div className="text-center text-red-600 my-4 font-semibold">
+              //     {error}
+              //   </div>)
+              : <div className={` w-full bg-gray-300 flex-shrink-0 overflow-auto custom-horizontal-scroll select-text h-full custom-horizontal-scroll ${!isMobile ? (isOpen ? "max-w-[calc(100vw-50px)]" : "max-w-[calc(100vw-65px)]") : "max-w-[calc(100vw-64px)]"}`}>
+                <CustomizeTable
+                  headers={headers}
+                  emptyMessage='No transaction logs available.'
+                  sortConfig={sortConfig}
+                  onSort={handleSort}
+                  renderRow={renderRow}
+                  data={filteredAndSortedLogs}
+                  className="table-auto border-collapse"
+                  theadClassName="px-4 py-2 text-left cursor-pointer select-none whitespace-nowrap"
+                  rowClassName=''
+                // className="text-center py-3 text-lg font-semibold"
+                />
+              </div>}
           </div>
         </div>
       </section>
@@ -565,17 +545,15 @@ const TemplateCampaign = ({ isOpen }) => {
                 <p className="m-0">Confirm Delete: <strong>{selectedUser.name}</strong>?</p>
               </div>
               <div className="modal-footer">
-                <div className="modal-footer">
-                  <button className="btn btn-secondary" onClick={handleCancelDelete}>No</button>
-                  <button className="px-3 py-2 rounded-md text-white bg-red-600" onClick={() => handleConfirmDelete(selectedUser?._id)}>Yes, Delete</button>
-                </div>
+                <button className="btn btn-secondary" onClick={handleCancelDelete}>No</button>
+                <button className="px-3 py-2 rounded-md text-white bg-red-600" onClick={() => handleConfirmDelete(selectedUser?._id)}>Yes, Delete</button>
               </div>
             </div>
           </div>
         </div>
       )}
       {/* Toast Container */}
-      <ToastContainer autoClose="3000" />
+      {/* <ToastContainer autoClose="3000" /> */}
     </>
   );
 };

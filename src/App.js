@@ -22,7 +22,13 @@ import MembershipValidTill from './pages/user/Membership_Valid_Till.js';
 
 // Pages
 const Dashboard = lazy(() => import('./pages/user/UserDashboard'));
+// Admin Pages
 const AdminDashboard = lazy(() => import('./pages/admin/AdminDashboard'));
+const AdminAllCampaigns = lazy(() => import('./pages/admin/AdminPages/AdminAllCampaigns'));
+const AdminAllGroups = lazy(() => import('./pages/admin/AdminPages/AdminAllGroups'));
+const AdminAllTemplates = lazy(() => import('./pages/admin/AdminPages/AdminAllTemplates'));
+const AdminCreateTemplates = lazy(() => import('./pages/admin/AdminPages/AdminCreateTemplates'));
+
 const TransitionCReditUser = lazy(() => import('./pages/admin/TransitionCReditUser'))
 
 const LoginScreen = lazy(() => import('./pages/auth/UserLogin'));
@@ -118,7 +124,7 @@ const App = () => {
   // }, [isLoggedIn, isChangePassword, navigate]);
 
   return (
-    <div>
+    <div className='custom-horizontal-scroll'>
       <div className="flex h-full w-full flex-wrap select-none hide-scrollbar">
         {/* Sidebar */}
         {/* 
@@ -162,9 +168,14 @@ const App = () => {
                   </Route>
 
                   {/* Protected routes */}
-                  <Route element={<PrivateRoute allowedRoles={[ROLES.SUPER_ADMIN]} />}>
+                  <Route element={<PrivateRoute allowedRoles={[ROLES.SUPER_ADMIN, ROLES.ADMIN]} />}>
                     {/* Dashboard admin and user */}
                     <Route path="/admin-dashboard" element={<AdminDashboard isOpen={isOpen} />} />
+                    <Route path="/create-campaigns" element={<AdminCreateTemplates isOpen={isOpen} />} />
+                    <Route path="/all-templates" element={<AdminAllTemplates />} />
+                    <Route path="/all-campaigns" element={<AdminAllCampaigns />} />
+                    <Route path="/all-groups" element={<AdminAllGroups />} />
+
                     <Route path='/transitiontable' element={<TransitionCReditUser />} />
                   </Route>
                   <Route element={<PrivateRoute allowedRoles={[ROLES.SUPER_ADMIN, ROLES.ADMIN, ROLES.RESELLER, ROLES.USER]} />}>
@@ -245,15 +256,15 @@ const App = () => {
                     <Route path="/template" element={<TemplateCampaign isOpen={isOpen} />} />
 
                     <Route path='/credit-history' element={<CreditHistory isOpen={isOpen} />} />
-                    <Route path='/manage-user' element={<ManageUser isOpen={isOpen} />} />
                     <Route path='/membership-validity' element={<MembershipValidTill />} />
-                    <Route path='/manage-credit' element={<ManageCredit isOpen={isOpen} />} />
                     <Route path='/profile' element={<ProfilePage />} />
                     <Route path='/unauthorized' element={<NotFoundPage />} />
                     <Route path='*' element={<NotFoundPage />} />
 
                   </Route>
                   <Route element={<PrivateRoute allowedRoles={[ROLES.SUPER_ADMIN, ROLES.ADMIN, ROLES.RESELLER]} />}>
+                    <Route path='/manage-credit' element={<ManageCredit isOpen={isOpen} />} />
+                    <Route path='/manage-user' element={<ManageUser isOpen={isOpen} />} />
                     <Route path='/add-new-user' element={<AddNewUser />} />
                   </Route>
                 </Routes>
@@ -262,7 +273,7 @@ const App = () => {
           </div>
         </div>
       </div>
-      <ToastContainer autoClose="3000" />
+      <ToastContainer autoClose="2000" />
     </div >
   );
 };

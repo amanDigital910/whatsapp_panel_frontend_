@@ -7,16 +7,25 @@ import { FaEye, FaEyeSlash } from "react-icons/fa";
 import { useDispatch, } from "react-redux";
 import { createUser, getAllUsers } from "../../redux/actions/authAction";
 import { getSecureItem } from "../utils/SecureLocalStorage";
-import { useNavigate } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 
 function AddNewUser() {
     const [user, setUser] = useState(null);
     const [showPassword, setShowPassword] = useState(false);
     const [showConfirmPassword, setShowConfirmPassword] = useState(false);
     const [isSubmitting, setIsSubmitting] = useState(false);
+    const [selectedRole, setSelectedRole] = useState("");
 
     const dispatch = useDispatch();
     const navigate = useNavigate();
+
+    const options = {
+        selectRole: "Select a Role",
+        super_admin: ["admin", "reseller", "user"],
+        admin: ["reseller", "user"],
+        reseller: ["reseller", "user"],
+        user: ["user"],
+    };
 
     const [formData, setFormData] = useState({
         userid: "",
@@ -25,6 +34,12 @@ function AddNewUser() {
         confirmPassword: "",
         userRole: "",
         selectedRoles: [],
+        selectedControls: [
+            "canCreateUsers",
+            "canUpdateUsers",
+            "canViewAllUsers",
+            "canManageUsers",
+        ],
     });
 
     const userRolesOptions = [
@@ -34,34 +49,31 @@ function AddNewUser() {
         "International Virtual",
     ];
 
-    const userControlsOptions = [
-        "Create Users",
-        "Update Users",
-        "Delete Users",
-        "View All Users",
-        "Manage Admins",
-        "Manage Resellers",
-        "Manage Users",
-        "View Analytics",
-        "Manage Settings",
-        "Manage Pricing Plans",
-        "View System Stats",
-        "Manage All Campaigns",
-        "Manage All Reports",
-        "Manage All Groups",
-        "Manage All Templates",
-        "Manage All Credits",
-        "Manage All APIKeys",
-        "Unlimited Credits"
+    const userControlItems = [
+        { key: "canCreateUsers", label: "Create Users" },
+        { key: "canUpdateUsers", label: "Update Users" },
+        { key: "canDeleteUsers", label: "Delete Users" },
+        { key: "canViewAllUsers", label: "View All Users" },
+        { key: "canManageAdmins", label: "Manage Admins" },
+        { key: "canManageResellers", label: "Manage Resellers" },
+        { key: "canManageUsers", label: "Manage Users" },
+        // { key: "canViewAnalytics", label: "View Analytics" },
+        // { key: "canManageSettings", label: "Manage Settings" },
+        // { key: "canManagePricingPlans", label: "Manage Pricing Plans" },
+        // { key: "canViewSystemStats", label: "View System Stats" },
+        { key: "canManageAllCampaigns", label: "Manage All Campaigns" },
+        { key: "canManageAllReports", label: "Manage All Reports" },
+        { key: "canManageAllGroups", label: "Manage All Groups" },
+        { key: "canManageAllTemplates", label: "Manage All Templates" },
+        { key: "canManageAllCredits", label: "Manage All Credits" },
+        { key: "canManageAllDebits", label: "Manage All Debits" },
+        { key: "canManageAllAPIKeys", label: "Manage All APIKeys" },
+        { key: "hasUnlimitedCredits", label: "Unlimited Credits" }
     ];
 
-    const data = getSecureItem("userData");
-    console.log(JSON.parse(data));
-
-
     const roleKeyMap = {
-        Virtual: "virtual",
-        Personal: "personal",
+        "Virtual": "virtual",
+        "Personal": "personal",
         "International Personal": "internationalPersonal",
         "International Virtual": "internationalVirtual",
     };
@@ -70,6 +82,13 @@ function AddNewUser() {
     const generatePermissions = (selectedRoles) => {
         return Object.keys(roleKeyMap).reduce((acc, role) => {
             acc[roleKeyMap[role]] = selectedRoles.includes(role);
+            return acc;
+        }, {});
+    };
+
+    const generateUserControls = (selectedControls) => {
+        return userControlItems.reduce((acc, control) => {
+            acc[control.key] = selectedControls.includes(control.key);
             return acc;
         }, {});
     };
@@ -99,12 +118,21 @@ function AddNewUser() {
         }));
     };
 
+    const handleUserControlCheckboxChange = (permission) => {
+        setFormData((prev) => ({
+            ...prev,
+            selectedControls: prev.selectedControls.includes(permission)
+                ? prev.selectedControls.filter((p) => p !== permission)
+                : [...prev.selectedControls, permission],
+        }));
+    };
+
     // Handle form submission
     const handleSubmit = async (e) => {
         e.preventDefault();
         if (isSubmitting) return;
 
-        const { username, password, confirmPassword, userRole, selectedRoles } = formData;
+        const { username, password, confirmPassword, userRole, selectedRoles, selectedControls } = formData;
 
         // Form validation
         if (!username.trim()) return toast.error("Username is required.");
@@ -118,14 +146,14 @@ function AddNewUser() {
             password,
             role: userRole,
             permissions: generatePermissions(selectedRoles),
+            rolePermissions: generateUserControls(selectedControls),
         };
 
         try {
             setIsSubmitting(true);
-            const response = dispatch(createUser(payload));
-            console.log("Response data", dispatch(createUser(payload)));
+            const response = await dispatch(createUser(payload));
 
-            if (response) {
+            if (response?.success) {
                 toast.success("User created successfully.");
                 setFormData({
                     userid: "",
@@ -134,58 +162,20 @@ function AddNewUser() {
                     confirmPassword: "",
                     userRole: "",
                     selectedRoles: [],
+                    selectedControls: []
                 });
                 navigate("/manage-user");
                 dispatch(getAllUsers());
             }
         } catch (error) {
-            toast.error(error?.message || "An unexpected error occurred.");
+            // toast.error(error?.message || "An unexpected error occurred.");
         } finally {
             setIsSubmitting(false);
         }
     };
-    // try {
-    //     const headerConfig = {
-    //         headers: {
-    //             'Content-Type': 'application/json',
-    //             'Authorization': `Bearer ${localStorage.getItem("userToken")}`,
-    //         }
-    //     };
-
-    //     //   const response = formData.userid
-    //     // ? await axios.put(`${process.env.REACT_APP_API_URL}/auth/updateUser/${formData.userid}`, payload, config)
-    //     // : await axios.post(`http://147.93.106.185:3000/api/auth/CreateUser`, payload, config);
-    //     const response = await axios.post(`http://147.93.106.185:3000/api/auth/CreateUser`, payload, headerConfig);
-
-    //     if ([200, 201].includes(response.status)) {
-    //         // toast.success(formData.userid ? "User updated!" : "User created!");
-    //         toast.success("Successfully User Created")
-
-    //         setFormData({
-    //             userid: "",
-    //             username: "",
-    //             password: "",
-    //             confirmPassword: "",
-    //             userRole: "",
-    //             selectedRoles: [],
-    //         });
-    //     }
-    // } catch (err) {
-    //     console.error(err);
-    //     toast.error("Something went wrong. Try again.");
-    // }
-
 
     const renderRoleOptions = () => {
         if (!user) return null;
-
-        const options = {
-            selectRole: "Select a Role",
-            super_admin: ["admin", "reseller", "user"],
-            admin: ["reseller", "user"],
-            reseller: ["user"],
-            user: ["user"],
-        };
 
         const availableRoles = options[user.role || "user"] || [];
 
@@ -203,9 +193,18 @@ function AddNewUser() {
         <>
             <section className="w-full bg-gray-200  flex justify-center flex-col pb-10">
                 <CreditHeader />
-                <div className="mx-6">
-                    <div className="mt-4 py-4 px-8 bg-white w-full ">
-                        <h3 className="text-2xl flex justify-center font-bold underline underline-offset-3">Add New User</h3>
+                <div className="px-3 mt-8">
+                    <div className="w-full py-2 bg-white rounded-lg flex">
+                        <Link className="no-underline" to={"/manage-user"}>
+                            <h1 className="text-2xl ss:text-xl md:text-xl text-start pl-4 md:pl-0 md:flex justify-center text-black font-semibold py-0 m-0 hover:underline underline-offset-4">
+                                Manage User
+                            </h1>
+                        </Link>
+                        <h1 className="text-2xl ss:text-xl md:text-xl text-start md:pl-0 md:flex justify-center text-black font-semibold py-0 m-0">
+                            &nbsp;&gt;&nbsp;Add New User
+                        </h1>
+                    </div>
+                    <div className="mt-3 py-3 px-6 bg-white w-full ">
                         <form onSubmit={handleSubmit} className="w-full">
                             <div className="mb-4 ">
                                 <label htmlFor="username" className="block text-lg font-medium text-black">
@@ -216,6 +215,8 @@ function AddNewUser() {
                                     className="mt-1 block w-full border-2 text-lg border-black rounded-md p-2"
                                     id="username"
                                     name="username"
+                                    maxLength={15}
+                                    minLength={5}
                                     placeholder="Ex. (vikram)"
                                     value={formData.username}
                                     onChange={handleChange}
@@ -305,7 +306,7 @@ function AddNewUser() {
                                 {/* User Permissions Section */}
                                 <div className="flex gap-4 w-full md:flex-col">
                                     {/* User Permissions */}
-                                    <div className="flex flex-col w-fit md:w-full h-fit md:min-h-fit min-h-full">
+                                    <div className={`flex flex-col h-fit ${formData.userRole !== "user" ? 'w-fit md:min-h-fit min-h-full' : 'w-full'}`}>
                                         <label className="text-lg font-medium text-black mb-1">User Permissions</label>
                                         <div className="flex-1 border-2 border-black rounded-md p-2 gap-1 h-fit">
                                             {userRolesOptions.map((role, index) => (
@@ -330,29 +331,31 @@ function AddNewUser() {
                                     </div>
 
                                     {/* Controls Section */}
-                                    <div className="flex-1 h-full flex flex-col mb-4">
-                                        <label className="text-lg font-medium text-black">Controls</label>
-                                        <div className="mt-1 flex-1 border-2 border-black rounded-md p-2 overflow-auto grid smm:lg:grid-cols-1 lg:grid-cols-2 grid-cols-3 gap-x-4">
-                                            {userControlsOptions.map((role, index) => (
-                                                <div key={index} className="flex items-center">
-                                                    <input
-                                                        type="checkbox"
-                                                        className="form-check-input mr-2 mt-0 border-black border-2"
-                                                        id={`control-permission-${index}`}
-                                                        value={role}
-                                                        checked={formData.selectedRoles.includes(role)}
-                                                        onChange={() => handleCheckboxChange(role)}
-                                                    />
-                                                    <label
-                                                        className="form-check-label pt-0.5 whitespace-nowrap"
-                                                        htmlFor={`control-permission-${index}`}
-                                                    >
-                                                        {role}
-                                                    </label>
-                                                </div>
-                                            ))}
+                                    {userControlItems.length > 0 && formData.userRole !== "user" && (
+                                        <div className="flex-1 h-full flex flex-col mb-4">
+                                            <label className="text-lg font-medium text-black">Controls</label>
+                                            <div className="mt-1 flex-1 border-2 border-black rounded-md p-2 overflow-auto grid smm:lg:grid-cols-1 lg:grid-cols-2 grid-cols-3 gap-x-4">
+                                                {userControlItems.map((controls, index) => (
+                                                    <div key={index} className="flex items-center">
+                                                        <input
+                                                            type="checkbox"
+                                                            className="form-check-input mr-2 mt-0 border-black border-2"
+                                                            id={`control-permission-${index}`}
+                                                            value={controls.key}
+                                                            checked={formData.selectedControls.includes(controls.key)}
+                                                            onChange={() => handleUserControlCheckboxChange(controls.key)}
+                                                        />
+                                                        <label
+                                                            className="form-check-label pt-0.5 whitespace-nowrap"
+                                                            htmlFor={`control-permission-${index}`}
+                                                        >
+                                                            {controls.label}
+                                                        </label>
+                                                    </div>
+                                                ))}
+                                            </div>
                                         </div>
-                                    </div>
+                                    )}
                                 </div>
                             </div>
 
@@ -363,9 +366,6 @@ function AddNewUser() {
                     </div>
                 </div>
             </section >
-
-            {/* Toast Container to Display Toasts */}
-            < ToastContainer autoClose="5000" />
         </>
     );
 }
