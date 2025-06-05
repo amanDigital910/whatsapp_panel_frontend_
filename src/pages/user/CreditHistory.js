@@ -24,7 +24,7 @@ const CreditManagement = ({ isOpen }) => {
   }, [dispatch]);
 
   useEffect(() => {
-    setFilteredUsers(users?.data || []);
+    setFilteredUsers(users || []);
   }, [users]);
 
   const handleSearch = (e) => {

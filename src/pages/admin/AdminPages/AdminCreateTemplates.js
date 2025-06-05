@@ -79,7 +79,7 @@ const AdminCreateTemplates = ({ isOpen }) => {
             setFeedback("All fields are required.");
             toast.error("Please fill all fields with valid values.");
             return;
-        } else if (name.length >= 40) {
+        } else if (name.length >= 60) {
             toast.error("Campaign name must not exceed 40 characters.");
             return;
         } else {
@@ -140,7 +140,7 @@ const AdminCreateTemplates = ({ isOpen }) => {
     const handleConfirmDelete = async (userId) => {
         try {
             const response = await dispatch(handleDeleteCampaign(userId));
-            
+
             if (response) {
                 toast.success(response.message || "Campaign deleted successfully!");
                 await dispatch(handleGetCampaigns());
@@ -283,71 +283,87 @@ const AdminCreateTemplates = ({ isOpen }) => {
                     </div>
                     <div className="lg:hidden w-3/5 flex flex-col gap-6">
                         <div className="lg:hidden flex flex-col bg-white border border-black p-3 rounded-md min-h-[530px]">
-                            <div className="flex md:justify-start justify-between gap-3 md:flex-col pb-3 ">
-                                <div className="flex gap-3  ">
-                                    <CopyToClipboard headers={headers} data={dummyData} />
-                                    <DownloadCSVButton headers={headers} dataLogs={dummyData} />
-                                    <DownloadPDFButton headers={headers} dataLogs={dummyData} />
+                            {loading ? (
+                                <div className="text-center my-4">
+                                    <div className="spinner-border text-dark" role="status">
+                                        <span className="visually-hidden">Loading...</span>
+                                    </div>
                                 </div>
-                                <RecordsPerPageDropdown
-                                    recordsPerPage={recordsPerPage}
-                                    setRecordsPerPage={setRecordsPerPage}
-                                    setCurrentPage={setCurrentPage}
-                                />
-                                <div className="relative md:w-full  max-w-[300px]">
-                                    <input
-                                        type="text"
-                                        placeholder="Search..."
-                                        value={searchTerm}
-                                        onChange={e => setSearchTerm(e.target.value)}
-                                        className="p-2 pr-8 w-full border border-black rounded-md"
-                                    />
-                                    {searchTerm && (
+                            // ) : error ? (
+                            //     <div className="text-center text-red-600 my-4 font-semibold">
+                            //         {"Transactions Unable to Fetch" || error}
+                            //     </div>
+                            )
+                             : (
+                                <div>
+                                    <div className="flex md:justify-start justify-between gap-3 md:flex-col pb-3 ">
+                                        <div className="flex gap-3  ">
+                                            <CopyToClipboard headers={headers} data={dummyData} />
+                                            <DownloadCSVButton headers={headers} dataLogs={dummyData} />
+                                            <DownloadPDFButton headers={headers} dataLogs={dummyData} />
+                                        </div>
+                                        <RecordsPerPageDropdown
+                                            recordsPerPage={recordsPerPage}
+                                            setRecordsPerPage={setRecordsPerPage}
+                                            setCurrentPage={setCurrentPage}
+                                        />
+                                        <div className="relative md:w-full  max-w-[300px]">
+                                            <input
+                                                type="text"
+                                                placeholder="Search..."
+                                                value={searchTerm}
+                                                onChange={e => setSearchTerm(e.target.value)}
+                                                className="p-2 pr-8 w-full border border-black rounded-md"
+                                            />
+                                            {searchTerm && (
+                                                <button
+                                                    type="button"
+                                                    onClick={() => setSearchTerm('')}
+                                                    className="absolute right-2 top-1/2 transform -translate-y-1/2 text-gray-500 bg-white px-1 hover:text-black"
+                                                >
+                                                    ❌
+                                                </button>
+                                            )}
+                                        </div>
+                                    </div>
+                                    <div className={` w-full bg-gray-300 flex-shrink-0 overflow-x-auto custom-horizontal-scroll select-text h-[440px] ${!isMobile ? (isOpen ? "max-w-[calc(100vw-50px)]" : "max-w-[calc(100vw-65px)]") : "max-w-[calc(100vw-64px)]"}`}>
+                                        <CustomizeTable
+                                            headers={headers}
+                                            emptyMessage='No transaction logs available.'
+                                            sortConfig={sortConfig}
+                                            onSort={handleSort}
+                                            renderRow={renderRow}
+                                            data={currentRecords}
+                                            className="table-auto border-collapse"
+                                            theadClassName="px-4 py-2 text-left cursor-pointer select-none whitespace-nowrap"
+                                            rowClassName=''
+                                        // className="text-center py-3 text-lg font-semibold"
+                                        />
+                                    </div>
+
+                                    <div className="flex flex-row whitespace-nowrap md:justify-center justify-end gap-3 align-items-center ">
                                         <button
-                                            type="button"
-                                            onClick={() => setSearchTerm('')}
-                                            className="absolute right-2 top-1/2 transform -translate-y-1/2 text-gray-500 bg-white px-1 hover:text-black"
+                                            className="btn btn-dark py-2"
+                                            onClick={handlePrevious}
+                                            disabled={currentPage === 1}
                                         >
-                                            ❌
+                                            &lt;
                                         </button>
-                                    )}
+                                        <div className="">
+                                            {indexOfFirstRecord + 1} - {' '}
+                                            {Math.min(indexOfLastRecord, allCampaign?.length)} of {' '}
+                                            {allCampaign?.length}
+                                        </div>
+                                        <button
+                                            className="btn btn-dark py-2"
+                                            onClick={handleNext}
+                                            disabled={currentPage === totalPages}
+                                        >
+                                            &gt;
+                                        </button>
+                                    </div>
                                 </div>
-                            </div>
-                            <div className={` w-full bg-gray-300 flex-shrink-0 overflow-x-auto custom-horizontal-scroll select-text h-[440px] ${!isMobile ? (isOpen ? "max-w-[calc(100vw-50px)]" : "max-w-[calc(100vw-65px)]") : "max-w-[calc(100vw-64px)]"}`}>
-                                <CustomizeTable
-                                    headers={headers}
-                                    emptyMessage='No transaction logs available.'
-                                    sortConfig={sortConfig}
-                                    onSort={handleSort}
-                                    renderRow={renderRow}
-                                    data={currentRecords}
-                                    className="table-auto border-collapse"
-                                    theadClassName="px-4 py-2 text-left cursor-pointer select-none whitespace-nowrap"
-                                    rowClassName=''
-                                // className="text-center py-3 text-lg font-semibold"
-                                />
-                            </div>
-                            <div className="flex flex-row whitespace-nowrap md:justify-center justify-end gap-3 align-items-center ">
-                                <button
-                                    className="btn btn-dark py-2"
-                                    onClick={handlePrevious}
-                                    disabled={currentPage === 1}
-                                >
-                                    &lt;
-                                </button>
-                                <div className="">
-                                    {indexOfFirstRecord + 1} - {' '}
-                                    {Math.min(indexOfLastRecord, allCampaign?.length)} of {' '}
-                                    {allCampaign?.length}
-                                </div>
-                                <button
-                                    className="btn btn-dark py-2"
-                                    onClick={handleNext}
-                                    disabled={currentPage === totalPages}
-                                >
-                                    &gt;
-                                </button>
-                            </div>
+                                )}
                         </div>
                     </div>
                 </div>

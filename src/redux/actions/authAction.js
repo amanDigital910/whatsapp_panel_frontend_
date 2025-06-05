@@ -38,6 +38,11 @@ const getAuthHeaders = () => ({
   Authorization: `Bearer ${getSecureItem('userToken')}`,
 });
 
+const getMultiTypeHeaders = () => ({
+  'Content-Type': 'multipart/form-data',
+  Authorization: `Bearer ${getSecureItem('userToken')}`,
+})
+
 // Action Creators
 export const loginRequest = () => ({ type: LOGIN_REQUEST });
 export const loginSuccess = (userData) => ({ type: LOGIN_SUCCESS, payload: userData });
@@ -130,10 +135,12 @@ export const getAllUsers = () => async (dispatch) => {
       { headers: getAuthHeaders() }
     );
 
-    if (response?.status === 200) {
-      dispatch({ type: GET_USERS_SUCCESS, payload: response.data });
-    }
-    return response.data;
+    // if (response?.status === 200) {
+    const filterSuperAdmins = response.data?.data.filter(user => user.role !== 'super_admin');
+    // return superAdmins;      
+    dispatch({ type: GET_USERS_SUCCESS, payload: filterSuperAdmins });
+
+    return filterSuperAdmins;
   } catch (error) {
     toast.error(error?.response?.data?.message || "Failed to fetch users");
     dispatch({
@@ -196,7 +203,7 @@ export const changeUserPassword = (userId, payload) => async (dispatch) => {
   try {
     const response = await axios.post(
       `${process.env.REACT_APP_API_URL}/api/auth/admin/change-user-password/${userId}`,
-      { payload },
+      payload,
       { headers: getAuthHeaders() }
     );
 
@@ -216,18 +223,11 @@ export const uploadProfilePicture = (file) => async (dispatch) => {
   dispatch({ type: UPLOAD_PROFILE_PICTURE_REQUEST });
 
   try {
-    const token = getSecureItem('userToken');
-    const formData = new FormData();
-    formData.append('profilePicture', file);
-    console.log(formData);
-    
+    console.log("Data Files Founded", file);
 
-    const response = await axios.put(`${process.env.REACT_APP_API_URL}/api/auth/profile-picture`, formData, {
-      headers: {
-        'Authorization': `Bearer ${token}`,
-        'Content-Type': 'multipart/form-data',
-      },
-    });
+    const response = await axios.put(`${process.env.REACT_APP_API_URL}/api/auth/profile-picture`,
+      file,
+      { headers: getMultiTypeHeaders() });
 
     dispatch({
       type: UPLOAD_PROFILE_PICTURE_SUCCESS,

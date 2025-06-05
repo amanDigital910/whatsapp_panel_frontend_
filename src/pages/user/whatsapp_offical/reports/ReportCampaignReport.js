@@ -289,7 +289,7 @@ const ReportCampaign = ({ isOpen }) => {
               {filteredAndSortedLogs.map((log, index) => (
                 <tr key={index} className="bg-white hover:bg-gray-50 whitespace-nowrap border border-black">
                   <td className="px-2 py-2 border border-gray-900">{log.id}</td>
-                  <td className="px-2 py-2 border border-gray-900 text-blue-600 underline cursor-pointer">{log.campaignName}</td>
+            <td className="px-2 py-2 border border-gray-900">{log.campaignName}</td>
                   <td className="px-2 py-2 border border-gray-900">+91{log.to}</td>
                   <td className="px-2 py-2 border border-gray-900">{log.readStatus || '-'}</td>
                   <td className="px-2 py-2 border border-gray-900 text-red-600">{log.status}</td>

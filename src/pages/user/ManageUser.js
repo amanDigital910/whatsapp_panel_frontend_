@@ -112,8 +112,6 @@ function ManageUser({ isOpen }) {
         ];
     };
 
-    console.log("Data Logged", users);
-
     const handleChange = (e) => {
         const { name, value } = e.target;
         setFormData((prevData) => ({
@@ -166,7 +164,7 @@ function ManageUser({ isOpen }) {
     }, [dispatch]);
 
     useEffect(() => {
-        setFilteredUsers(users?.data || []);
+        setFilteredUsers(users || []);
     }, [users]);
 
     const headers = [

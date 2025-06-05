@@ -1,6 +1,6 @@
 /* eslint-disable react/jsx-no-undef */
 import React, { lazy, Suspense, useState } from 'react';
-import { BrowserRouter as Router, Routes, Route, Navigate, useLocation } from 'react-router-dom';
+import { BrowserRouter as Router, Routes, Route, Navigate, useLocation, useNavigate } from 'react-router-dom';
 import 'bootstrap/dist/css/bootstrap.min.css';
 import 'bootstrap/dist/js/bootstrap.bundle.min.js';
 import CustomSideBar from './components/CustomSideBar';
@@ -28,6 +28,7 @@ const AdminAllCampaigns = lazy(() => import('./pages/admin/AdminPages/AdminAllCa
 const AdminAllGroups = lazy(() => import('./pages/admin/AdminPages/AdminAllGroups'));
 const AdminAllTemplates = lazy(() => import('./pages/admin/AdminPages/AdminAllTemplates'));
 const AdminCreateTemplates = lazy(() => import('./pages/admin/AdminPages/AdminCreateTemplates'));
+const ManageAllCredits = lazy(() => import('./pages/admin/AdminPages/ManageAllCredits'));
 
 const TransitionCReditUser = lazy(() => import('./pages/admin/TransitionCReditUser'))
 
@@ -106,9 +107,12 @@ const CreditHistory = lazy(() => import("./pages/user/CreditHistory.js"))
 const App = () => {
   const [isOpen, setIsOpen] = useState(true);
   const [activeDropdown, setActiveDropdown] = useState(null);
+  const navigate = useNavigate();
 
-  const toggleDropdown = (index) =>
+  const toggleDropdown = (index, link) => {
+    if (link) navigate(link);
     setActiveDropdown(activeDropdown === index ? null : index);
+  };
 
   // Disable Side bar in Login Screen
   const location = useLocation();
@@ -172,11 +176,12 @@ const App = () => {
                     {/* Dashboard admin and user */}
                     <Route path="/admin-dashboard" element={<AdminDashboard isOpen={isOpen} />} />
                     <Route path="/create-campaigns" element={<AdminCreateTemplates isOpen={isOpen} />} />
-                    <Route path="/all-templates" element={<AdminAllTemplates />} />
-                    <Route path="/all-campaigns" element={<AdminAllCampaigns />} />
-                    <Route path="/all-groups" element={<AdminAllGroups />} />
+                    <Route path="/all-templates" element={<AdminAllTemplates isOpen={isOpen} />} />
+                    <Route path="/all-campaigns" element={<AdminAllCampaigns isOpen={isOpen} />} />
+                    <Route path="/all-groups" element={<AdminAllGroups isOpen={isOpen} />} />
+                    <Route path="/manage-developer-api" element={<ManageAllCredits isOpen={isOpen} />} />
 
-                    <Route path='/transitiontable' element={<TransitionCReditUser />} />
+                    <Route path='/transitiontable' element={<TransitionCReditUser isOpen={isOpen} />} />
                   </Route>
                   <Route element={<PrivateRoute allowedRoles={[ROLES.SUPER_ADMIN, ROLES.ADMIN, ROLES.RESELLER, ROLES.USER]} />}>
                     <Route path="/dashboard" element={<Dashboard />} />

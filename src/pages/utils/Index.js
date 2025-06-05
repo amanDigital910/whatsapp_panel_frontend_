@@ -5,6 +5,7 @@ import { useEffect, useRef, useState } from "react"
 import { LuArrowDown, LuArrowUp } from 'react-icons/lu'
 import { toast } from 'react-toastify'
 import '../user/whatsapp_offical/commonCSS.css'
+import { QuestionMark } from '../../assets'
 
 const RequireMark = () => {
     return (
@@ -808,7 +809,7 @@ export const CustomizeTable = ({
                         <th
                             key={key}
                             onClick={() => onSort(key)}
-                            className="px-2 py-2 text-left cursor-pointer select-none whitespace-wrap w-fit bg-gray-900 text-white border border-white"
+                            className="px-2 py-2 text-left cursor-pointer select-none whitespace-wrap w-fit bg-[#383387] text-white border border-white"
                         >
                             <div className="flex items-center justify-between gap-3 ">
                                 {label}
@@ -837,7 +838,7 @@ export const RecordsPerPageDropdown = ({ recordsPerPage, setRecordsPerPage, setC
     const options = [25, 50, 75, 100];
 
     return (
-        <div className="flex items-center gap-2 pr-2 border border-black rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500">
+        <div className="flex items-center w-fit gap-2 pr-2 border border-black rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500">
             <select
                 value={recordsPerPage}
                 onChange={(e) => {
@@ -852,6 +853,26 @@ export const RecordsPerPageDropdown = ({ recordsPerPage, setRecordsPerPage, setC
                     </option>
                 ))}
             </select>
+        </div>
+    );
+};
+
+export const InfoTooltip = ({ message, props }) => {
+    return (
+        <div className="relative group inline-block cursor-pointer h-fit w-fit">
+
+            {/* <div className=" py-0 px-1 -mt-1.5 rounded-full border border-gray-400 bg-[#383387] text-white text-[0.6rem] font-bold flex items-center justify-center"
+            >
+                ?
+            </div> */}
+            <div className=" py-0 px-1 -mt-1.5 rounded-full bg-[#383387] text-white text-[0.6rem] font-bold flex items-center justify-center"
+            >
+                <QuestionMark />
+            </div>
+
+            <div className="absolute left-1/2 top-full -translate-x-1/2 bg-black text-white text-sm w-60 whitespace-pre-wrap px-3 py-1 rounded opacity-0 group-hover:!opacity-100 transition-opacity duration-300 z-50 pointer-events-none ">
+                {message}
+            </div>
         </div>
     );
 };
