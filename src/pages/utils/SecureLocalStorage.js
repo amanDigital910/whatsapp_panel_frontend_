@@ -4,7 +4,7 @@ import CryptoJS from 'crypto-js';
 const generateSecretKey = () => {
     const chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789!@#$%^&*()_+[]{}|;:,.<>?';
     let key = '';
-    for (let i = 0; i < 40; i++) {
+    for (let i = 0; i < 100; i++) {
         key += chars.charAt(Math.floor(Math.random() * chars.length));
     }
     return key;

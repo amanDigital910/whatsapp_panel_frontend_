@@ -207,8 +207,8 @@ const SideBar = ({ isOpen, toggleDropdown, activeDropdown }) => {
 
     const userRolePermission = {
         permissions: {
-            virtual: false,
-            personal: false,
+            virtual: true,
+            personal: true,
             internationalVirtual: true,
             internationalPersonal: true,
         }
