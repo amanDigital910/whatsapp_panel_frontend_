@@ -47,6 +47,8 @@ function AddNewUser() {
         "Personal",
         "International Personal",
         "International Virtual",
+        "Manage Whatsapp Official",
+        "Manage Developer API"
     ];
 
     const userControlItems = [
@@ -69,7 +71,6 @@ function AddNewUser() {
         { key: "canManageAllDebits", label: "Manage All Debits" },
         { key: "canManageAllAPIKeys", label: "Manage All APIKeys" },
         { key: "hasUnlimitedCredits", label: "Unlimited Credits" },
-        { key: "canDeveloperManageAPIs", label: "Manage Developer API" }
     ];
 
     const roleKeyMap = {

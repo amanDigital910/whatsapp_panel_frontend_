@@ -205,22 +205,47 @@ const SideBar = ({ isOpen, toggleDropdown, activeDropdown }) => {
         },
     ];
 
+    const userRolePermission = {
+        permissions: {
+            virtual: false,
+            personal: false,
+            internationalVirtual: true,
+            internationalPersonal: true,
+        }
+    }
     const userRole = JSON.parse(getSecureItem("userData"));
-    const userPermissions = Array.isArray(userRole?.permissions) ? userRole.permissions : [];
+    const userPermissions = userRolePermission?.permissions || {};
 
     function filterMenuItems(menu) {
         return menu.reduce((acc, item) => {
-            if (                
-                (userRole?.role === "user" && ["Manage User", "Manage Credits",].includes(item.label)) ||
-                (!["admin", "super_admin"].includes(userRole?.role) && ["Admin Dashboard", "Transaction Logs"].includes(item.label))
-                || (item.permissionKey && userPermissions.includes(acc.permissionKey))
-            ) {
-                console.log("ACC Data SideBar Data",acc,item);
+            const isRestrictedForUser =
+                userRole?.role === "user" &&
+                ["Manage User", "Manage Credits"].includes(item.label);
+
+            const isAdminOnly =
+                !["super_admin"].includes(userRole?.role) &&
+                ["Admin Dashboard", "Transaction Logs"].includes(item.label);
+
+            const lacksPermission =
+                item.permissionKey && !userPermissions[item.permissionKey];
+
+            if (isRestrictedForUser || isAdminOnly || lacksPermission) {
+                return acc; // skip item
+            }
+
+            // Handle dropdown (1 level)
+            if (item.dropdown) {
+                const filteredDropdown = item.dropdown.filter(sub => {
+                    return !sub.permissionKey || userPermissions[sub.permissionKey];
+                });
+
+                if (filteredDropdown.length > 0) {
+                    acc.push({ ...item, dropdown: filteredDropdown });
+                }
                 return acc;
             }
 
-            const newItem = { ...item };
-            acc.push(newItem);
+            acc.push(item);
             return acc;
         }, []);
     }

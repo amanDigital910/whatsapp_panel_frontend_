@@ -1,7 +1,7 @@
 import React, { useState, useEffect, useMemo } from "react";
 import axios from "axios";
 import CreditHeader from "../../../components/CreditHeader";
-import { CampaignHeading, CopyToClipboard, CustomizeTable, DownloadCSVButton, DownloadPDFButton } from "../../utils/Index";
+import { CampaignHeading, CampaignReportModal, CopyToClipboard, CustomizeTable, DownloadCSVButton, DownloadPDFButton } from "../../utils/Index";
 import useIsMobile from "../../../hooks/useMobileSize";
 import '../whatsapp_offical/commonCSS.css'
 
@@ -12,6 +12,7 @@ const WhatsappReport = ({ isOpen }) => {
   const [error, setError] = useState(null);
   const [searchTerm, setSearchTerm] = useState('');
   const [sortConfig, setSortConfig] = useState({ key: '', direction: 'asc' });
+  const [showPopup, setShowPopup] = useState(false);
   const [dummyData, setDummyData] = useState([
     {
       "campaignId": "CMP1001",
@@ -48,29 +49,52 @@ const WhatsappReport = ({ isOpen }) => {
       "campaignReport": "Failed",
       "templateStatus": "Approved",
       "campaignSubmit": "2025-05-13 11:15"
-    }])
+    }]);
 
   const headers = [
     { key: "CampaignId", label: 'Campaign ID' },
     { key: "userName", label: 'User Name' },
-    { key: "campaignTitle", label: 'Campaign Title' },
     { key: "numberCount", label: 'Number of Campaign' },
+    { key: "campaignTitle", label: 'Campaign Title' },
     { key: "campaignReport", label: 'Campaign Report' },
     { key: "templateStatus", label: 'Template Status' },
     { key: "campaignSubmit", label: 'Campaign Submit' }
   ];
 
+  const handleCampaignReport = () => {
+    setShowPopup(true);
+  };
+
+  const closePopup = () => {
+    setShowPopup(false);
+  };
+
   const renderRow = (log, index) => (
     <tr key={index} className="text-black border border-gray-700 hover:bg-gray-500 whitespace-wrap">
       <td className="px-2 py-2 border border-gray-900">{log.campaignId ?? '-'}</td>
-<td className="px-2 py-2 border border-gray-900">
+      <td className="px-2 py-2 border border-gray-900">
         {log.userName || 'N/A'}
       </td>
-      <td className="px-2 py-2 border border-gray-900">{log.campaignTitle ?? '-'}</td>
       <td className="px-2 py-2 border border-gray-900">
         {log.numberCount || 'N/A'}
       </td>
-      <td className="px-2 py-2 border border-gray-900">{log.campaignReport || 'N/A'}</td>
+      <td className="px-2 py-2 border border-gray-900">
+        <button className="bg-[#383387] w-full h-full py-1 text-white rounded-md" onClick={handleCampaignReport}>
+          {log.campaignTitle ?? '-'}
+        </button>
+      </td>
+      {/* <td className="px-2 py-2 border border-gray-900">{log.campaignReport || 'N/A'}</td> */}
+      <td className="px-2 py-2 border border-gray-900">
+        {log.campaignReport === 'Completed' ? (
+          <button className="w-full h-full py-1 bg-[#22c55e] text-white font-medium tracking-wide rounded-md text-sm" >
+            Download
+          </button>
+        ) : (
+          <button className="w-full h-full py-1 bg-[#406dc7] text-white rounded-md font-medium tracking-wide text-sm">
+            Reject Refund
+          </button>
+        )}
+      </td>
       <td className="px-2 py-2 border border-gray-900">{log.templateStatus || 'Invalid date'}</td>
       <td className="px-2 py-2 border border-gray-900">{log.campaignSubmit || 'N/A'}</td>
     </tr>
@@ -131,7 +155,7 @@ const WhatsappReport = ({ isOpen }) => {
 
   return (
     <>
-      <section className={`w-[100%] h-full pb-3 bg-gray-200 min-h-[calc(100vh-70px)] ${!isMobile ? isOpen ? "ml-[240px] 60 w-[calc(100vw-246px)]" : "ml-20 w-[calc(100vw-80px)]" : ""} `}>
+      <section className={`w-[100%] h-full pb-3 bg-gray-200 min-h-[calc(100vh-70px)] ${!isMobile ? isOpen ? "ml-[240px] 60 w-[calc(100vw-241px)]" : "ml-20 w-[calc(100vw-80px)]" : ""} `}>
         <CreditHeader />
         <div className="w-full mt-8 mb-2">
           <CampaignHeading campaignHeading="Virtual Whatsapp Report" />
@@ -195,6 +219,24 @@ const WhatsappReport = ({ isOpen }) => {
             </div>
           </div>
         </div>
+        {showPopup && (
+          <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+            <div className="bg-white rounded-md w-[600px] relative">
+              <button
+                className="absolute top-2 right-3 text-gray-500 text-3xl font-bold"
+                onClick={closePopup}
+              >
+                &times;
+              </button>
+              <CampaignReportModal
+                campaignTitle="demo"
+                campaignType="WAV"
+                message="hii I am from uv digital solution"
+                numbers={["9876543210", "9123456789"]}
+              />
+            </div>
+          </div>
+        )}
       </section>
     </>
   );

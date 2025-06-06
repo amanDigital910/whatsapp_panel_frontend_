@@ -172,7 +172,7 @@ const App = () => {
                   </Route>
 
                   {/* Protected routes */}
-                  <Route element={<PrivateRoute allowedRoles={[ROLES.SUPER_ADMIN, ROLES.ADMIN]} />}>
+                  <Route element={<PrivateRoute allowedRoles={[ROLES.SUPER_ADMIN]} />}>
                     {/* Dashboard admin and user */}
                     <Route path="/admin-dashboard" element={<AdminDashboard isOpen={isOpen} />} />
                     <Route path="/create-campaigns" element={<AdminCreateTemplates isOpen={isOpen} />} />
@@ -185,40 +185,6 @@ const App = () => {
                   </Route>
                   <Route element={<PrivateRoute allowedRoles={[ROLES.SUPER_ADMIN, ROLES.ADMIN, ROLES.RESELLER, ROLES.USER]} />}>
                     <Route path="/dashboard" element={<Dashboard />} />
-
-                    {/* Wa virtual campaige */}
-                    <Route path="/virtual-quick-csv" element={<VirtualCampaign />} />
-                    <Route path="/virtual-dp" element={<DpVirtualCampaign />} />
-                    <Route path="/virtual-poll" element={<VirtualPollCampaign />} />
-                    <Route path="/virtual-button" element={<ButtonCampaign />} />
-                    <Route path="/virtual-whatsapp-report" element={<WhatsappReport isOpen={isOpen} />} />
-                    {/* <Route path="/user/csvvirtual" element={<CsvVirtualCampaign />} /> */}
-
-                    {/* wa personal Campaige */}
-                    <Route path="/personal-quick-csv" element={<PerosnalCampaign2 />} />
-                    <Route path="/personal-poll" element={<PersonalPoll />} />
-                    {/* <Route path="/personal-personal-csv" element={<PersonalCsv />} /> */}
-                    <Route path="/personal-button" element={<PersonalButton />} />
-                    {/* <Route path='/personal-Personalbutton' element={<PersonalCSVButton/> } /> */}
-                    <Route path="/personal-whatsapp-report" element={<PersonalCampaign isOpen={isOpen} />} />
-                    <Route path="/personal-scan-whatsapp" element={<PersonalCampaignScan isOpen={isOpen} />} />
-                    <Route path="/personal-group-community" element={<PersonalCampaignChannel />} />
-                    <Route path="/personal-channel-create-bulk-sms" element={<PersonalGroupChannelCommunity />} />
-
-                    {/* wa Int virtual */}
-                    <Route path="/international-virtual-quick-csv" element={<InternationalCampaign />} />
-                    {/* <Route path="/international-csvcampaign" element={<InternaitionaCsv />} /> */}
-                    <Route path="/international-virtual-button" element={<InternaitionaButton />} />
-                    <Route path="/international-virtual-whatsapp-report" element={<InternationalWhatsappReport isOpen={isOpen} />} />
-
-
-                    {/* Wa Int Personal */}
-                    <Route path="/international-personal-quick-csv" element={<InternationCampaigePersonal />} />
-                    {/* <Route path="/international-personal-csvcampaign" element={<InternationalCampaignCsv />} /> */}
-                    <Route path="/international-personal-button" element={<InternationalCampaignButton />} />
-                    <Route path="/international-personal-poll" element={<InternationalCampaignPoll />} />
-                    <Route path="/international-personal-whatsapp-report" element={<InternationalReport isOpen={isOpen} />} />
-                    <Route path="/international-personal-scan-whatsapp" element={<InternationalPersonalScan isOpen={isOpen} />} />
 
                     {/* Whatsapp Offical Pages Routing */}
                     <Route path="/whatsapp-dashboard" element={<WhatsappDashboard />} />
@@ -267,6 +233,48 @@ const App = () => {
                     <Route path='*' element={<NotFoundPage />} />
 
                   </Route>
+
+                  <Route element={<PrivateRoute allowedRoles={[ROLES.SUPER_ADMIN, ROLES.ADMIN, ROLES.RESELLER, ROLES.USER]} requiredPermissions={["virtual"]} />}>
+                    {/* Wa virtual campaige */}
+                    <Route path="/virtual-quick-csv" element={<VirtualCampaign />} />
+                    <Route path="/virtual-dp" element={<DpVirtualCampaign />} />
+                    <Route path="/virtual-poll" element={<VirtualPollCampaign />} />
+                    <Route path="/virtual-button" element={<ButtonCampaign />} />
+                    <Route path="/virtual-whatsapp-report" element={<WhatsappReport isOpen={isOpen} />} />
+                    {/* <Route path="/user/csvvirtual" element={<CsvVirtualCampaign />} /> */}
+                  </Route>
+                  <Route element={<PrivateRoute allowedRoles={[ROLES.SUPER_ADMIN, ROLES.ADMIN, ROLES.RESELLER, ROLES.USER]} requiredPermissions={["personal"]} />}>
+                    {/* wa personal Campaige */}
+                    <Route path="/personal-quick-csv" element={<PerosnalCampaign2 />} />
+                    <Route path="/personal-poll" element={<PersonalPoll />} />
+                    {/* <Route path="/personal-personal-csv" element={<PersonalCsv />} /> */}
+                    <Route path="/personal-button" element={<PersonalButton />} />
+                    {/* <Route path='/personal-Personalbutton' element={<PersonalCSVButton/> } /> */}
+                    <Route path="/personal-whatsapp-report" element={<PersonalCampaign isOpen={isOpen} />} />
+                    <Route path="/personal-scan-whatsapp" element={<PersonalCampaignScan isOpen={isOpen} />} />
+                    <Route path="/personal-group-community" element={<PersonalCampaignChannel />} />
+                    <Route path="/personal-channel-create-bulk-sms" element={<PersonalGroupChannelCommunity />} />
+                  </Route>
+                  <Route element={<PrivateRoute allowedRoles={[ROLES.SUPER_ADMIN, ROLES.ADMIN, ROLES.RESELLER, ROLES.USER]} requiredPermissions={["internationalVirtual"]} />}>
+                    {/* wa Int virtual */}
+                    <Route path="/international-virtual-quick-csv" element={<InternationalCampaign />} />
+                    {/* <Route path="/international-csvcampaign" element={<InternaitionaCsv />} /> */}
+                    <Route path="/international-virtual-button" element={<InternaitionaButton />} />
+                    <Route path="/international-virtual-whatsapp-report" element={<InternationalWhatsappReport isOpen={isOpen} />} />
+
+                  </Route>
+                  <Route element={<PrivateRoute allowedRoles={[ROLES.SUPER_ADMIN, ROLES.ADMIN, ROLES.RESELLER, ROLES.USER]} requiredPermissions={["internationalPersonal"]} />}>
+                    {/* Wa Int Personal */}
+                    <Route path="/international-personal-quick-csv" element={<InternationCampaigePersonal />} />
+                    {/* <Route path="/international-personal-csvcampaign" element={<InternationalCampaignCsv />} /> */}
+                    <Route path="/international-personal-button" element={<InternationalCampaignButton />} />
+                    <Route path="/international-personal-poll" element={<InternationalCampaignPoll />} />
+                    <Route path="/international-personal-whatsapp-report" element={<InternationalReport isOpen={isOpen} />} />
+                    <Route path="/international-personal-scan-whatsapp" element={<InternationalPersonalScan isOpen={isOpen} />} />
+                  </Route>
+                  {/* <Route element={<PrivateRoute allowedRoles={[ROLES.SUPER_ADMIN, ROLES.ADMIN, ROLES.RESELLER, ROLES.USER]} requiredPermissions={["virtual"]} />}>
+                    
+                  </Route> */}
                   <Route element={<PrivateRoute allowedRoles={[ROLES.SUPER_ADMIN, ROLES.ADMIN, ROLES.RESELLER]} />}>
                     <Route path='/manage-credit' element={<ManageCredit isOpen={isOpen} />} />
                     <Route path='/manage-user' element={<ManageUser isOpen={isOpen} />} />

@@ -1,10 +1,13 @@
 import './style.css'
 import { MdDelete } from "react-icons/md"
 import { FaFileCsv } from "react-icons/fa6"
-import { useEffect, useRef, useState } from "react"
+import { useRef, useState } from "react"
 import { LuArrowDown, LuArrowUp } from 'react-icons/lu'
 import { toast } from 'react-toastify'
 import '../user/whatsapp_offical/commonCSS.css'
+import { saveAs } from 'file-saver';
+import JSZip from 'jszip';
+import { Document, Packer, Paragraph } from 'docx';
 import { QuestionMark } from '../../assets'
 
 const RequireMark = () => {
@@ -12,6 +15,21 @@ const RequireMark = () => {
         <span className="text-red-500">*</span>
     )
 }
+
+export const customAbbreviations = {
+    'Virtual Quick Campaign': 'WV',
+    'Virtual Button Campaign': 'WVB',
+    'Virtual DP Campaign': 'WVD',
+    'Personal Quick Campaign': 'WP',
+    'Personal Button Campaign': 'WPB',
+    'Personal POLL Campaign': 'WPP',
+    'International Personal Quick Campaign': 'WIP',
+    'International Personal Button Campaign': 'WIPB',
+    'International Personal POLL Campaign': 'WIPP',
+    'International Virtual Quick Campaign': 'WIV',
+    'International Virtual Button Campaign': 'WIVB',
+};
+
 // Main Heading
 export const CampaignHeading = ({ campaignHeading }) => {
     return (
@@ -994,6 +1012,33 @@ export const DownloadCSVButton = ({ headers, dataLogs }) => {
     );
 };
 
+export const DownloadReportCSV = ({ headers, dataLogs, filename = 'data.csv' }) => {
+    if (!headers || !dataLogs) return;
+
+    // Create CSV header row
+    const csvHeader = headers.map(h => h.label).join(',') + '\n';
+
+    // Create CSV body
+    const csvRows = dataLogs.map(row => {
+        return headers.map(h => {
+            const value = h.key.split('.').reduce((acc, part) => acc?.[part], row);
+            return `"${value ?? ''}"`; // Ensure empty values are handled
+        }).join(',');
+    }).join('\n');
+
+    const csvContent = csvHeader + csvRows;
+    const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
+    const url = URL.createObjectURL(blob);
+
+    // Create and click a link to download the file
+    const link = document.createElement('a');
+    link.setAttribute('href', url);
+    link.setAttribute('download', filename);
+    link.click();
+
+    // Cleanup
+    URL.revokeObjectURL(url);
+};
 
 export const DownloadPDFButton = ({ headers, dataLogs }) => {
     const getFlattenedRow = (row) => {
@@ -1056,5 +1101,107 @@ export const DownloadPDFButton = ({ headers, dataLogs }) => {
         >
             PDF
         </button>
+    );
+};
+
+export const CampaignReportModal = ({ campaignTitle, campaignType, message, numbers }) => {
+    console.log("Message Data", message, campaignTitle, campaignType, numbers);
+
+    const copyToClipboard = () => {
+        navigator.clipboard.writeText(message || '')
+            .then(() => toast.success("Message copied to Clipboard!"))
+            .catch(() => toast.error("Failed to copy!"));
+    };
+
+    const downloadNumbers = () => {
+        if (numbers) return;
+        toast.success("Numbers Download Successfully!")
+        const blob = new Blob([numbers.join('\n')], { type: 'text/plain;charset=utf-8' });
+        saveAs(blob, `${campaignTitle}_numbers.txt`);
+    };
+
+    const downloadMessageDocx = async () => {
+        const doc = new Document({
+            sections: [{
+                children: [new Paragraph(message || '')],
+            }],
+        });
+        toast.success("Message Download Successfully!")
+        const blob = await Packer.toBlob(doc);
+        saveAs(blob, `${campaignTitle}_message.docx`);
+    };
+
+    const downloadZip = async () => {
+        if (!numbers || !campaignTitle) {
+            toast.error("Missing numbers or campaign title.");
+            return;
+        }
+        const zip = new JSZip();
+        zip.file(`${campaignTitle}_numbers.txt`, numbers.join('\n'));
+
+        const doc = new Document({
+            sections: [{
+                children: [new Paragraph(message || '')],
+            }],
+        });
+        const messageBlob = await Packer.toBlob(doc);
+        zip.file(`${campaignTitle}_message.docx`, messageBlob);
+        console.log("Data found of Message Blob", messageBlob);
+
+        zip.generateAsync({ type: "blob" }).then((content) => {
+            saveAs(content, `${campaignTitle}_campaign.zip`);
+            toast.success("Zip Downloaded Successfully!");
+        }).catch(() => {
+            toast.error("Failed to generate ZIP file.");
+        });
+    };
+
+    return (
+        <div className="bg-white rounded-md shadow-lg p-4 w-[600px] max-w-full">
+            <h2 className="text-xl font-bold mb-2">
+                {campaignTitle ? campaignTitle : 'Campaign'} Camp Type: {campaignType ?? 'N/A'}
+            </h2>
+
+            <div className="mb-4 flex flex-col">
+                <label className="font-semibold text-lg block mb-1">Message</label>
+                <textarea
+                    readOnly
+                    value={message}
+                    className="w-full h-40 border border-gray-300 p-2 rounded-md resize-none"
+                />
+                <button
+                    onClick={copyToClipboard}
+                    className="mt-2 bg-[#0a3473] w-full text-white py-2 rounded-md"
+                >
+                    Copy Message
+                </button>
+            </div>
+
+            <div>
+                <p className="font-semibold mb-2 text-lg">Download Campaign</p>
+                <div className="flex flex-wrap gap-2 w-full">
+                    <button
+                        onClick={downloadNumbers}
+                        className="bg-orange-500 hover:bg-orange-600 text-white  px-6 py-2 rounded-md w-full flex-1"
+                    >
+                        Number
+                    </button>
+
+                    <button
+                        onClick={downloadMessageDocx}
+                        className="bg-slate-800 hover:bg-slate-900 text-white px-6 py-2 rounded-md w-full flex-1"
+                    >
+                        Message
+                    </button>
+
+                    <button
+                        onClick={downloadZip}
+                        className="bg-amber-700 hover:bg-amber-800 text-white px-6 py-2 rounded-md w-full flex-1"
+                    >
+                        Zip
+                    </button>
+                </div>
+            </div>
+        </div>
     );
 };

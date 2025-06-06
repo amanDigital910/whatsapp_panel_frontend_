@@ -1,10 +1,11 @@
 import { useDispatch, useSelector } from "react-redux";
-import { CampaignHeading, CopyToClipboard, CustomizeTable, DownloadCSVButton, DownloadPDFButton, RecordsPerPageDropdown } from "../utils/Index"
+import { CampaignHeading, CopyToClipboard, customAbbreviations, CustomizeTable, DownloadCSVButton, DownloadPDFButton, RecordsPerPageDropdown } from "../utils/Index"
 import { useEffect, useMemo, useState } from "react";
 import { getSecureItem } from "../utils/SecureLocalStorage";
 import useIsMobile from "../../hooks/useMobileSize";
 import { getAllUsers } from "../../redux/actions/authAction";
 import CreditHeader from "../../components/CreditHeader";
+import { fetchTransactionLogs } from "../../redux/actions/transactionAction";
 
 const CreditManagement = ({ isOpen }) => {
   const isMobile = useIsMobile();
@@ -16,16 +17,23 @@ const CreditManagement = ({ isOpen }) => {
   const [sortConfig, setSortConfig] = useState({ key: '_id', direction: 'desc' });
   const [searchTerm, setSearchTerm] = useState('');
 
-  const { loading, users, error } = useSelector((state) => state.userCreate);
+  // const { loading, users, error } = useSelector((state) => state.userCreate);
+  const { loading, stats, logs, error } = useSelector((state) => state.creditsTransaction);
+
+  console.log("Data of The Logs", logs);
+  useEffect(() => {
+    dispatch(fetchTransactionLogs());
+  }, []);
+
 
   useEffect(() => {
     dispatch(getAllUsers());
     // console.log("Set Filtered User", filteredUsers);
-  }, [dispatch]);
+  }, []);
 
   useEffect(() => {
-    setFilteredUsers(users || []);
-  }, [users]);
+    setFilteredUsers(logs || []);
+  }, [logs]);
 
   const handleSearch = (e) => {
     const query = e.target.value.toLowerCase();
@@ -43,16 +51,17 @@ const CreditManagement = ({ isOpen }) => {
     { key: '_id', label: 'User ID' },
     { key: 'username', label: 'Username' },
     { key: 'role', label: 'User Role' },
-    { key: 'firstName', label: 'Firstname (usertype)' },
+    { key: 'credit', label: 'Balance' },
     { key: 'updatedAt', label: 'Last Updated' },
+    { key: 'categoryId[name]', label: 'Credit Note' },
   ];
 
   const renderRow = (log, index) => (
     <tr key={index} className="text-black border border-gray-700 hover:bg-gray-500 whitespace-nowrap ">
       <td className="px-2 py-2 border text-[1rem] border-gray-900 w-20">{log?._id.slice(-5) || '-'}</td>
-      <td className="px-2 py-2 border text-[1rem] border-gray-900">{log?.username || '-'}</td>
-      <td className="px-2 py-2 border text-[1rem] border-gray-900">{log?.role || '-'}</td>
-      <td className="px-2 py-2 border text-[1rem] border-gray-900">{log?.firstName || '-'}</td>
+      <td className="px-2 py-2 border text-[1rem] border-gray-900">{log?.toUserId.username || '-'}</td>
+      <td className="px-2 py-2 border text-[1rem] border-gray-900">{log?.balanceType || 'Credit/Debit' || '-'}</td>
+      <td className="px-2 py-2 border text-[1rem] border-gray-900">{log?.credit || '-'}</td>
       {/* <td className="px-2 py-2 border text-[1rem] border-gray-900">{new Date(log?.updatedAt).toLocaleDateString('en-GB')}</td> */}
       <td className="px-2 py-2 border text-[1rem] border-gray-900">
         {new Date(log?.updatedAt).toLocaleString('en-GB', {
@@ -64,6 +73,7 @@ const CreditManagement = ({ isOpen }) => {
           hour12: true,
         })}
       </td>
+      <td className="px-2 py-2 border text-[1rem] border-gray-900">{customAbbreviations[log?.categoryId?.name] || '-'}</td>
     </tr>
   );
 

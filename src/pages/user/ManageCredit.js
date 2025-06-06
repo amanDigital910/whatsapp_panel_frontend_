@@ -6,7 +6,7 @@ import 'react-toastify/dist/ReactToastify.css';
 import CreditHeader from "../../components/CreditHeader";
 import useIsMobile from '../../hooks/useMobileSize';
 import '../user/whatsapp_offical/commonCSS.css'
-import { CampaignHeading, CopyToClipboard, CustomizeTable, DownloadCSVButton, DownloadPDFButton, RecordsPerPageDropdown } from '../utils/Index';
+import { CampaignHeading, CopyToClipboard, customAbbreviations, CustomizeTable, DownloadCSVButton, DownloadPDFButton, RecordsPerPageDropdown } from '../utils/Index';
 import { getSecureItem } from '../utils/SecureLocalStorage';
 import { getAllUsers } from '../../redux/actions/authAction';
 import { useDispatch } from 'react-redux';
@@ -148,20 +148,6 @@ function ManageCredit({ isOpen }) {
         { key: 'createdAt', label: 'Current Date' },
         { key: 'creditNote', label: 'Credit Note' },
     ];
-
-    const customAbbreviations = {
-        'Virtual Quick Campaign': 'WV',
-        'Virtual Button Campaign': 'WVB',
-        'Virtual DP Campaign': 'WVD',
-        'Personal Quick Campaign': 'WP',
-        'Personal Button Campaign': 'WPB',
-        'Personal POLL Campaign': 'WPP',
-        'International Personal Quick Campaign': 'WIP',
-        'International Personal Button Campaign': 'WIPB',
-        'International Personal POLL Campaign': 'WIPP',
-        'International Virtual Quick Campaign': 'WIV',
-        'International Virtual Button Campaign': 'WIVB',
-    };
 
     const renderRow = (item) => (
         <tr key={item._id} className="text-black border border-gray-700 hover:bg-gray-500">

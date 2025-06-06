@@ -409,7 +409,7 @@ const TemplateCampaign = ({ isOpen }) => {
 
   return (
     <>
-      <section className={`bg-gray-200 flex flex-col justify-center ${!isMobile ? (isOpen ? "ml-[240px] w-[calc(100vw-252px)]" : "ml-20 w-[calc(100vw-90px)]") : ""}`}>
+      <section className={`bg-gray-200 flex flex-col justify-center ${!isMobile ? (isOpen ? "ml-[240px] w-[calc(100vw-242px)]" : "ml-20 w-[calc(100vw-90px)]") : ""}`}>
         <CreditHeader />
         <div className="w-full mt-8">
           <CampaignHeading campaignHeading={"All Templates"} />

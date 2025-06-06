@@ -177,7 +177,7 @@ const TransitionCReditUser = ({ isOpen }) => {
     return (
         <>
             {/* <section className={`w-full h-full bg-gray-200 flex flex-col min-h-[calc(100vh-70px)] pb-3  `} > */}
-            <section className={`w-full h-full bg-gray-200 flex flex-col min-h-[calc(100vh-70px)] pb-3  ${!isMobile ? isOpen ? "ml-[240px] w-[calc(100vw-241px)]" : "w-[calc(100vw-90px)]" : "left-0 w-full"} `} >
+            <section className={`h-full bg-gray-200 flex flex-col min-h-[calc(100vh-70px)] pb-3  ${!isMobile ? isOpen ? "w-[calc(100vw-242px)]" : "w-[calc(100vw-90px)]" : "left-0 w-full"} `} >
                 <CreditHeader />
 
                 <div className="w-full mt-8 ">
