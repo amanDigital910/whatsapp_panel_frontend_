@@ -24,14 +24,14 @@ const AdminDashboard = ({ isOpen }) => {
     { key: '_id', label: 'User ID' },
     { key: 'username', label: 'Username' },
     { key: 'role', label: 'User Role' },
-    { key: 'firstName', label: 'Firstname (usertype)' },
+    { key: 'createdBy', label: 'Created By' },
     { key: 'updatedAt', label: 'Last Updated' },
   ];
 
   const renderRow = (log, index) => (
     <tr key={index} className="text-black border border-gray-700 hover:bg-gray-500 whitespace-nowrap">
       <td className="px-2 py-2 border text-[1rem] border-gray-900 w-20">
-        {log?._id?.slice(-5) || '-'}
+        {log?._id.slice(-5) || '-'}
       </td>
       <td className="px-2 py-2 border text-[1rem] border-gray-900">
         {log?.username || '-'}
@@ -40,7 +40,7 @@ const AdminDashboard = ({ isOpen }) => {
         {log?.role || '-'}
       </td>
       <td className="px-2 py-2 border text-[1rem] border-gray-900">
-        {log?.firstName || '-'}
+        {log?.createdBy?._id.slice(-5) || log?.createdBy?.username || '-'}
       </td>
       <td className="px-2 py-2 border text-[1rem] border-gray-900">
         {new Date(log?.updatedAt).toLocaleString('en-GB', {

@@ -59,15 +59,20 @@ const UserLogin = () => {
     if (isAuthenticated) {
       // Navigate based on user role
       const usersRole = userRole?.role;
+      console.log("userRole?.username", userRole?.username);
 
-      if (usersRole === 'super_admin' || usersRole === 'admin') {
-        toast.success('Welcome Admin!');
+
+      if (usersRole === 'super_admin') {
+        toast.success(`Welcome ${userRole?.username || "Super Admin"}!`);
         navigate('/admin-dashboard');
+      } else if (usersRole === 'admin') {
+        toast.success(`Welcome ${userRole?.username || "Admin"}!`);
+        navigate('/dashboard');
       } else if (usersRole === 'reseller') {
-        toast.success('Welcome Reseller!');
+        toast.success(`Welcome ${userRole?.username || "Reseller"}!`);
         navigate('/dashboard');
       } else if (usersRole === 'user') {
-        toast.success('Welcome User!');
+        toast.success(`Welcome ${userRole?.username || "User"}!`);
         navigate('/dashboard');
       } else {
         navigate('/login');

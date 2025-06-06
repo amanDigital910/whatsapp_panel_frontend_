@@ -15,7 +15,8 @@ const UserDashboard = () => {
       cardCredit: 0,
       bg: "#383387",
       redirectUrl: "/virtual-quick-csv",
-      charName: 'WV'
+      charName: 'WV',
+      requiredPermission: "virtual"
     },
     {
       id: 2,
@@ -23,7 +24,8 @@ const UserDashboard = () => {
       cardCredit: 0,
       bg: "#383387",
       redirectUrl: "/virtual-button",
-      charName: 'WVB'
+      charName: 'WVB',
+      requiredPermission: "virtual"
     },
     {
       id: 3,
@@ -31,7 +33,8 @@ const UserDashboard = () => {
       cardCredit: 0,
       bg: "#383387",
       redirectUrl: "/virtual-dp",
-      charName: 'WVD'
+      charName: 'WVD',
+      requiredPermission: "virtual"
     },
     {
       id: 4,
@@ -39,7 +42,8 @@ const UserDashboard = () => {
       cardCredit: 0,
       bg: "#383387",
       redirectUrl: "/virtual-poll",
-      charName: 'WVP'
+      charName: 'WVP',
+      requiredPermission: "virtual"
     },
     {
       id: 5,
@@ -47,7 +51,8 @@ const UserDashboard = () => {
       cardCredit: 0,
       bg: "#25D366",
       redirectUrl: "/personal-quick-csv",
-      charName: 'WP'
+      charName: 'WP',
+      requiredPermission: "personal"
     },
     {
       id: 6,
@@ -55,7 +60,8 @@ const UserDashboard = () => {
       cardCredit: 0,
       bg: "#25D366",
       redirectUrl: "/personal-button",
-      charName: 'WPB'
+      charName: 'WPB',
+      requiredPermission: "personal"
     },
     {
       id: 7,
@@ -63,7 +69,8 @@ const UserDashboard = () => {
       cardCredit: 0,
       bg: "#25D366",
       redirectUrl: "/personal-group-community",
-      charName: 'WPG'
+      charName: 'WPG',
+      requiredPermission: "personal"
     },
     {
       id: 8,
@@ -71,7 +78,8 @@ const UserDashboard = () => {
       cardCredit: 0,
       bg: "#25D366",
       redirectUrl: "/personal-channel-create-bulk-sms",
-      charName: 'WPCG'
+      charName: 'WPCG',
+      requiredPermission: "personal"
     },
     {
       id: 9,
@@ -79,7 +87,8 @@ const UserDashboard = () => {
       cardCredit: 0,
       bg: "#25D366",
       redirectUrl: "/personal-poll",
-      charName: 'WPP'
+      charName: 'WPP',
+      requiredPermission: "personal"
     },
     {
       id: 10,
@@ -87,7 +96,8 @@ const UserDashboard = () => {
       cardCredit: 0,
       bg: "#7b1111",
       redirectUrl: "/international-virtual-quick-csv",
-      charName: 'WIV'
+      charName: 'WIV',
+      requiredPermission: "internationalVirtual"
     },
     {
       id: 11,
@@ -95,7 +105,8 @@ const UserDashboard = () => {
       cardCredit: 0,
       bg: "#7b1111",
       redirectUrl: "/international-virtual-button",
-      charName: 'WIVB'
+      charName: 'WIVB',
+      requiredPermission: "internationalVirtual"
     },
     {
       id: 12,
@@ -103,7 +114,8 @@ const UserDashboard = () => {
       cardCredit: 0,
       bg: "#52117b",
       redirectUrl: "/international-virtual-button",
-      charName: 'WIP'
+      charName: 'WIP',
+      requiredPermission: "internationalPersonal"
     },
     {
       id: 13,
@@ -111,7 +123,8 @@ const UserDashboard = () => {
       cardCredit: 0,
       bg: "#52117b",
       redirectUrl: "/international-personal-button",
-      charName: 'WIPB'
+      charName: 'WIPB',
+      requiredPermission: "internationalPersonal"
     },
     {
       id: 14,
@@ -119,7 +132,8 @@ const UserDashboard = () => {
       cardCredit: 0,
       bg: "#52117b",
       redirectUrl: "/international-personal-poll",
-      charName: 'WIPP'
+      charName: 'WIPP',
+      requiredPermission: "internationalPersonal"
     },
     {
       id: 15,
@@ -127,15 +141,31 @@ const UserDashboard = () => {
       cardCredit: 0,
       bg: "#f03c15",
       redirectUrl: "/membership-validity",
-      charName: "M"
+      charName: "M",
+      requiredPermission: null // visible to all
     }
   ];
+
+  const userRolePermission = {
+    permissions: {
+      virtual: true,
+      personal: true,
+      internationalVirtual: true,
+      internationalPersonal: true,
+    },
+  };
+
+  const filteredMsgCategory = MsgCategory.filter(item => {
+    if (!item.requiredPermission) return true;
+
+    return userRolePermission.permissions[item.requiredPermission];
+  });
 
   return (
     <>
       <section className="container py-5 w-full select-none" style={{ backgroundColor: "#fff", minHeight: "100%" }}>
         <div className="row g-4 ">
-          {MsgCategory.map((item, index) => (
+          {filteredMsgCategory.map((item, index) => (
             <div className="group col-12 col-md-6 col-lg-4 cursor-pointer" key={index}>
               <div className="shadow-md hover:shadow-xl  border-gray-400 border rounded-lg px-4 flex flex-col justify-between h-32 overflow-hidden relative transition-all duration-500 ease-in-out transform hover:scale-105 hover:translate-y-[-5px]"
                 style={{
