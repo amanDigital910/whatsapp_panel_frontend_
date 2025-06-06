@@ -36,6 +36,15 @@ function ManageUser({ isOpen }) {
         permissions: [],
     });
 
+    useEffect(() => {
+        dispatch(getAllUsers());
+        // console.log("Set Filtered User", filteredUsers);
+    }, []);
+
+    useEffect(() => {
+        setFilteredUsers(users || []);
+    }, [users]);
+
     const userRolesOptions = [
         "Virtual",
         "Personal",
@@ -56,7 +65,7 @@ function ManageUser({ isOpen }) {
     const extractSelectedRoles = (permissions = {}) =>
         Object.entries(roleKeyMap).filter(([_, key]) => permissions[key]).map(([label]) => label);
 
-    const handleSubmit = (e) => {
+    const handleSubmit = async (e) => {
         e.preventDefault();
 
         const payload = {
@@ -66,9 +75,10 @@ function ManageUser({ isOpen }) {
         };
 
         if (formData._id) {
-            dispatch(updateUser(formData._id, payload));
-            dispatch(getAllUsers());
-            console.log("Payload Data", payload);
+            const response = await dispatch(updateUser(formData._id, payload));
+            if (response?.success) {
+                dispatch(getAllUsers());
+            }
         }
 
         setIsModalOpen(false);
@@ -89,7 +99,7 @@ function ManageUser({ isOpen }) {
             super_admin: ["admin", "reseller", "user"],
             admin: ["admin", "reseller", "user"],
             reseller: ["reseller", "user"],
-            user: ["user"],
+            user: ["reseller", "user"],
         };
         //  admin: ["admin", "reseller", "user"],
         //     reseller: ["admin", "reseller", "user"],
@@ -111,8 +121,6 @@ function ManageUser({ isOpen }) {
             )),
         ];
     };
-
-    console.log("Data Logged", users);
 
     const handleChange = (e) => {
         const { name, value } = e.target;
@@ -158,16 +166,6 @@ function ManageUser({ isOpen }) {
         setSelectedUser(null);
         dispatch(getAllUsers());
     };
-
-
-    useEffect(() => {
-        dispatch(getAllUsers());
-        // console.log("Set Filtered User", filteredUsers);
-    }, [dispatch]);
-
-    useEffect(() => {
-        setFilteredUsers(users?.data || []);
-    }, [users]);
 
     const headers = [
         { key: '_id', label: 'User ID' },

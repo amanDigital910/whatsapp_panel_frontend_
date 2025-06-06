@@ -1,6 +1,6 @@
 /* eslint-disable array-callback-return */
 import React, { useState } from 'react';
-import { Link, useLocation } from 'react-router-dom';
+import { Link, useLocation, useNavigate } from 'react-router-dom';
 import creditCardIcon from '../assets/icons/credit-card.png';
 import dashboardIcon from '../assets/icons/dashboard.png';
 import home from '../assets/icons/home.png';
@@ -18,6 +18,7 @@ import useIsMobile from '../hooks/useMobileSize';
 import './style.css'
 
 import { getSecureItem } from '../pages/utils/SecureLocalStorage';
+import { ActiveDropdownSymbol, DropdownSymbol } from '../assets';
 
 const SideBar = ({ isOpen, toggleDropdown, activeDropdown }) => {
 
@@ -42,6 +43,7 @@ const SideBar = ({ isOpen, toggleDropdown, activeDropdown }) => {
     const sidebarMenu = [
         {
             label: "Admin Dashboard",
+            to: "/admin-dashboard",
             // permissionKey: "adminDashboard",
             icon: dashboardIcon,
             dropdown: [
@@ -50,6 +52,7 @@ const SideBar = ({ isOpen, toggleDropdown, activeDropdown }) => {
                 { label: "All Campaigns", to: "/all-campaigns", },
                 { label: "All Templates", to: "/all-templates", },
                 { label: "All Groups", to: "/all-groups", },
+                { label: "Manage Developer API", to: "/manage-developer-api", },
             ]
         },
         {
@@ -202,21 +205,47 @@ const SideBar = ({ isOpen, toggleDropdown, activeDropdown }) => {
         },
     ];
 
+    const userRolePermission = {
+        permissions: {
+            virtual: false,
+            personal: false,
+            internationalVirtual: true,
+            internationalPersonal: true,
+        }
+    }
     const userRole = JSON.parse(getSecureItem("userData"));
-    // const userPermissions = Array.isArray(userRole?.permissions) ? userRole.permissions : [];
+    const userPermissions = userRolePermission?.permissions || {};
 
     function filterMenuItems(menu) {
         return menu.reduce((acc, item) => {
-            if (
-                (userRole?.role === "user" && ["Manage User", "Manage Credits",].includes(item.label)) ||
-                (!["admin", "super_admin"].includes(userRole?.role) && ["Admin Dashboard", "Transaction Logs"].includes(item.label))
-                // || (item.permissionKey && !userPermissions.includes(item.permissionKey))
-            ) {
+            const isRestrictedForUser =
+                userRole?.role === "user" &&
+                ["Manage User", "Manage Credits"].includes(item.label);
+
+            const isAdminOnly =
+                !["super_admin"].includes(userRole?.role) &&
+                ["Admin Dashboard", "Transaction Logs"].includes(item.label);
+
+            const lacksPermission =
+                item.permissionKey && !userPermissions[item.permissionKey];
+
+            if (isRestrictedForUser || isAdminOnly || lacksPermission) {
+                return acc; // skip item
+            }
+
+            // Handle dropdown (1 level)
+            if (item.dropdown) {
+                const filteredDropdown = item.dropdown.filter(sub => {
+                    return !sub.permissionKey || userPermissions[sub.permissionKey];
+                });
+
+                if (filteredDropdown.length > 0) {
+                    acc.push({ ...item, dropdown: filteredDropdown });
+                }
                 return acc;
             }
 
-            const newItem = { ...item };
-            acc.push(newItem);
+            acc.push(item);
             return acc;
         }, []);
     }
@@ -267,7 +296,8 @@ const SideBar = ({ isOpen, toggleDropdown, activeDropdown }) => {
                                         {item.dropdown ? (
                                             <div className="group">
                                                 <button
-                                                    onClick={() => toggleDropdown(index)}
+                                                    // onClick={() => toggleDropdown(index, item?.to && !item.dropdown ? item?.to : null)}
+                                                    onClick={() => toggleDropdown(index, item?.to)}
                                                     className={`w-full flex items-center p-3 hover:underline underline-offset-4 transition ${isOpen ? "justify-between" : "justify-center"}  ${isDropdownActive && 'bg-green-700 font-semibold'}`}
                                                 >
                                                     <div className={`flex items-center ${isOpen ? "space-x-2" : ""} justify-center`}>
@@ -275,14 +305,7 @@ const SideBar = ({ isOpen, toggleDropdown, activeDropdown }) => {
                                                         {isOpen && <span className="text-lg ">{item.label}</span>}
                                                     </div>
                                                     {isOpen && (
-                                                        <svg
-                                                            className={`w-4 h-4 transition-transform duration-200 ${activeDropdown === index ? "rotate-180" : ""}`}
-                                                            fill="none"
-                                                            stroke="currentColor"
-                                                            viewBox="0 0 24 24"
-                                                        >
-                                                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
-                                                        </svg>
+                                                        <DropdownSymbol activeDropdown={activeDropdown} index={index} />
                                                     )}
                                                 </button>
 
@@ -309,15 +332,7 @@ const SideBar = ({ isOpen, toggleDropdown, activeDropdown }) => {
                                                                             {subItem.label}
                                                                         </p>
                                                                         {hasNested && (
-                                                                            <svg
-                                                                                className={`w-4 h-4 transition-transform duration-200 text-white ${isNestedOpen ? 'rotate-180' : ''
-                                                                                    }`}
-                                                                                fill="none"
-                                                                                stroke="currentColor"
-                                                                                viewBox="0 0 24 24"
-                                                                            >
-                                                                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
-                                                                            </svg>
+                                                                            <ActiveDropdownSymbol isNestedOpen={isNestedOpen} />
                                                                         )}
                                                                     </Link>
                                                                     {hasNested && isNestedOpen && (

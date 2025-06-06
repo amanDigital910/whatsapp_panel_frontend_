@@ -4,7 +4,7 @@ import { useEffect, useMemo, useRef, useState } from 'react';
 import CreditHeader from '../../components/CreditHeader';
 import { toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
-import { CampaignHeading, CampaignTitle, CopyToClipboard, CustomizeTable, DownloadCSVButton, DownloadPDFButton, PdfUploader, VideoUploader } from '../utils/Index';
+import { CampaignHeading, CampaignTitle, CopyToClipboard, CustomizeTable, DownloadCSVButton, DownloadPDFButton, PdfUploader, RecordsPerPageDropdown, VideoUploader } from '../utils/Index';
 import ImageUploaderGroup from '../utils/ImageUploaderGroup';
 import { useDispatch, useSelector } from 'react-redux';
 import { createTemplate, deleteTemplate, getAllTemplates, updateTemplate } from '../../redux/actions/templateAction';
@@ -17,7 +17,7 @@ const TemplateCampaign = ({ isOpen }) => {
   const [templateMsg, setTemplateMsg] = useState("");
   const [feedback, setFeedback] = useState("");
   const [currentPage, setCurrentPage] = useState(1);
-  const recordsPerPage = 5;
+  const [recordsPerPage, setRecordsPerPage] = useState(25);
   const [editingId, setEditingId] = useState(null); // Track which template is being edited
   const dispatch = useDispatch();
   const isMobile = useIsMobile();
@@ -399,9 +399,17 @@ const TemplateCampaign = ({ isOpen }) => {
     setCurrentPage(pageNumber);
   };
 
+  const handleNext = () => {
+    if (currentPage < totalPages) setCurrentPage(prev => prev + 1);
+  };
+
+  const handlePrevious = () => {
+    if (currentPage > 1) setCurrentPage(prev => prev - 1);
+  };
+
   return (
     <>
-      <section className={`bg-gray-200 flex flex-col justify-center ${!isMobile ? (isOpen ? "ml-[240px] w-[calc(100vw-252px)]" : "ml-20 w-[calc(100vw-90px)]") : ""}`}>
+      <section className={`bg-gray-200 flex flex-col justify-center ${!isMobile ? (isOpen ? "ml-[240px] w-[calc(100vw-242px)]" : "ml-20 w-[calc(100vw-90px)]") : ""}`}>
         <CreditHeader />
         <div className="w-full mt-8">
           <CampaignHeading campaignHeading={"All Templates"} />
@@ -477,32 +485,8 @@ const TemplateCampaign = ({ isOpen }) => {
             </button>
             {/* Feedback */}
           </div>
+
           <div className="bg-white p-3 m-3">
-            <div className="flex  md:justify-start justify-between gap-3 md:flex-col pb-3 ">
-              <div className="flex gap-3  ">
-                <CopyToClipboard headers={headers} data={templatesData} />
-                <DownloadCSVButton headers={headers} dataLogs={templatesData} />
-                <DownloadPDFButton headers={headers} dataLogs={templatesData} />
-              </div>
-              <div className="relative md:w-full  max-w-[300px]">
-                <input
-                  type="text"
-                  placeholder="Search..."
-                  value={searchTerm}
-                  onChange={e => setSearchTerm(e.target.value)}
-                  className="p-2 pr-8 w-full border border-black rounded-md"
-                />
-                {searchTerm && (
-                  <button
-                    type="button"
-                    onClick={() => setSearchTerm('')}
-                    className="absolute right-2 top-1/2 transform -translate-y-1/2 text-gray-500 bg-white px-1 hover:text-black"
-                  >
-                    ❌
-                  </button>
-                )}
-              </div>
-            </div>
             {loading ? (
               <div className="text-center my-4">
                 <div className="spinner-border text-dark" role="status">
@@ -514,19 +498,77 @@ const TemplateCampaign = ({ isOpen }) => {
               //   <div className="text-center text-red-600 my-4 font-semibold">
               //     {error}
               //   </div>)
-              : <div className={` w-full bg-gray-300 flex-shrink-0 overflow-auto custom-horizontal-scroll select-text h-full custom-horizontal-scroll ${!isMobile ? (isOpen ? "max-w-[calc(100vw-50px)]" : "max-w-[calc(100vw-65px)]") : "max-w-[calc(100vw-64px)]"}`}>
-                <CustomizeTable
-                  headers={headers}
-                  emptyMessage='No transaction logs available.'
-                  sortConfig={sortConfig}
-                  onSort={handleSort}
-                  renderRow={renderRow}
-                  data={filteredAndSortedLogs}
-                  className="table-auto border-collapse"
-                  theadClassName="px-4 py-2 text-left cursor-pointer select-none whitespace-nowrap"
-                  rowClassName=''
-                // className="text-center py-3 text-lg font-semibold"
-                />
+              :
+              <div>
+                <div className="flex  md:justify-start justify-between gap-3 md:flex-col pb-3 ">
+                  <div className="flex gap-3  ">
+                    <CopyToClipboard headers={headers} data={templatesData} />
+                    <DownloadCSVButton headers={headers} dataLogs={templatesData} />
+                    <DownloadPDFButton headers={headers} dataLogs={templatesData} />
+                  </div>
+                  <div className='flex gap-3 md:flex-col md:justify-center justify-end '>
+                    <div className="relative md:w-full max-w-[300px]">
+                      <input
+                        type="text"
+                        placeholder="Search..."
+                        value={searchTerm}
+                        onChange={e => setSearchTerm(e.target.value)}
+                        className="p-2 pr-8 w-full border border-black rounded-md"
+                      />
+                      {searchTerm && (
+                        <button
+                          type="button"
+                          onClick={() => setSearchTerm('')}
+                          className="absolute right-2 top-1/2 transform -translate-y-1/2 text-gray-500 bg-white px-1 hover:text-black"
+                        >
+                          ❌
+                        </button>
+                      )}
+                    </div>
+                    <div className='flex sm:flex-row gap-3'>
+                      <RecordsPerPageDropdown
+                        recordsPerPage={recordsPerPage}
+                        setRecordsPerPage={setRecordsPerPage}
+                        setCurrentPage={setCurrentPage}
+                      />
+                      <div className="flex flex-row whitespace-nowrap gap-2 align-items-center ">
+                        <button
+                          className="btn btn-dark"
+                          onClick={handlePrevious}
+                          disabled={currentPage === 1}
+                        >
+                          &lt;
+                        </button>
+                        <div className="">
+                          {indexOfFirstRecord + 1} -{' '}
+                          {Math.min(indexOfLastRecord, filteredAndSortedLogs.length)} of{' '}
+                          {filteredAndSortedLogs.length}
+                        </div>
+                        <button
+                          className="btn btn-dark"
+                          onClick={handleNext}
+                          disabled={currentPage === totalPages}
+                        >
+                          &gt;
+                        </button>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+                <div className={` w-full bg-gray-300 flex-shrink-0 overflow-auto custom-horizontal-scroll select-text h-full custom-horizontal-scroll ${!isMobile ? (isOpen ? "max-w-[calc(100vw-50px)]" : "max-w-[calc(100vw-65px)]") : "max-w-[calc(100vw-64px)]"}`}>
+                  <CustomizeTable
+                    headers={headers}
+                    emptyMessage='No transaction logs available.'
+                    sortConfig={sortConfig}
+                    onSort={handleSort}
+                    renderRow={renderRow}
+                    data={filteredAndSortedLogs}
+                    className="table-auto border-collapse"
+                    theadClassName="px-4 py-2 text-left cursor-pointer select-none whitespace-nowrap"
+                    rowClassName=''
+                  // className="text-center py-3 text-lg font-semibold"
+                  />
+                </div>
               </div>}
           </div>
         </div>

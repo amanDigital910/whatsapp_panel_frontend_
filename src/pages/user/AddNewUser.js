@@ -2,7 +2,7 @@
 import React, { useState, useEffect } from "react";
 import CreditHeader from "../../components/CreditHeader";
 import 'react-toastify/dist/ReactToastify.css'; // Import Toastify CSS
-import { ToastContainer, toast } from 'react-toastify'; // Import Toastify
+import { toast } from 'react-toastify'; // Import Toastify
 import { FaEye, FaEyeSlash } from "react-icons/fa";
 import { useDispatch, } from "react-redux";
 import { createUser, getAllUsers } from "../../redux/actions/authAction";
@@ -14,7 +14,6 @@ function AddNewUser() {
     const [showPassword, setShowPassword] = useState(false);
     const [showConfirmPassword, setShowConfirmPassword] = useState(false);
     const [isSubmitting, setIsSubmitting] = useState(false);
-    const [selectedRole, setSelectedRole] = useState("");
 
     const dispatch = useDispatch();
     const navigate = useNavigate();
@@ -39,6 +38,7 @@ function AddNewUser() {
             "canUpdateUsers",
             "canViewAllUsers",
             "canManageUsers",
+            "canManageAllGroups"
         ],
     });
 
@@ -47,6 +47,8 @@ function AddNewUser() {
         "Personal",
         "International Personal",
         "International Virtual",
+        "Manage Whatsapp Official",
+        "Manage Developer API"
     ];
 
     const userControlItems = [
@@ -68,7 +70,7 @@ function AddNewUser() {
         { key: "canManageAllCredits", label: "Manage All Credits" },
         { key: "canManageAllDebits", label: "Manage All Debits" },
         { key: "canManageAllAPIKeys", label: "Manage All APIKeys" },
-        { key: "hasUnlimitedCredits", label: "Unlimited Credits" }
+        { key: "hasUnlimitedCredits", label: "Unlimited Credits" },
     ];
 
     const roleKeyMap = {

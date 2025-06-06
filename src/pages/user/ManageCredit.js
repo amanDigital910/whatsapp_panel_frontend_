@@ -6,7 +6,7 @@ import 'react-toastify/dist/ReactToastify.css';
 import CreditHeader from "../../components/CreditHeader";
 import useIsMobile from '../../hooks/useMobileSize';
 import '../user/whatsapp_offical/commonCSS.css'
-import { CampaignHeading, CopyToClipboard, CustomizeTable, DownloadCSVButton, DownloadPDFButton, RecordsPerPageDropdown } from '../utils/Index';
+import { CampaignHeading, CopyToClipboard, customAbbreviations, CustomizeTable, DownloadCSVButton, DownloadPDFButton, RecordsPerPageDropdown } from '../utils/Index';
 import { getSecureItem } from '../utils/SecureLocalStorage';
 import { getAllUsers } from '../../redux/actions/authAction';
 import { useDispatch } from 'react-redux';
@@ -135,7 +135,7 @@ function ManageCredit({ isOpen }) {
         };
     }, []);
 
-    const filteredAllUser = users?.data?.filter(user =>
+    const filteredAllUser = users?.filter(user =>
         user.username.toLowerCase().includes(inputValue.toLowerCase())
     );
 
@@ -148,20 +148,6 @@ function ManageCredit({ isOpen }) {
         { key: 'createdAt', label: 'Current Date' },
         { key: 'creditNote', label: 'Credit Note' },
     ];
-
-    const customAbbreviations = {
-        'Virtual Quick Campaign': 'WV',
-        'Virtual Button Campaign': 'WVB',
-        'Virtual DP Campaign': 'WVD',
-        'Personal Quick Campaign': 'WP',
-        'Personal Button Campaign': 'WPB',
-        'Personal POLL Campaign': 'WPP',
-        'International Personal Quick Campaign': 'WIP',
-        'International Personal Button Campaign': 'WIPB',
-        'International Personal POLL Campaign': 'WIPP',
-        'International Virtual Quick Campaign': 'WIV',
-        'International Virtual Button Campaign': 'WIVB',
-    };
 
     const renderRow = (item) => (
         <tr key={item._id} className="text-black border border-gray-700 hover:bg-gray-500">
@@ -417,86 +403,90 @@ function ManageCredit({ isOpen }) {
                             </form>
 
                             {/* Buttons Section */}
-                            <div className="flex  md:justify-start justify-between gap-3 md:flex-col pt-3">
-                                <div className="flex gap-3  ">
-                                    <CopyToClipboard headers={headers} data={filteredAndSortedLogs} />
-                                    <DownloadCSVButton headers={headers} dataLogs={filteredAndSortedLogs} />
-                                    <DownloadPDFButton headers={headers} dataLogs={filteredAndSortedLogs} />
-                                </div>
-                                <div className="flex justify-end gap-3 ">
-                                    <div className="relative md:w-full  max-w-[300px]">
-                                        <input
-                                            type="text"
-                                            placeholder="Search..."
-                                            value={searchTerm}
-                                            onChange={e => setSearchTerm(e.target.value)}
-                                            className="p-2 pr-8 w-full border border-black rounded-md"
-                                        />
-                                        {searchTerm && (
-                                            <button
-                                                type="button"
-                                                onClick={() => setSearchTerm('')}
-                                                className="absolute right-2 top-1/2 transform -translate-y-1/2 text-gray-500 bg-white px-1 hover:text-black"
-                                            >
-                                                ❌
-                                            </button>
-                                        )}
+                            {loading ? (
+                                <div className="text-center my-4">
+                                    <div className="spinner-border text-dark" role="status">
+                                        <span className="visually-hidden">Loading...</span>
                                     </div>
-                                    <RecordsPerPageDropdown
-                                        recordsPerPage={recordsPerPage}
-                                        setRecordsPerPage={setRecordsPerPage}
-                                        setCurrentPage={setCurrentPage}
-                                    />
-                                    {/* Pagination Controls */}
-                                    <div className="flex flex-row whitespace-nowrap md:justify-center justify-end gap-3 align-items-center ">
-                                        <button
-                                            className="btn btn-dark py-2"
-                                            onClick={handlePrevious}
-                                            disabled={currentPage === 1}
-                                        >
-                                            &lt;
-                                        </button>
-                                        <div className="">
-                                            {indexOfFirstRecord + 1} -{' '}
-                                            {Math.min(indexOfLastRecord, filteredAndSortedLogs.length)} of{' '}
-                                            {filteredAndSortedLogs.length}
+                                </div>
+                            ) : transError ? (
+                                <div className="text-center text-red-600 my-4 font-semibold">
+                                    {transError}
+                                </div>) :
+                                <div>
+                                    <div className="flex  md:justify-start justify-between gap-3 md:flex-col pt-3">
+                                        <div className="flex gap-3  ">
+                                            <CopyToClipboard headers={headers} data={filteredAndSortedLogs} />
+                                            <DownloadCSVButton headers={headers} dataLogs={filteredAndSortedLogs} />
+                                            <DownloadPDFButton headers={headers} dataLogs={filteredAndSortedLogs} />
                                         </div>
-                                        <button
-                                            className="btn btn-dark py-2"
-                                            onClick={handleNext}
-                                            disabled={currentPage === totalPages}
-                                        >
-                                            &gt;
-                                        </button>
+                                        <div className="flex justify-end gap-3 ">
+                                            <div className="relative md:w-full  max-w-[300px]">
+                                                <input
+                                                    type="text"
+                                                    placeholder="Search..."
+                                                    value={searchTerm}
+                                                    onChange={e => setSearchTerm(e.target.value)}
+                                                    className="p-2 pr-8 w-full border border-black rounded-md"
+                                                />
+                                                {searchTerm && (
+                                                    <button
+                                                        type="button"
+                                                        onClick={() => setSearchTerm('')}
+                                                        className="absolute right-2 top-1/2 transform -translate-y-1/2 text-gray-500 bg-white px-1 hover:text-black"
+                                                    >
+                                                        ❌
+                                                    </button>
+                                                )}
+                                            </div>
+                                            <RecordsPerPageDropdown
+                                                recordsPerPage={recordsPerPage}
+                                                setRecordsPerPage={setRecordsPerPage}
+                                                setCurrentPage={setCurrentPage}
+                                            />
+                                            {/* Pagination Controls */}
+                                            <div className="flex flex-row whitespace-nowrap md:justify-center justify-end gap-3 align-items-center ">
+                                                <button
+                                                    className="btn btn-dark py-2"
+                                                    onClick={handlePrevious}
+                                                    disabled={currentPage === 1}
+                                                >
+                                                    &lt;
+                                                </button>
+                                                <div className="">
+                                                    {indexOfFirstRecord + 1} -{' '}
+                                                    {Math.min(indexOfLastRecord, filteredAndSortedLogs.length)} of{' '}
+                                                    {filteredAndSortedLogs.length}
+                                                </div>
+                                                <button
+                                                    className="btn btn-dark py-2"
+                                                    onClick={handleNext}
+                                                    disabled={currentPage === totalPages}
+                                                >
+                                                    &gt;
+                                                </button>
+                                            </div>
+                                        </div>
                                     </div>
-                                </div>
-                            </div>
 
-                            {/* Table Section */}
-                            <div className={`w-full bg-gray-300 flex-shrink-0 overflow-auto custom-horizontal-scroll select-text h-full mt-3 ${!isMobile ? (isOpen ? "max-w-[calc(100vw-50px)]" : "max-w-[calc(100vw-65px)]") : "max-w-[calc(100vw-64px)]"}`}>
-                                {loading ? (
-                                    <div className="text-center my-4">
-                                        <div className="spinner-border text-dark" role="status">
-                                            <span className="visually-hidden">Loading...</span>
+                                    {/* Table Section */}
+                                    <div className={`w-full bg-gray-300 flex-shrink-0 overflow-auto custom-horizontal-scroll select-text h-full mt-3 ${!isMobile ? (isOpen ? "max-w-[calc(100vw-50px)]" : "max-w-[calc(100vw-65px)]") : "max-w-[calc(100vw-64px)]"}`}>
+                                        <div className={`min-w-max`}>
+                                            <CustomizeTable
+                                                headers={headers}
+                                                data={currentRecords}
+                                                sortConfig={sortConfig}
+                                                onSort={handleSort}
+                                                emptyMessage='No Credits Available'
+                                                renderRow={renderRow}
+                                                className="table-auto border-collapse"
+                                                theadClassName="bg-gray-800"
+                                            />
                                         </div>
+
                                     </div>
-                                ) : transError ? (
-                                    <div className="text-center text-red-600 my-4 font-semibold">
-                                        {transError}
-                                    </div>) : <div className={`min-w-max`}>
-                                    <CustomizeTable
-                                        headers={headers}
-                                        data={currentRecords}
-                                        sortConfig={sortConfig}
-                                        onSort={handleSort}
-                                        emptyMessage='No Credits Available'
-                                        renderRow={renderRow}
-                                        className="table-auto border-collapse"
-                                        theadClassName="bg-gray-800"
-                                    />
                                 </div>
-                                }
-                            </div>
+                            }
                             {/* <table className="min-w-full text-sm">
                                     <thead className="bg-gray-100 sticky top-0 z-10 ">
                                         <tr>
@@ -525,7 +515,7 @@ function ManageCredit({ isOpen }) {
                                             filteredAndSortedLogs?.map((log, index) => (
                                                 <tr key={index} className="bg-white hover:bg-gray-50 whitespace-nowrap border border-black">
                                                     <td className="px-2 py-2 border border-gray-900">{log.id}</td>
-                                                    <td className="px-2 py-2 border border-gray-900 text-blue-600 underline cursor-pointer">{log.to_user_name}</td>
+                                              <td className="px-2 py-2 border border-gray-900">{log.to_user_name}</td>
                                                     <td className="px-2 py-2 border border-gray-900">{log.credit_type.charAt(0).toUpperCase() + log.credit_type.slice(1)}</td>
                                                     <td className="px-2 py-2 border border-gray-900">{log.credit || '-'}</td>
                                                     <td className="px-2 py-2 border border-gray-900 text-red-600">{log.name}</td>

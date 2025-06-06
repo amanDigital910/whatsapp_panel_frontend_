@@ -1,7 +1,5 @@
 import React, { useEffect, useMemo, useState } from 'react'
-import Admin from '../../assets/icons/user-setting.png';
-import User from '../../assets/icons/user.png';
-import Reseller from '../../assets/icons/social (1).png';
+import { AdminSVGComponent, ResellerSVGComponent, UserSVGComponent } from '../../assets/index.js';
 import { useDispatch, useSelector } from 'react-redux';
 import useIsMobile from '../../hooks/useMobileSize';
 import { getAllUsers } from '../../redux/actions/authAction';
@@ -65,19 +63,19 @@ const AdminDashboard = ({ isOpen }) => {
     {
       label: 'Admin',
       route: 'admin',
-      icon: Admin,
+      icon: (isActive) => <AdminSVGComponent color={isActive ? "#fff" : "#000"} />,
       count: adminCount,
     },
     {
       label: 'Reseller',
       route: 'reseller',
-      icon: Reseller,
+      icon: (isActive) => <ResellerSVGComponent color={isActive ? "#fff" : "#000"} />,
       count: resellerCount,
     },
     {
       label: 'User',
       route: 'user',
-      icon: User,
+      icon: (isActive) => <UserSVGComponent color={isActive ? "#fff" : "#000"} />,
       count: userCount,
     },
   ];
@@ -87,10 +85,10 @@ const AdminDashboard = ({ isOpen }) => {
   };
 
   const filteredAndSortedLogs = useMemo(() => {
-    if (!users?.data) return [];
+    if (!users) return [];
 
     // Filter by active tab first
-    const roleFiltered = users.data.filter(user => user?.role?.toLowerCase() === activeTab);
+    const roleFiltered = users.filter(user => user?.role?.toLowerCase() === activeTab);
 
     // Then filter by search term
     const term = searchTerm.trim();
@@ -153,7 +151,7 @@ const AdminDashboard = ({ isOpen }) => {
 
   // Counter animation
   useEffect(() => {
-    if (!users?.data) return;
+    if (!users) return;
 
     const counters = {
       admin: 0,
@@ -162,7 +160,7 @@ const AdminDashboard = ({ isOpen }) => {
     };
 
     // Count users by role
-    users.data.forEach(user => {
+    users.forEach(user => {
       if (user?.role) {
         counters[user.role.toLowerCase()]++;
       }
@@ -190,11 +188,11 @@ const AdminDashboard = ({ isOpen }) => {
     }, 50);
 
     return () => clearInterval(interval);
-  }, [users?.data]);
+  }, [adminCount, resellerCount, userCount, users]);
 
   return (
     <>
-      <div className='flex flex-col pb-3 bg-gray-200'>
+      <div className='flex flex-col pb-3 bg-gray-200 min-h-[calc(100vh-70px)]'>
         <div className="flex gap-4 mb-4 mt-8 md:flex-col items-center justify-center">
           {userTabs.map((tab) => (
             <button
@@ -204,8 +202,9 @@ const AdminDashboard = ({ isOpen }) => {
             >
               <div className="flex items-center p-4">
                 {/* Icon */}
-                <div className="mr-4 flex-shrink-0">
-                  <img src={tab.icon} alt={tab.label} className="w-10 h-10 object-contain" />
+                <div className={`mr-4 flex-shrink-0 ${activeTab === tab.route ? "text-white" : "text-black"}`}>
+                  {/* <img src={tab.icon} alt={tab.label} className="w-10 h-10 object-contain" /> */}
+                  {tab.icon(activeTab === tab.route)}
                 </div>
 
                 {/* Label and Count */}

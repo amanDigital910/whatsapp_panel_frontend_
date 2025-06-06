@@ -1,7 +1,7 @@
 import React, { useState, useEffect, useMemo } from "react";
 import axios from "axios";
 import CreditHeader from "../../../components/CreditHeader";
-import { CampaignHeading, CopyToClipboard, CustomizeTable, DownloadCSVButton, DownloadPDFButton } from "../../utils/Index";
+import { CampaignHeading, CampaignReportModal, CopyToClipboard, CustomizeTable, DownloadCSVButton, DownloadPDFButton } from "../../utils/Index";
 import useIsMobile from "../../../hooks/useMobileSize";
 import '../whatsapp_offical/commonCSS.css'
 
@@ -12,6 +12,7 @@ const WhatsappReport = ({ isOpen }) => {
   const [error, setError] = useState(null);
   const [searchTerm, setSearchTerm] = useState('');
   const [sortConfig, setSortConfig] = useState({ key: '', direction: 'asc' });
+  const [showPopup, setShowPopup] = useState(false);
   const [dummyData, setDummyData] = useState([
     {
       "campaignId": "CMP1001",
@@ -26,7 +27,7 @@ const WhatsappReport = ({ isOpen }) => {
       "campaignId": "CMP1002",
       "userName": "Bob Smith",
       "numberCount": 85,
-      "campaign": "Event Reminder",
+      "campaignTitle": "Event Reminder",
       "campaignReport": "Pending",
       "templateStatus": "Pending",
       "campaignSubmit": "2025-05-11 09:30"
@@ -35,7 +36,7 @@ const WhatsappReport = ({ isOpen }) => {
       "campaignId": "CMP1003",
       "userName": "Clara Green",
       "numberCount": 200,
-      "campaign": "Product Launch",
+      "campaignTitle": "Product Launch",
       "campaignReport": "Completed",
       "templateStatus": "Rejected",
       "campaignSubmit": "2025-05-12 16:45"
@@ -44,7 +45,7 @@ const WhatsappReport = ({ isOpen }) => {
       "campaignId": "CMP1004",
       "userName": "Daniel White",
       "numberCount": 50,
-      "campaign": "Feedback Request",
+      "campaignTitle": "Feedback Request",
       "campaignReport": "Failed",
       "templateStatus": "Approved",
       "campaignSubmit": "2025-05-13 11:15"
@@ -53,24 +54,47 @@ const WhatsappReport = ({ isOpen }) => {
   const headers = [
     { key: "CampaignId", label: 'Campaign ID' },
     { key: "userName", label: 'User Name' },
-    { key: "numberCount", label: 'Number Count' },
+    { key: "numberCount", label: 'Number of Campaign' },
     { key: "campaignTitle", label: 'Campaign Title' },
     { key: "campaignReport", label: 'Campaign Report' },
     { key: "templateStatus", label: 'Template Status' },
     { key: "campaignSubmit", label: 'Campaign Submit' }
   ];
 
+  const handleCampaignReport = () => {
+    setShowPopup(true);
+  };
+
+  const closePopup = () => {
+    setShowPopup(false);
+  };
+
   const renderRow = (log, index) => (
     <tr key={index} className="text-black border border-gray-700 hover:bg-gray-500 whitespace-wrap">
       <td className="px-2 py-2 border border-gray-900">{log.campaignId ?? '-'}</td>
-      <td className="px-2 py-2 border border-gray-900 text-blue-600 underline cursor-pointer">
+      <td className="px-2 py-2 border border-gray-900">
         {log.userName || 'N/A'}
       </td>
       <td className="px-2 py-2 border border-gray-900">
         {log.numberCount || 'N/A'}
       </td>
-      <td className="px-2 py-2 border border-gray-900">{log.campaignTitle ?? '-'}</td>
-      <td className="px-2 py-2 border border-gray-900">{log.campaignReport || 'N/A'}</td>
+      <td className="px-2 py-2 border border-gray-900">
+        <button className="bg-[#383387] w-full h-full py-1 text-white rounded-md" onClick={handleCampaignReport}>
+          {log.campaignTitle ?? '-'}
+        </button>
+      </td>
+      {/* <td className="px-2 py-2 border border-gray-900">{log.campaignReport || 'N/A'}</td> */}
+      <td className="px-2 py-2 border border-gray-900">
+        {log.campaignReport === 'Completed' ? (
+          <button className="w-full h-full py-1 bg-[#22c55e] text-white font-medium tracking-wide rounded-md text-sm" >
+            Download
+          </button>
+        ) : (
+          <button className="w-full h-full py-1 bg-[#406dc7] text-white rounded-md font-medium tracking-wide text-sm">
+            Reject Refund
+          </button>
+        )}
+      </td>
       <td className="px-2 py-2 border border-gray-900">{log.templateStatus || 'Invalid date'}</td>
       <td className="px-2 py-2 border border-gray-900">{log.campaignSubmit || 'N/A'}</td>
     </tr>
@@ -131,19 +155,19 @@ const WhatsappReport = ({ isOpen }) => {
 
   return (
     <>
-      <section className={`w-[100%] h-full pb-3 bg-gray-200 min-h-[calc(100vh-70px)] ${!isMobile ? isOpen ? "ml-[240px] 60 w-[calc(100vw-246px)]" : "ml-20 w-[calc(100vw-80px)]" : ""} `}>
+      <section className={`w-[100%] h-full pb-3 bg-gray-200 min-h-[calc(100vh-70px)] ${!isMobile ? isOpen ? "ml-[240px] 60 w-[calc(100vw-241px)]" : "ml-20 w-[calc(100vw-80px)]" : ""} `}>
         <CreditHeader />
         <div className="w-full mt-8 mb-2">
-          <CampaignHeading campaignHeading="Whatsapp Report" />
+          <CampaignHeading campaignHeading="International Virtual Whatsapp Report" />
         </div>
         <div className="px-3 flex flex-col gap-2">
           <div className="w-full flex gap-3 justify-content-between md:items-start items-center md:flex-col py-2 bg-white px-3">
             <div className="flex items-center gap-2 min-w-[30%]">
-              <p className="font-[600] text-[20px] m-0">To</p>
+              <p className="font-[600] text-[20px] m-0">From</p>
               <input type="date" className="form-control" />
             </div>
             <div className="flex items-center gap-2 min-w-[30%]">
-              <p className="font-[600] text-[20px] m-0">From</p>
+              <p className="font-[600] text-[20px] m-0">To</p>
               <input type="date" className="form-control" />
             </div>
             <button className="px-10 py-2 rounded text-white bg-brand_colors">
@@ -195,6 +219,24 @@ const WhatsappReport = ({ isOpen }) => {
             </div>
           </div>
         </div>
+        {showPopup && (
+          <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+            <div className="bg-white rounded-md w-[600px] relative">
+              <button
+                className="absolute top-2 right-3 text-gray-500 text-3xl font-bold"
+                onClick={closePopup}
+              >
+                &times;
+              </button>
+              <CampaignReportModal
+                campaignTitle="demo"
+                campaignType="WAV"
+                message="hii I am from uv digital solution"
+                numbers={["9876543210", "9123456789"]}
+              />
+            </div>
+          </div>
+        )}
       </section>
     </>
   );
