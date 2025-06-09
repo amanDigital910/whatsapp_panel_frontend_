@@ -137,6 +137,33 @@ const UserDashboard = () => {
     },
     {
       id: 15,
+      cardName: "Whatsapp Offical Dashboard",
+      cardCredit: 0,
+      bg: "#128b7f",
+      redirectUrl: "/whatsapp-dashboard",
+      charName: 'WOD',
+      requiredPermission: "whatsappOfficial"
+    },
+    {
+      id: 16,
+      cardName: "Personal Developer API",
+      cardCredit: 0,
+      bg: "#128b7f",
+      redirectUrl: "/personal/developer-api",
+      charName: 'PDA',
+      requiredPermission: "developerAPI"
+    },
+    {
+      id: 17,
+      cardName: "International Developer API",
+      cardCredit: 0,
+      bg: "#128b7f",
+      redirectUrl: "/international/developer-api",
+      charName: 'IDA',
+      requiredPermission: "developerAPI"
+    },
+    {
+      id: 18,
       cardName: "Membership Valid Till",
       cardCredit: 0,
       bg: "#f03c15",
@@ -152,6 +179,8 @@ const UserDashboard = () => {
       personal: true,
       internationalVirtual: true,
       internationalPersonal: true,
+      whatsappOfficial: true,
+      developerAPI: true
     },
   };
 

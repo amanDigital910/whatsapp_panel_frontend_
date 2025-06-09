@@ -15,6 +15,8 @@ const userRolePermission = {
     personal: true,
     internationalVirtual: true,
     internationalPersonal: true,
+    whatsappOfficial: true,
+    developerAPI: true
   }
 }
 

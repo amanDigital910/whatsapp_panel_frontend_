@@ -51,6 +51,7 @@ const CreditManagement = ({ isOpen }) => {
     { key: '_id', label: 'User ID' },
     { key: 'username', label: 'Username' },
     { key: 'role', label: 'User Role' },
+    { key: 'createdBy', label: 'Created By' },
     { key: 'credit', label: 'Balance' },
     { key: 'updatedAt', label: 'Last Updated' },
     { key: 'categoryId[name]', label: 'Credit Note' },
@@ -61,6 +62,7 @@ const CreditManagement = ({ isOpen }) => {
       <td className="px-2 py-2 border text-[1rem] border-gray-900 w-20">{log?._id.slice(-5) || '-'}</td>
       <td className="px-2 py-2 border text-[1rem] border-gray-900">{log?.toUserId.username || '-'}</td>
       <td className="px-2 py-2 border text-[1rem] border-gray-900">{log?.balanceType || 'Credit/Debit' || '-'}</td>
+      
       <td className="px-2 py-2 border text-[1rem] border-gray-900">{log?.credit || '-'}</td>
       {/* <td className="px-2 py-2 border text-[1rem] border-gray-900">{new Date(log?.updatedAt).toLocaleDateString('en-GB')}</td> */}
       <td className="px-2 py-2 border text-[1rem] border-gray-900">

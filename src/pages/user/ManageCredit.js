@@ -141,8 +141,8 @@ function ManageCredit({ isOpen }) {
 
     const headers = [
         { key: '_id', label: 'ID' },
-        { key: 'fromUserId.username', label: 'From User' },
-        { key: 'toUserId.username', label: 'To User ID' },
+        { key: 'toUserId.username', label: 'Username' },
+        { key: 'fromUserId.username', label: 'Created By' },
         { key: 'credit', label: 'Credit Balance' },
         { key: 'creditType', label: 'Credit Type' },
         { key: 'createdAt', label: 'Current Date' },
@@ -152,8 +152,8 @@ function ManageCredit({ isOpen }) {
     const renderRow = (item) => (
         <tr key={item._id} className="text-black border border-gray-700 hover:bg-gray-500">
             <td className="px-4 py-2 border border-gray-700">{item?._id.slice(-5)}</td>
-            <td className="px-4 py-2 border border-gray-700">{item?.fromUserId?.username}</td>
             <td className="px-4 py-2 border border-gray-700">{item?.toUserId?.username}</td>
+            <td className="px-4 py-2 border border-gray-700">{item?.fromUserId?.username}</td>
             <td className="px-4 py-2 border border-gray-700">{item.credit}</td>
             <td className="px-4 py-2 border border-gray-700">{item.creditType}</td>
             <td className="px-4 py-2 border border-gray-700">{new Date(item.createdAt).toLocaleDateString('en-GB', {

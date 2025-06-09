@@ -183,9 +183,20 @@ const App = () => {
 
                     <Route path='/transitiontable' element={<TransitionCReditUser isOpen={isOpen} />} />
                   </Route>
+                  {/* Users Details */}
                   <Route element={<PrivateRoute allowedRoles={[ROLES.SUPER_ADMIN, ROLES.ADMIN, ROLES.RESELLER, ROLES.USER]} />}>
                     <Route path="/dashboard" element={<Dashboard />} />
 
+                    <Route path="/group" element={<GroupCampaign />} />
+                    <Route path="/template" element={<TemplateCampaign isOpen={isOpen} />} />
+
+                    <Route path='/credit-history' element={<CreditHistory isOpen={isOpen} />} />
+                    <Route path='/membership-validity' element={<MembershipValidTill />} />
+                    <Route path='/profile' element={<ProfilePage />} />
+                    <Route path='/unauthorized' element={<NotFoundPage />} />
+                    <Route path='*' element={<NotFoundPage />} />
+                  </Route>
+                  <Route element={<PrivateRoute allowedRoles={[ROLES.SUPER_ADMIN, ROLES.ADMIN, ROLES.RESELLER, ROLES.USER]} requiredPermissions={["whatsappOfficial"]} />}>
                     {/* Whatsapp Offical Pages Routing */}
                     <Route path="/whatsapp-dashboard" element={<WhatsappDashboard />} />
                     <Route path="/whatsapp-send" element={<WhatsappSend />} />
@@ -213,7 +224,8 @@ const App = () => {
                     <Route path="/whatsapp-reports/daily-stats" element={<DailyStatsReport />} />
                     <Route path="/whatsapp-reports/user-responses" element={<UserResponseReport />} />
                     <Route path="/whatsapp-reports/exports" element={<ExportReport />} />
-
+                  </Route>
+                  <Route element={<PrivateRoute allowedRoles={[ROLES.SUPER_ADMIN, ROLES.ADMIN, ROLES.RESELLER, ROLES.USER]} requiredPermissions={["developerAPI"]} />}>
                     {/* Developer API Pages*/}
                     {/* Personal Developer API */}
                     <Route path="/personal/developer-api" element={<PersonalDeveloperAPI isOpen={isOpen} />} />
@@ -221,17 +233,6 @@ const App = () => {
                     {/* International Developer API */}
                     <Route path="/international/developer-api" element={<InternationalDeveloperAPI />} />
                     <Route path="/international/whatsapp-report" element={<InternationalDeveloperReport />} />
-
-
-                    <Route path="/group" element={<GroupCampaign />} />
-                    <Route path="/template" element={<TemplateCampaign isOpen={isOpen} />} />
-
-                    <Route path='/credit-history' element={<CreditHistory isOpen={isOpen} />} />
-                    <Route path='/membership-validity' element={<MembershipValidTill />} />
-                    <Route path='/profile' element={<ProfilePage />} />
-                    <Route path='/unauthorized' element={<NotFoundPage />} />
-                    <Route path='*' element={<NotFoundPage />} />
-
                   </Route>
 
                   <Route element={<PrivateRoute allowedRoles={[ROLES.SUPER_ADMIN, ROLES.ADMIN, ROLES.RESELLER, ROLES.USER]} requiredPermissions={["virtual"]} />}>

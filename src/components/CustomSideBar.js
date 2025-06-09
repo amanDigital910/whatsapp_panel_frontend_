@@ -52,6 +52,7 @@ const SideBar = ({ isOpen, toggleDropdown, activeDropdown }) => {
                 { label: "All Campaigns", to: "/all-campaigns", },
                 { label: "All Templates", to: "/all-templates", },
                 { label: "All Groups", to: "/all-groups", },
+                { label: "Whatsapp Official", to: "/whatsapp-official", },
                 { label: "Manage Developer API", to: "/manage-developer-api", },
             ]
         },
@@ -183,7 +184,7 @@ const SideBar = ({ isOpen, toggleDropdown, activeDropdown }) => {
         {
             label: "Developer API",
             icon: DeveloperAPI,
-            // permissionKey: "developerAPI",
+            permissionKey: "developerAPI",
             dropdown: [
                 {
                     label: "Personal API",
@@ -211,6 +212,8 @@ const SideBar = ({ isOpen, toggleDropdown, activeDropdown }) => {
             personal: true,
             internationalVirtual: true,
             internationalPersonal: true,
+            whatsappOfficial: true,
+            developerAPI: true
         }
     }
     const userRole = JSON.parse(getSecureItem("userData"));

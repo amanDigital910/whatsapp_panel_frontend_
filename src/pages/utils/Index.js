@@ -437,7 +437,7 @@ export const WhatsappTextNumber = ({ setWhatsAppNumbers, whatsAppNumbers, statsN
             <div className="h-full flex flex-grow">
                 <textarea
                     className="w-full h-full px-3 py-2 rounded-md bg-white text-black border border-black form-control placeholder-gray-500"
-                    placeholder="Enter WhatsApp Numbers (without +91)"
+                    placeholder="Enter WhatsApp Numbers (without 91)"
                     required
                     style={{
                         minHeight: '400px',
@@ -511,25 +511,26 @@ export const WhatsappTextNumber = ({ setWhatsAppNumbers, whatsAppNumbers, statsN
 export const TemplateDropdown = ({ selectedTemplate, setSelectedTemplate, msgTemplates, setEditorData, }) => {
     return (
         <select
-            className="form-select form-control border-black py-2 px-3 rounded-md"
+            className="form-select form-control border-black py-2 px-3 rounded-md text-black font-medium"
             value={selectedTemplate}
             onChange={(e) => {
                 const templateId = e.target.value;
                 setSelectedTemplate(templateId);
                 const template = msgTemplates.find(
-                    (t) => t.templateId.toString() === templateId
+                    (t) => t._id.toString() === templateId
                 );
                 if (template) {
-                    setEditorData(template.template_msg);
+                    setEditorData(template);
+                      console.log("Complete the template message",template);
                 }
             }}
         >
             <option value="" disabled>Select Your Template</option>
-            {msgTemplates.map((template) => (
-                <option key={template.templateId} value={template.templateId}>
-                    {template.template_name}
+            {msgTemplates.map((template) =>
+                <option className='text-black font-medium' key={template._id} value={template._id}>
+                    {template.name.toString()}
                 </option>
-            ))}
+            )}
         </select>
     );
 }

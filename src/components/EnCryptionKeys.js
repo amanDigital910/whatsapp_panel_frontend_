@@ -1,8 +1,9 @@
 // EnCryptionKeys.js
 import CryptoJS from 'crypto-js';
+import { secretKey } from '../pages/utils/SecureLocalStorage';
 
 // Use environment variables for production
-const secretKey = process.env.SECRET_KEY || 'G7$k9@q2!Zx3#F8v5*Jm1^Tn4&Lw0%Rz6';
+// const secretKey = process.env.SECRET_KEY || 'G7$k9@q2!Zx3#F8v5*Jm1^Tn4&Lw0%Rz6';
 
 export const encryptData = (data) => {
   return CryptoJS.AES.encrypt(JSON.stringify(data), secretKey).toString();

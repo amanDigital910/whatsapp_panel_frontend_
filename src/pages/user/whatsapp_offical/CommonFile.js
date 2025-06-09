@@ -164,7 +164,7 @@ export const WhatsappTextNumber = ({ setWhatsAppNumbers, whatsAppNumbers, labelC
             <div className="h-full flex flex-grow">
                 <textarea
                     className={`w-full h-full px-3 py-2 rounded-md bg-white text-black form-control placeholder-gray-500 ${className}`}
-                    placeholder="Enter WhatsApp Numbers (without +91)"
+                    placeholder="Enter WhatsApp Numbers (without 91)"
                     required
                     style={{
                         minHeight: '500px',

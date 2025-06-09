@@ -23,11 +23,18 @@ function ManageUser({ isOpen }) {
     const [sortConfig, setSortConfig] = useState({ key: 'updatedAt', direction: 'desc' });
     const [searchTerm, setSearchTerm] = useState('');
     const storedData = JSON.parse(getSecureItem("userData"));
+    const [roleFilter, setRoleFilter] = useState(null);
 
     const [isModalOpen, setIsModalOpen] = useState(false);
     const [showDeleteModal, setShowDeleteModal] = useState(false);
     const [selectedUser, setSelectedUser] = useState(null);
     const [selectedUserEdit, setSelectedUserEdit] = useState(null);
+    const userData = JSON.parse(getSecureItem("userData"));
+    const userRole = userData?.role || "";
+    const filteredUsersRole = roleFilter
+        ? users.filter(user => user.role.toLowerCase() === roleFilter.toLowerCase())
+        : users;
+
 
     const [formData, setFormData] = useState({
         _id: "",
@@ -171,7 +178,9 @@ function ManageUser({ isOpen }) {
         { key: '_id', label: 'User ID' },
         { key: 'username', label: 'Username' },
         { key: 'role', label: 'User Role' },
-        { key: 'createdBy._id', label: 'Created By' },
+        ...(userRole !== 'reseller'
+            ? [{ key: 'createdBy._id', label: 'Created By', }]
+            : []),
         { key: 'updatedAt', label: 'Last Updated' },
         { key: 'action', label: 'Action' }
     ];
@@ -243,8 +252,10 @@ function ManageUser({ isOpen }) {
         <tr key={index} className="text-black border border-gray-700 hover:bg-gray-500 whitespace-nowrap ">
             <td className="px-2 py-2 border text-[1rem] border-gray-900 w-20">{log?._id.slice(-5) || '-'}</td>
             <td className="px-2 py-2 border text-[1rem] border-gray-900">{log?.username || '-'}</td>
-            <td className="px-2 py-2 border text-[1rem] border-gray-900">{log?.role || '-'}</td>
-            <td className="px-2 py-2 border text-[1rem] border-gray-900">{log?.createdBy?._id.slice(-5) || '-'}</td>
+            <td className="px-2 py-2 border text-[1rem] border-gray-900" >{log?.role || '-'}</td>
+            {userRole !== 'reseller' ?
+                <td className="px-2 py-2 border text-[1rem] border-gray-900">{log?.createdBy?._id.slice(-5) || '-'}</td>
+                : []}
             <td className="px-2 py-2 border text-[1rem] border-gray-900">
                 {new Date(log?.updatedAt).toLocaleString('en-GB', {
                     day: '2-digit',

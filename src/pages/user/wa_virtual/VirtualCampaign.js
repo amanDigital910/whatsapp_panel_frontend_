@@ -4,10 +4,14 @@ import CreditHeader from "../../../components/CreditHeader";
 import { CampaignHeading, CampaignStatus, CampaignTitle, CountryDropDown, CSVButton, GroupDropDown, PdfUploader, TemplateDropdown, VideoUploader, WhatsappTextNumber } from "../../utils/Index";
 import ImageUploaderGroup from "../../utils/ImageUploaderGroup";
 import CustomEditor from "../../../components/RichTextEditor";
+import { useDispatch, useSelector } from "react-redux";
+import { getAllTemplates } from "../../../redux/actions/templateAction";
 
 const VirtualCampaign = () => {
   // State for campaign title.
+  const dispatch = useDispatch();
   const [campaignTitle, setCampaignTitle] = useState("");
+  const { loading, error, templatesData } = useSelector((state) => state.template);
   // State for groups, selected group, and WhatsApp numbers.
   const [groups, setGroups] = useState([]);
   const [selectedGroup, setSelectedGroup] = useState("");
@@ -61,18 +65,19 @@ const VirtualCampaign = () => {
   // State for message templates and selected template.
   const [msgTemplates, setMsgTemplates] = useState([]);
   const [selectedTemplate, setSelectedTemplate] = useState("");
+  const [templateValue, setTemplateValue] = useState('');
 
   // Base API URL from environment variable.
 
   // Fetch groups from the API when the component mounts.
-  useEffect(() => {
-    axios
-      .get(`${process.env.REACT_APP_API_URL}/msggroup/`)
-      .then((response) => {
-        setGroups(response.data);
-      })
-      .catch((error) => console.error("Error fetching groups:", error));
-  }, []);
+  // useEffect(() => {
+  //   axios
+  //     .get(`${process.env.REACT_APP_API_URL}/msggroup/`)
+  //     .then((response) => {
+  //       setGroups(response.data);
+  //     })
+  //     .catch((error) => console.error("Error fetching groups:", error));
+  // }, []);
 
   // Fetch countries from REST Countries API.
   useEffect(() => {
@@ -117,13 +122,18 @@ const VirtualCampaign = () => {
 
   // Fetch message templates from the API.
   useEffect(() => {
-    axios
-      .get(`${process.env.REACT_APP_API_URL}/msgtemplate`)
-      .then((response) => setMsgTemplates(response.data))
-      .catch((error) =>
-        console.error("Error fetching message templates:", error)
-      );
+    dispatch(getAllTemplates());
   }, []);
+
+  useEffect(() => {
+    if (editorData?.message?.text) {
+      setTemplateValue(editorData.message.text);
+    }
+  }, [editorData]);
+
+  useEffect(() => {
+    setMsgTemplates(templatesData);
+  }, [templatesData]);
 
   // When a group is selected, update the WhatsApp numbers field.
   useEffect(() => {
@@ -294,10 +304,10 @@ const VirtualCampaign = () => {
             <div className="lg:w-full w-3/5 flex flex-col gap-6">
               {/* Status Section */}
               <CampaignStatus
-                 duplicateStatus={statsNumber.duplicates}
-                 invalidStatus={statsNumber.invalid}
-                 totalStatus={statsNumber.total}
-                 validStatus={statsNumber.valid}
+                duplicateStatus={statsNumber.duplicates}
+                invalidStatus={statsNumber.invalid}
+                totalStatus={statsNumber.total}
+                validStatus={statsNumber.valid}
               />
 
               {/* Template Dropdown */}
@@ -309,7 +319,7 @@ const VirtualCampaign = () => {
 
               {/* Rich Text Editor */}
               <div className="w-full rounded-md h-[400px] ">
-                <CustomEditor />
+                <CustomEditor templateValue={templateValue} setTemplateValue={setTemplateValue} />
               </div>
 
               {/* File Upload Section */}
