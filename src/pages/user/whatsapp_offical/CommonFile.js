@@ -158,7 +158,7 @@ export const WhatsappTextNumber = ({ setWhatsAppNumbers, whatsAppNumbers, labelC
                 {labelText}
                 <RequiredAsterisk required={required} />
             </p>
-            {warningMessage && <p className={` flex flex-row w-fit p-0 m-0 text-base text-red-500`}>
+            {warningMessage && <p className={` flex flex-row whitespace-pre-wrap w-fit p-0 m-0 text-base text-red-500`}>
                 {warningMessage}
             </p>}
             <div className="h-full flex flex-grow">

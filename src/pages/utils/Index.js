@@ -207,7 +207,7 @@ export const DisplayButton = ({
                 </div>
 
                 {/* Right side: Text Input Fields */}
-                <div className="w-full">
+                <div className="w-full flex flex-col">
                     {isFixedButton && (
                         <input
                             type="text"

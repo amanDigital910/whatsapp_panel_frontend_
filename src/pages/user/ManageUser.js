@@ -199,7 +199,7 @@ function ManageUser({ isOpen }) {
     };
 
     const handleAddNewUser = () => {
-        navigate('/add-new-user');
+        navigate('/add-user');
     };
 
     const filteredAndSortedLogs = useMemo(() => {

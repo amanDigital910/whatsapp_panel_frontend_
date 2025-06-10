@@ -90,80 +90,85 @@ const SendWhatsapp = () => {
   return (
     <div className='w-full bg-gray-200 '>
       <TitleName titleName={"Send Whatsapp Compaign"} />
-      <div className=' p-3 h-full'>
-        <div className=' h-full py-4 px-4 bg-white flex flex-col gap-4'>
-          <TextFieldArea
-            className={"border-black border w-full pl-2 py-2 rounded-md text-lg "}
-            labelText={"Campaign Name"}
-            fieldType={"text"}
-            placeholder={"Enter Campaign Name"}
-            valueInput={campaignName}
-            setValueInput={setCampaignName}
-            required='true'
-          />
+      <div className='p-3 h-full'>
+        <div className=' h-full py-4 px-4 bg-white '>
+          <div className='w-2/3 flex flex-col gap-3'>
+            <div className='text-base'>
+              <span className='font-semibold'>Messaging Limit :</span>
+              <span className='text-[#ff0000] font-semibold'>TIER_10K</span>
+            </div>
+            <TextFieldArea
+              className={"border-black border w-full pl-2 py-2 rounded-md text-lg "}
+              labelText={"Campaign Name"}
+              fieldType={"text"}
+              placeholder={"Enter Campaign Name"}
+              valueInput={campaignName}
+              setValueInput={setCampaignName}
+              required='true'
+            />
 
-          <TextFieldArea
-            className={"border-black border w-full pl-2 py-2 rounded-md text-lg "}
-            labelText={"Phone Number"}
-            fieldType={"phone"}
-            placeholder={"Enter your number"}
-            valueInput={mobileNo}
-            setValueInput={setMobileNo}
-            required='true'
-          />
+            <TextFieldArea
+              className={"border-black border w-full pl-2 py-2 rounded-md text-lg "}
+              labelText={"Phone Number"}
+              fieldType={"phone"}
+              placeholder={"Enter your number"}
+              valueInput={mobileNo}
+              setValueInput={setMobileNo}
+              required='true'
+            />
 
-          <TemplateDropdown
-            labelText="Template Name"
-            labelClassName="font-bold text-lg"
-            required
-            msgTemplates={msgTemplates}
-            selectedTemplate={selectedTemplate}
-            setEditorData={setEditorData}
-            setSelectedTemplate={setSelectedTemplate} />
+            <TemplateDropdown
+              labelText="Template Name"
+              labelClassName="font-bold text-lg"
+              required
+              msgTemplates={msgTemplates}
+              selectedTemplate={selectedTemplate}
+              setEditorData={setEditorData}
+              setSelectedTemplate={setSelectedTemplate} />
 
-          <CountryDropDown
-            titleName="Countries"
-            required='true'
-            labelClassName="font-bold text-lg"
-            selectedCountry={selectedCountry}
-            setSelectedCountry={setSelectedCountry}
-            countries={countries} />
+            <CountryDropDown
+              titleName="Countries"
+              required='true'
+              labelClassName="font-bold text-lg"
+              selectedCountry={selectedCountry}
+              setSelectedCountry={setSelectedCountry}
+              countries={countries} />
 
-          <RadioButtonGroup
-            name="whatsapp radio"
-            labelClassName="font-bold text-lg"
-            radioTitle={"Send Whatsapp Compaign"}
-            options={options}
-            selectedValue={selectedValue}
-            setSelectedValue={setSelectedValue}
-            required='true'
-          />
+            <RadioButtonGroup
+              name="whatsapp radio"
+              labelClassName="font-bold text-lg"
+              radioTitle={"Send Whatsapp Compaign"}
+              options={options}
+              selectedValue={selectedValue}
+              setSelectedValue={setSelectedValue}
+              required='true'
+            />
 
-          <CheckboxField
-            label="Multi Country Campaign"
-            className=''
-            labelClassName="font-bold text-lg"
-            checked={isAgreed}
-            onChange={setIsAgreed}
-            name="whatsapp checkbox"
-            required='true'
-          />
+            <CheckboxField
+              label="Multi Country Campaign"
+              className=''
+              labelClassName="font-bold text-lg"
+              checked={isAgreed}
+              onChange={setIsAgreed}
+              name="whatsapp checkbox"
+              required='true'
+            />
 
-          {/* WhatsApp Numbers Textarea */}
-          <WhatsappTextNumber
-            labelText="Numbers"
-            labelClassName="font-bold text-lg"
-            warningMessage="This is the wraning"
-            required='true'
-            whatsAppNumbers={whatsAppTextNumbers}
-            setWhatsAppNumbers={setWhatsAppTextNumbers}
-            statsNumber={statsNumber}
-            setStatsNumber={setStatsNumber}
-            className="border border-black rounded-md focus:border-black focus-within:border-black"
-          />
+            {/* WhatsApp Numbers Textarea */}
+            <WhatsappTextNumber
+              labelText="Numbers"
+              labelClassName="font-bold text-lg"
+              warningMessage="Each line should have a single phone number. 300,000 numbers are allowed to be copy paste. For more please use the CSV upload option"
+              required='true'
+              whatsAppNumbers={whatsAppTextNumbers}
+              setWhatsAppNumbers={setWhatsAppTextNumbers}
+              statsNumber={statsNumber}
+              setStatsNumber={setStatsNumber}
+              className="border border-black rounded-md focus:border-black focus-within:border-black"
+            />
 
-          <SubmitNowButton handleSendCampaign={handleSubmit} />
-
+            <SubmitNowButton handleSendCampaign={handleSubmit} />
+          </div>
         </div>
       </div>
     </div>

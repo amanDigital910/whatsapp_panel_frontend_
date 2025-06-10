@@ -75,6 +75,10 @@ const WhatsappSettingFlows = lazy(() => import("./pages/user/whatsapp_offical/wh
 const WhatsappSettingWebhook = lazy(() => import("./pages/user/whatsapp_offical/whatsapp_settings/WebHook.js"))
 const WhatsappSettingPricing = lazy(() => import("./pages/user/whatsapp_offical/whatsapp_settings/Pricing.js"))
 
+const AddWhatsappSettingTemplates = lazy(() => import("./pages/user/whatsapp_offical/whatsapp_settings/create/AddTemplates.js"))
+const AddWhatsappSettingUserTrigger = lazy(() => import("./pages/user/whatsapp_offical/whatsapp_settings/create/AddUserTrigger.js"))
+const AddWhatsappSettingFlows = lazy(() => import("./pages/user/whatsapp_offical/whatsapp_settings/create/AddFlows.js"))
+
 // Whatsapp Profiles Settings
 const WhatsappProfileSetting = lazy(() => import("./pages/user/whatsapp_offical/settings/SettingProfile.js"))
 const WhatsappProfileCompany = lazy(() => import("./pages/user/whatsapp_offical/settings/CompanyProfile.js"))
@@ -210,12 +214,17 @@ const App = () => {
                     <Route path='/whatsapp-profile/security' element={<WhatsappProfileSecurity />} />
 
                     {/* Whatsapp Offical Settings Pages Routing */}
-                    <Route path='/whatsapp-settings/phones' element={<WhatsappSettingPhones />} />
-                    <Route path='/whatsapp-settings/templates' element={<WhatsappSettingTemplates />} />
-                    <Route path='/whatsapp-settings/user-trigger' element={<WhatsappSettingUserTrigger />} />
-                    <Route path='/whatsapp-settings/flows' element={<WhatsappSettingFlows />} />
-                    <Route path='/whatsapp-settings/webhook' element={<WhatsappSettingWebhook />} />
-                    <Route path='/whatsapp-settings/pricing' element={<WhatsappSettingPricing />} />
+                    <Route path='/whatsapp-settings/phones' element={<WhatsappSettingPhones isOpen={isOpen} />} />
+                    <Route path='/whatsapp-settings/templates' element={<WhatsappSettingTemplates isOpen={isOpen} />} />
+                    <Route path='/whatsapp-settings/user-trigger' element={<WhatsappSettingUserTrigger isOpen={isOpen} />} />
+                    <Route path='/whatsapp-settings/flows' element={<WhatsappSettingFlows isOpen={isOpen} />} />
+                    <Route path='/whatsapp-settings/webhook' element={<WhatsappSettingWebhook isOpen={isOpen} />} />
+                    <Route path='/whatsapp-settings/pricing' element={<WhatsappSettingPricing isOpen={isOpen} />} />
+
+                    {/* Add Pages of Whatsapp Offical */}
+                    <Route path='/whatsapp-settings/add-template' element={<AddWhatsappSettingTemplates isOpen={isOpen} />} />
+                    <Route path='/whatsapp-settings/add-trigger' element={<AddWhatsappSettingUserTrigger isOpen={isOpen} />} />
+                    <Route path='/whatsapp-settings/add-flows' element={<AddWhatsappSettingFlows isOpen={isOpen} />} />
 
                     {/* Whatsapp Offical Report Page Routing */}
                     <Route path="/whatsapp-reports/campaigns" element={<CampaignReport activeDropdown={activeDropdown} isOpen={isOpen} />} />
@@ -279,7 +288,7 @@ const App = () => {
                   <Route element={<PrivateRoute allowedRoles={[ROLES.SUPER_ADMIN, ROLES.ADMIN, ROLES.RESELLER]} />}>
                     <Route path='/manage-credit' element={<ManageCredit isOpen={isOpen} />} />
                     <Route path='/manage-user' element={<ManageUser isOpen={isOpen} />} />
-                    <Route path='/add-new-user' element={<AddNewUser />} />
+                    <Route path='/add-user' element={<AddNewUser />} />
                   </Route>
                 </Routes>
               </Suspense>
