@@ -10,29 +10,28 @@ const AutoLogoutWrapper = ({ children }) => {
   const timerRef = useRef(null);
   // const timeoutDuration = 30 * 60 * 1000; // 30 minute
   const timeoutDuration = 10 * 60 * 1000; // 10 Minute
-  const token = getSecureItem('userToken');
-  const userData = getSecureItem('userData');
 
   const handleLogout = useCallback(() => {
-    removeSecureItem(token);
-    removeSecureItem(userData);
+    removeSecureItem('userToken');
+    removeSecureItem('userData');
     dispatch(logout());
     navigate("/login");
-  }, [dispatch, navigate, token, userData]);
+  }, [dispatch, navigate]);
 
   const resetTimer = useCallback(() => {
-    setSecureItem(token, Date.now().toString());
+    // Store last active time
+    setSecureItem('lastActivity', Date.now().toString());
 
+    // Reset inactivity timeout
     if (timerRef.current) clearTimeout(timerRef.current);
-    timerRef.current = setTimeout(() => {
-      handleLogout();
-    }, timeoutDuration);
-  }, [handleLogout, timeoutDuration, token]);
+    timerRef.current = setTimeout(handleLogout, timeoutDuration);
+  }, [handleLogout, timeoutDuration]);
 
   useEffect(() => {
-    // Check on load: has timeout already passed?
-    const lastActivity = localStorage.getItem(token);
-    if (lastActivity && Date.now() - parseInt(lastActivity) > timeoutDuration) {
+    const lastActivity = getSecureItem("lastActivity");
+    const timeSinceLastActivity = Date.now() - parseInt(lastActivity || 0);
+
+    if (lastActivity && timeSinceLastActivity > timeoutDuration) {
       handleLogout();
     } else {
       resetTimer();
@@ -45,7 +44,7 @@ const AutoLogoutWrapper = ({ children }) => {
       events.forEach(event => window.removeEventListener(event, resetTimer));
       if (timerRef.current) clearTimeout(timerRef.current);
     };
-  }, [handleLogout, resetTimer, timeoutDuration, token]);
+  }, [handleLogout, resetTimer, timeoutDuration]);
 
   return children;
 };
