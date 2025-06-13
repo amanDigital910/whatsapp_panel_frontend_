@@ -214,7 +214,7 @@ const UserDashboard = () => {
                       {item.cardName}
                     </h2>
                     <h3 className="text-primary font-semibold text-lg transition-colors duration-300 hover:text-blue-500">
-                      {item.id === 15 ? `Date - ${item.cardDate}` : `Balance - ${item.cardCredit}`}
+                      {item.id === 18 ? `Date - ${item.cardDate}` : `Balance - ${item.cardCredit}`}
                     </h3>
                   </div>
 

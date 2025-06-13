@@ -95,7 +95,7 @@ const SendWhatsapp = () => {
           <div className='w-2/3 flex flex-col gap-3'>
             <div className='text-base'>
               <span className='font-semibold'>Messaging Limit :</span>
-              <span className='text-[#ff0000] font-semibold'>TIER_10K</span>
+              <span className='text-[#ff0000] font-semibold'>&nbsp;TIER_10K</span>
             </div>
             <TextFieldArea
               className={"border-black border w-full pl-2 py-2 rounded-md text-lg "}

@@ -1,0 +1,22 @@
+.iphone-bg {
+  background-image: url('../../../../../assets/Iphone_12_blank_screen.png');
+  background-repeat: no-repeat;
+  background-position: center;
+  background-size: cover;
+  min-width: 300px;
+  height: 580px;
+}
+
+.bubble-with-logo::before {
+  content: "";
+  background-position: 50% 50%;
+  position: absolute;
+  top: 0.5rem;
+  left: -3px;
+  top: 84px;
+  width: 20px;
+  height: 20px;
+  background-image: url('../../../../../assets/whatsappPreviewSidebarLogo.png');
+  background-size: cover;
+  background-repeat: no-repeat;
+}

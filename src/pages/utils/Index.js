@@ -521,7 +521,7 @@ export const TemplateDropdown = ({ selectedTemplate, setSelectedTemplate, msgTem
                 );
                 if (template) {
                     setEditorData(template);
-                      console.log("Complete the template message",template);
+                    console.log("Complete the template message", template);
                 }
             }}
         >
@@ -1206,3 +1206,36 @@ export const CampaignReportModal = ({ campaignTitle, campaignType, message, numb
         </div>
     );
 };
+
+const variantStyles = {
+    success: 'bg-green-100 text-green-800 border-green-300',
+    error: 'bg-red-100 text-red-800 border-red-300',
+    warning: 'bg-yellow-100 text-yellow-800 border-yellow-300',
+    info: 'bg-blue-100 text-blue-800 border-blue-300',
+};
+
+const icons = {
+    success: 'bi-check-circle-fill',
+    error: 'bi-exclamation-triangle-fill',
+    warning: 'bi-exclamation-circle-fill',
+    info: 'bi-info-circle-fill',
+};
+
+export const AlertBar = ({ type = 'info', message, onClose }) => {
+    return (
+        <div
+            className={`border-l-4 p-4 rounded-md shadow-sm flex items-center justify-between gap-3 ${variantStyles[type]}`}
+        >
+            <div className="flex items-center gap-2">
+                <i className={`bi ${icons[type]} text-xl`}></i>
+                <span className="text-sm font-medium">{message}</span>
+            </div>
+            <button
+                onClick={onClose}
+                className="text-xl text-gray-500 hover:text-gray-700"
+            >
+                &times;
+            </button>
+        </div>
+    );
+}

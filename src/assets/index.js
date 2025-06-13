@@ -197,3 +197,16 @@ export const ActiveDropdownSymbol = ({ isNestedOpen }) => (
         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
     </svg>
 )
+
+export const LandscapeThreeDot = () => (
+    <svg fill="#fff" width="15px" height="15px" viewBox="0 0 50 50" xmlns="http://www.w3.org/2000/svg">
+        <path d="M20,44c0-3.3,2.7-6,6-6s6,2.7,6,6s-2.7,6-6,6S20,47.3,20,44z M20,26c0-3.3,2.7-6,6-6s6,2.7,6,6s-2.7,6-6,6
+	S20,29.3,20,26z M20,8c0-3.3,2.7-6,6-6s6,2.7,6,6s-2.7,6-6,6S20,11.3,20,8z"/>
+    </svg>
+)
+
+export const BackArrow = () => (
+    <svg fill="#fff" width="15px" height="15px" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg">
+        <polygon points="3.828 9 9.899 2.929 8.485 1.515 0 10 .707 10.707 8.485 18.485 9.899 17.071 3.828 11 20 11 20 9 3.828 9" />
+    </svg>
+)
